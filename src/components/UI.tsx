@@ -97,6 +97,12 @@ const PART_CUSTOMIZERS: PartColorOption[] = [
     presetColors: ['#27272a', '#121215', '#e2e8f0', '#130e24', '#050505', '#1e293b', '#78350f', '#064e3b'],
   },
   {
+    key: 'knobColor',
+    label: 'Rotary Encoder Knob',
+    desc: 'Top-right CNC metallic volume & macro wheel',
+    presetColors: ['#3f3f46', '#ff7700', '#0284c7', '#d946ef', '#eab308', '#e2e8f0', '#dc2626', '#18181b'],
+  },
+  {
     key: 'switchStem',
     label: 'Switch Stems',
     desc: 'Mechanical cross-stem slider color',

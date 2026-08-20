@@ -9,6 +9,7 @@ export interface CustomColors {
   keycapsMod: string;
   keycapsAccent: string;
   keycapsText: string;
+  knobColor: string;
   switchStem: string;
   plate: string;
   pcb: string;
@@ -23,6 +24,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsMod: '#121215',
     keycapsAccent: '#222226',
     keycapsText: '#f3f4f6',
+    knobColor: '#3f3f46',
     switchStem: '#ff7700',
     plate: '#475569',
     pcb: '#18181b',
@@ -35,6 +37,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsMod: '#e2e8f0',
     keycapsAccent: '#0284c7',
     keycapsText: '#0f172a',
+    knobColor: '#0284c7',
     switchStem: '#0284c7',
     plate: '#cbd5e1',
     pcb: '#1e293b',
@@ -47,6 +50,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsMod: '#170f2d',
     keycapsAccent: '#d946ef',
     keycapsText: '#f1f5f9',
+    knobColor: '#d946ef',
     switchStem: '#06b6d4',
     plate: '#4c1d95',
     pcb: '#2e1065',
@@ -59,6 +63,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsMod: '#08080a',
     keycapsAccent: '#18181b',
     keycapsText: '#71717a',
+    knobColor: '#18181b',
     switchStem: '#eab308',
     plate: '#18181b',
     pcb: '#09090b',
@@ -85,7 +90,7 @@ interface AppState {
 const state: AppState = {
   scrollProgress: 0,
   colorTheme: 'ember',
-  rgbMode: 'off', // Backlight OFF by default as requested
+  rgbMode: 'off',
   switchType: 'linear',
   soundEnabled: false,
   showAnnotations: false,

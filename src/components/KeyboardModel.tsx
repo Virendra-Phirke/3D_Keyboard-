@@ -467,8 +467,8 @@ export function KeyboardModel() {
         ))}
 
         <group position={[knob.x, 0.35, knob.z]}>
-          <Cylinder args={[0.55, 0.55, 0.42, 24]} material={new THREE.MeshStandardMaterial({ color: customColors.caseColor, roughness: 0.25, metalness: 0.95 })} />
-          <Cylinder args={[0.44, 0.44, 0.05, 24]} position={[0, 0.22, 0]} material={new THREE.MeshStandardMaterial({ color: "#27272a", roughness: 0.2, metalness: 0.9 })} />
+          <Cylinder args={[0.55, 0.55, 0.42, 24]} material={new THREE.MeshStandardMaterial({ color: customColors.knobColor, roughness: 0.25, metalness: 0.95 })} />
+          <Cylinder args={[0.44, 0.44, 0.05, 24]} position={[0, 0.22, 0]} material={new THREE.MeshStandardMaterial({ color: customColors.knobColor, roughness: 0.2, metalness: 0.9 })} />
           <Cylinder args={[0.48, 0.48, 0.06, 24]} position={[0, 0.12, 0]} material={new THREE.MeshStandardMaterial({ color: customColors.ledColor, emissive: customColors.ledColor, emissiveIntensity: rgbMode === "off" ? 0 : 2.5 })} />
         </group>
       </group>
