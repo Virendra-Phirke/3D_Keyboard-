@@ -150,7 +150,9 @@ function MiniKeyboardCard({
   layout,
   isActive,
   onClick,
-  onDelete
+  onDelete,
+  onRename,
+  onDuplicate,
 }: {
   layout: SavedLayout;
   isActive: boolean;
