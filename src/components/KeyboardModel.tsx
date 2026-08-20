@@ -16,33 +16,33 @@ import { playSwitchSound } from "../utils/audio";
 const mapLinear = THREE.MathUtils.mapLinear;
 const clamp = THREE.MathUtils.clamp;
 
-// Layer annotation data for exploded view with expanded vertical spacing
+// Layer annotation data for exploded view
 const LAYER_ANNOTATIONS = [
   {
     id: 'keycaps',
     title: '01. PBT DOUBLESHOT KEYCAPS',
-    spec: '1.5mm Extra-Thick PBT • Cherry Sculpt • Oil-Resistant Matte Finish',
+    spec: '1.5mm Extra-Thick PBT • Sculpted Cherry Profile • Concave Dish',
     yOffset: 6.0,
     alignRight: false,
   },
   {
     id: 'switches',
     title: '02. CUSTOM MECHANICAL SWITCHES',
-    spec: 'Factory Lubed • 45g Actuation • 5-Pin Hot-Swappable',
+    spec: 'Clear PC Top • Lubed MX Stem • South-Facing SMD LED',
     yOffset: 4.0,
     alignRight: true,
   },
   {
     id: 'plate',
     title: '03. CNC ANODIZED ALUMINUM PLATE',
-    spec: '6063 Aircraft Alloy • Laser-Cut Switch Cutouts • Gasket Mounts',
+    spec: '6063 Aircraft Alloy • Stainless Steel Stabilizers • Gasket Mounts',
     yOffset: 2.2,
     alignRight: false,
   },
   {
     id: 'pcb',
     title: '04. HOT-SWAP RGB CIRCUIT BOARD',
-    spec: 'South-Facing SMD RGB • Kailh Sockets • 1000Hz Polling Rate • QMK/VIA',
+    spec: 'South-Facing SMD RGB • Kailh Sockets • 1000Hz Polling Rate',
     yOffset: 0.5,
     alignRight: true,
   },
@@ -56,7 +56,7 @@ const LAYER_ANNOTATIONS = [
   {
     id: 'case',
     title: '06. CNC ALUMINUM CASE & HARDWARE',
-    spec: 'Sandblasted & Anodized Shell • Solid Brass Internal Weight',
+    spec: 'Sandblasted & Anodized Shell • Solid Brass Weight Bar',
     yOffset: -2.8,
     alignRight: true,
   },
@@ -78,6 +78,7 @@ interface KeycapItemProps {
   onRelease: (code: string) => void;
 }
 
+/* ─── REALISTIC SCULPTED CHERRY PROFILE KEYCAP ─── */
 function KeycapItem({
   keyInfo,
   theme,
@@ -106,13 +107,44 @@ function KeycapItem({
     );
   }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors]);
 
-  const keycapMaterial = useMemo(() => {
+  const topDishMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.45,
+      roughness: 0.42,
       metalness: 0.05,
     });
   }, [texture]);
+
+  const skirtColor = useMemo(() => {
+    if (keyInfo.label === 'ESC' || (keyInfo.type === 'accent' && keyInfo.label !== 'ENTER' && keyInfo.label !== 'FN')) {
+      return customColors.keycapsAccent || '#ea580c';
+    }
+    if (keyInfo.type === 'modifier' || keyInfo.type === 'special' || keyInfo.type === 'space' || keyInfo.type === 'knob') {
+      return customColors.keycapsMod || '#121215';
+    }
+    return customColors.keycapsAlpha || '#18181c';
+  }, [keyInfo.type, keyInfo.label, customColors]);
+
+  const skirtMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: isPressed ? '#27272a' : skirtColor,
+      roughness: 0.44,
+      metalness: 0.05,
+    });
+  }, [skirtColor, isPressed]);
+
+  // Cherry sculpt profile row tilts
+  const rowTilt = useMemo(() => {
+    switch (keyInfo.row) {
+      case 0: return 0.08;  // F-row
+      case 1: return 0.06;  // Number row
+      case 2: return 0.02;  // QWERTY
+      case 3: return -0.01; // Home row
+      case 4: return -0.05; // Shift row
+      case 5: return -0.07; // Bottom row / Space
+      default: return 0.0;
+    }
+  }, [keyInfo.row]);
 
   useFrame((_, delta) => {
     if (keycapRef.current) {
@@ -122,15 +154,37 @@ function KeycapItem({
     }
   });
 
+  const w = keyInfo.width;
+  const d = keyInfo.depth;
+
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
-      <group ref={keycapRef} position={[0, 0.2, 0]}>
+      <group ref={keycapRef} position={[0, 0.2, 0]} rotation={[rowTilt, 0, 0]}>
+        {/* 1. Base Skirt (Lower wide foundation) */}
         <RoundedBox
-          args={[keyInfo.width - 0.08, 0.42, keyInfo.depth - 0.08]}
-          radius={0.06}
+          args={[w - 0.06, 0.16, d - 0.06]}
+          radius={0.03}
           smoothness={2}
-          material={keycapMaterial}
-          position={[0, 0.21, 0]}
+          material={skirtMaterial}
+          position={[0, 0.08, 0]}
+        />
+
+        {/* 2. Tapered Upper Body (Inward sloping Cherry profile side walls) */}
+        <RoundedBox
+          args={[w - 0.16, 0.24, d - 0.16]}
+          radius={0.04}
+          smoothness={2}
+          material={skirtMaterial}
+          position={[0, 0.24, 0]}
+        />
+
+        {/* 3. Top Sculpted Concave Dish with Laser-Etched Texture */}
+        <RoundedBox
+          args={[w - 0.18, 0.06, d - 0.18]}
+          radius={0.03}
+          smoothness={2}
+          material={topDishMaterial}
+          position={[0, 0.38, 0]}
           onPointerDown={(e) => {
             e.stopPropagation();
             onPress(keyInfo.code);
@@ -140,24 +194,16 @@ function KeycapItem({
             onRelease(keyInfo.code);
           }}
         />
+
+        {/* 4. Bottom Cross Stem Mount Socket */}
+        <Cylinder
+          args={[0.18, 0.18, 0.12, 12]}
+          position={[0, -0.04, 0]}
+          material={skirtMaterial}
+        />
       </group>
     </group>
   );
-}
-
-function useState_light(): [boolean, (v: boolean) => void] {
-  const val = useRef(false);
-  const [, setR] = useMemo(() => {
-    let r = 0;
-    return [, (fn: (v: number) => number) => { r = fn(r); }];
-  }, []);
-  const setter = (v: boolean) => {
-    if (val.current !== v) {
-      val.current = v;
-      if (setR) setR((x) => x + 1);
-    }
-  };
-  return [val.current, setter];
 }
 
 interface SwitchItemProps {
@@ -165,29 +211,95 @@ interface SwitchItemProps {
   stemMat: THREE.MeshStandardMaterial;
   baseMat: THREE.MeshStandardMaterial;
   clearMat: THREE.MeshStandardMaterial;
-  metalMat: THREE.MeshStandardMaterial;
+  springMat: THREE.MeshStandardMaterial;
+  ledMat: THREE.MeshStandardMaterial;
   isPressed: boolean;
 }
 
+/* ─── REALISTIC GATERON / CHERRY MX SWITCH ─── */
 function SwitchItem({
   keyInfo,
   stemMat,
   baseMat,
   clearMat,
-  metalMat,
+  springMat,
+  ledMat,
   isPressed
 }: SwitchItemProps) {
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
-      <Box args={[0.74, 0.22, 0.74]} position={[0, 0.11, 0]} material={baseMat} />
-      <Box args={[0.7, 0.3, 0.7]} position={[0, 0.34, 0]} material={clearMat} />
-      <Cylinder args={[0.09, 0.09, 0.26, 6]} position={[0, 0.23, 0]} material={metalMat} />
-      <group position={[0, isPressed ? 0.36 : 0.48, 0]}>
-        <Box args={[0.26, 0.28, 0.09]} material={stemMat} />
-        <Box args={[0.09, 0.28, 0.26]} material={stemMat} />
+      {/* 1. Lower Housing Base (Black Nylon Box with Side Mount Clips) */}
+      <Box args={[0.76, 0.18, 0.76]} position={[0, 0.09, 0]} material={baseMat} />
+      <Box args={[0.06, 0.14, 0.28]} position={[0.39, 0.09, 0]} material={baseMat} />
+      <Box args={[0.06, 0.14, 0.28]} position={[-0.39, 0.09, 0]} material={baseMat} />
+
+      {/* 2. Clear Polycarbonate Upper Housing (Beveled Pyramid Frustum) */}
+      <Box args={[0.72, 0.08, 0.72]} position={[0, 0.22, 0]} material={clearMat} />
+      <Box args={[0.62, 0.18, 0.62]} position={[0, 0.32, 0]} material={clearMat} />
+
+      {/* 3. Internal Coiled Spring & Contact Leaf */}
+      <Cylinder args={[0.08, 0.08, 0.26, 12]} position={[0, 0.24, 0]} material={springMat} />
+
+      {/* 4. South-Facing SMD RGB LED Light Chip */}
+      <Box args={[0.18, 0.04, 0.10]} position={[0, 0.12, 0.26]} material={ledMat} />
+
+      {/* 5. Orange Cross Stem Slider (Depresses smoothly when key is pressed) */}
+      <group position={[0, isPressed ? 0.34 : 0.46, 0]}>
+        {/* Center Cross Slider */}
+        <Box args={[0.08, 0.26, 0.26]} position={[0, 0, 0]} material={stemMat} />
+        <Box args={[0.26, 0.26, 0.08]} position={[0, 0, 0]} material={stemMat} />
+        {/* Slider Base Collar */}
+        <Box args={[0.32, 0.06, 0.32]} position={[0, -0.10, 0]} material={stemMat} />
       </group>
-      <Box args={[0.04, 0.24, 0.04]} position={[-0.16, -0.08, 0.12]} material={metalMat} />
-      <Box args={[0.04, 0.24, 0.04]} position={[0.16, -0.08, -0.12]} material={metalMat} />
+
+      {/* 6. Bottom PCB Contact Pins & Center Guide Post */}
+      <Cylinder args={[0.08, 0.08, 0.16, 8]} position={[0, -0.06, 0]} material={baseMat} />
+      <Box args={[0.03, 0.18, 0.03]} position={[-0.18, -0.06, 0.12]} material={springMat} />
+      <Box args={[0.03, 0.18, 0.03]} position={[0.18, -0.06, -0.12]} material={springMat} />
+    </group>
+  );
+}
+
+/* ─── STAINLESS STEEL STABILIZER BAR ─── */
+function StabilizerAssembly({
+  x,
+  z,
+  width,
+  stemMat,
+  baseMat,
+  wireMat
+}: {
+  x: number;
+  z: number;
+  width: number;
+  stemMat: THREE.MeshStandardMaterial;
+  baseMat: THREE.MeshStandardMaterial;
+  wireMat: THREE.MeshStandardMaterial;
+}) {
+  const halfSpan = (width * 1.05 - 0.7) / 2;
+
+  return (
+    <group position={[x, 0, z]}>
+      {/* Left Stabilizer Housing & Dummy Stem */}
+      <group position={[-halfSpan, 0, 0]}>
+        <Box args={[0.32, 0.28, 0.38]} position={[0, 0.14, 0]} material={baseMat} />
+        <Box args={[0.08, 0.22, 0.22]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.22, 0.22, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
+      </group>
+
+      {/* Right Stabilizer Housing & Dummy Stem */}
+      <group position={[halfSpan, 0, 0]}>
+        <Box args={[0.32, 0.28, 0.38]} position={[0, 0.14, 0]} material={baseMat} />
+        <Box args={[0.08, 0.22, 0.22]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.22, 0.22, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
+      </group>
+
+      {/* Stainless Steel Connecting Wire */}
+      <group position={[0, 0.06, 0.14]}>
+        <Cylinder args={[0.02, 0.02, halfSpan * 2, 8]} rotation={[0, 0, Math.PI / 2]} material={wireMat} />
+        <Cylinder args={[0.02, 0.02, 0.16, 8]} position={[-halfSpan, 0.06, -0.06]} rotation={[Math.PI / 3, 0, 0]} material={wireMat} />
+        <Cylinder args={[0.02, 0.02, 0.16, 8]} position={[halfSpan, 0.06, -0.06]} rotation={[Math.PI / 3, 0, 0]} material={wireMat} />
+      </group>
     </group>
   );
 }
@@ -233,25 +345,33 @@ export function KeyboardModel() {
   // DYNAMIC CUSTOMIZABLE MATERIALS
   const caseMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.caseColor,
-      roughness: 0.35,
-      metalness: 0.8,
+      color: customColors.caseColor || '#141418',
+      roughness: 0.28,
+      metalness: 0.88,
     });
   }, [customColors.caseColor]);
 
+  const goldChamferMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: '#f59e0b',
+      roughness: 0.18,
+      metalness: 0.96,
+    });
+  }, []);
+
   const plateMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.plate,
-      roughness: 0.28,
-      metalness: 0.9,
+      color: customColors.plate || '#1e1e24',
+      roughness: 0.25,
+      metalness: 0.90,
     });
   }, [customColors.plate]);
 
   const pcbMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.pcb,
+      color: customColors.pcb || '#0d0d10',
       roughness: 0.65,
-      metalness: 0.3,
+      metalness: 0.30,
     });
   }, [customColors.pcb]);
 
@@ -265,7 +385,7 @@ export function KeyboardModel() {
 
   const brassMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.weightBar,
+      color: customColors.weightBar || '#f59e0b',
       roughness: 0.15,
       metalness: 0.98,
     });
@@ -273,16 +393,16 @@ export function KeyboardModel() {
 
   const rgbLedMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.ledColor,
-      emissive: customColors.ledColor,
-      emissiveIntensity: rgbMode === "off" ? 0 : 3.5,
+      color: customColors.ledColor || '#ff8800',
+      emissive: customColors.ledColor || '#ff8800',
+      emissiveIntensity: rgbMode === "off" ? 0.2 : 3.8,
       roughness: 0.2,
     });
   }, [rgbMode, customColors.ledColor]);
 
   const foamMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#334155",
+      color: "#1e293b",
       roughness: 0.95,
       metalness: 0.05,
     });
@@ -290,35 +410,43 @@ export function KeyboardModel() {
 
   const switchStemMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: customColors.switchStem,
+      color: customColors.switchStem || '#ff7700',
       roughness: 0.25,
-      metalness: 0.15
+      metalness: 0.08
     });
   }, [customColors.switchStem]);
 
   const switchBaseMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#27272a",
-      roughness: 0.5,
-      metalness: 0.3
+      color: "#18181b",
+      roughness: 0.55,
+      metalness: 0.25
     });
   }, []);
 
   const switchClearMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#9ca3af",
-      roughness: 0.2,
-      metalness: 0.1,
+      color: "#cbd5e1",
+      roughness: 0.15,
+      metalness: 0.10,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.65
     });
   }, []);
 
-  const switchMetalMat = useMemo(() => {
+  const switchSpringMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#fbbf24",
+      color: "#f59e0b",
       metalness: 0.98,
       roughness: 0.15
+    });
+  }, []);
+
+  const wireMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: "#e2e8f0",
+      metalness: 0.98,
+      roughness: 0.12
     });
   }, []);
 
@@ -329,14 +457,18 @@ export function KeyboardModel() {
       positions.push([x, totalDepth / 2 - 0.4]);
       positions.push([x, -totalDepth / 2 + 0.4]);
     }
-    positions.push([-totalWidth / 2 + 0.6, 0]);
-    positions.push([totalWidth / 2 - 0.6, 0]);
     return positions;
   }, [totalWidth, totalDepth]);
 
+  // Wide keys requiring stabilizers
+  const stabilizedKeys = useMemo(() => {
+    return keys.filter(k => k.width >= 1.75);
+  }, [keys]);
+
+  // Render loop with smooth easing
   useFrame(({ clock }, delta) => {
     const rawOffset = getScrollProgress();
-    smoothedScroll.current = THREE.MathUtils.damp(smoothedScroll.current, rawOffset, 16, delta);
+    smoothedScroll.current = THREE.MathUtils.damp(smoothedScroll.current, rawOffset, 14, delta);
     smoothedZoom.current = THREE.MathUtils.damp(smoothedZoom.current, zoomLevel, 12, delta);
     const scrollOffset = smoothedScroll.current;
     const time = clock.getElapsedTime();
@@ -347,15 +479,9 @@ export function KeyboardModel() {
 
     // 1. Position, Orientation & Interactive Zoom Scaling
     if (mainGroup.current) {
-      const explodeProgress = getProgress(0.08, 0.92);
+      const explodeProgress = getProgress(0.06, 0.94);
 
-      const targetX = mapLinear(explodeProgress, 0, 1, 0, 0);
-      const targetY = mapLinear(explodeProgress, 0, 1, 0, 0.1);
-      const targetZ = mapLinear(explodeProgress, 0, 1, 0, 0);
-
-      mainGroup.current.position.x = targetX;
-      mainGroup.current.position.y = targetY;
-      mainGroup.current.position.z = targetZ;
+      mainGroup.current.position.set(0, mapLinear(explodeProgress, 0, 1, 0, 0.1), 0);
 
       const currentScale = 0.48 * smoothedZoom.current;
       mainGroup.current.scale.set(currentScale, currentScale, currentScale);
@@ -424,8 +550,10 @@ export function KeyboardModel() {
     // 3. Dynamic Backlight Glow with custom LED color
     if (amberBacklight.current && underglowLight.current) {
       if (rgbMode === "off") {
-        amberBacklight.current.intensity = 0;
-        underglowLight.current.intensity = 0;
+        amberBacklight.current.intensity = 0.5;
+        underglowLight.current.intensity = 0.5;
+        amberBacklight.current.color.set(customColors.ledColor || '#ff8800');
+        underglowLight.current.color.set(customColors.ledColor || '#ff8800');
       } else if (rgbMode === "rainbow") {
         const hue = (time * 0.25) % 1;
         const color = new THREE.Color().setHSL(hue, 1, 0.55);
@@ -435,13 +563,13 @@ export function KeyboardModel() {
         underglowLight.current.intensity = 3.5;
       } else if (rgbMode === "breathe") {
         const intensity = (Math.sin(time * 2.5) * 0.5 + 0.5) * 4.0 + 0.8;
-        amberBacklight.current.color.set(customColors.ledColor);
-        underglowLight.current.color.set(customColors.ledColor);
+        amberBacklight.current.color.set(customColors.ledColor || '#ff8800');
+        underglowLight.current.color.set(customColors.ledColor || '#ff8800');
         amberBacklight.current.intensity = intensity;
         underglowLight.current.intensity = intensity;
       } else {
-        amberBacklight.current.color.set(customColors.ledColor);
-        underglowLight.current.color.set(customColors.ledColor);
+        amberBacklight.current.color.set(customColors.ledColor || '#ff8800');
+        underglowLight.current.color.set(customColors.ledColor || '#ff8800');
         amberBacklight.current.intensity = 4.2;
         underglowLight.current.intensity = 3.6;
       }
@@ -450,15 +578,11 @@ export function KeyboardModel() {
 
   return (
     <group ref={mainGroup} scale={[0.48, 0.48, 0.48]} position={[0, 0, 0]}>
-      {/* WARM UNDERGLOW LIGHTS */}
-      <pointLight ref={amberBacklight} position={[0, 0.6, 0]} intensity={rgbMode === "off" ? 0 : 4.2} distance={24} decay={1.8} color={customColors.ledColor} />
-      <pointLight ref={underglowLight} position={[0, -0.6, 0]} intensity={rgbMode === "off" ? 0 : 3.6} distance={26} decay={1.8} color={customColors.ledColor} />
-
-      {/* 1. LAYER 1: KEYCAPS & ROTARY KNOB */}
-      <group ref={keycapsGroup}>
+      {/* 1. LAYER 1: SCULPTED CHERRY KEYCAPS & CNC ROTARY KNOB */}
+      <group ref={keycapsGroup} position={[0, 0, 0]}>
         {keys.map((key) => (
           <KeycapItem
-            key={`keycap-${key.id}`}
+            key={`key-${key.id}`}
             keyInfo={key}
             theme={colorTheme}
             customColors={customColors}
@@ -468,19 +592,20 @@ export function KeyboardModel() {
           />
         ))}
 
-        <group position={[knob.x, 0.35, knob.z]}>
-          {/* Outer Beveled Gold / Brass Accent Ring */}
-          <Cylinder args={[0.56, 0.56, 0.38, 32]} material={new THREE.MeshStandardMaterial({ color: customColors.weightBar || "#f59e0b", roughness: 0.15, metalness: 0.95 })} />
+        {/* CNC Metallic Rotary Encoder Knob with Concentric Bevels */}
+        <group position={[knob.x, 0.38, knob.z]}>
+          {/* Outer Beveled Brass/Gold Chamfer Ring */}
+          <Cylinder args={[0.58, 0.58, 0.42, 36]} material={goldChamferMaterial} />
           {/* Inner Textured Anodized Core */}
-          <Cylinder args={[0.50, 0.50, 0.42, 32]} material={new THREE.MeshStandardMaterial({ color: customColors.knobColor || "#18181c", roughness: 0.25, metalness: 0.85 })} />
-          {/* Top Knurled Bevel Inset */}
-          <Cylinder args={[0.44, 0.44, 0.05, 32]} position={[0, 0.22, 0]} material={new THREE.MeshStandardMaterial({ color: "#121215", roughness: 0.3, metalness: 0.9 })} />
-          {/* Underglow Accent Light Halo */}
-          <Cylinder args={[0.54, 0.54, 0.05, 32]} position={[0, -0.15, 0]} material={new THREE.MeshStandardMaterial({ color: customColors.ledColor, emissive: customColors.ledColor, emissiveIntensity: rgbMode === "off" ? 0.3 : 2.5 })} />
+          <Cylinder args={[0.52, 0.52, 0.46, 36]} material={new THREE.MeshStandardMaterial({ color: customColors.knobColor || "#141416", roughness: 0.22, metalness: 0.90 })} />
+          {/* Top Knurled Radial Inset */}
+          <Cylinder args={[0.45, 0.45, 0.05, 36]} position={[0, 0.24, 0]} material={new THREE.MeshStandardMaterial({ color: "#0d0d0f", roughness: 0.35, metalness: 0.85 })} />
+          {/* Glowing LED Halo Base */}
+          <Cylinder args={[0.56, 0.56, 0.06, 36]} position={[0, -0.16, 0]} material={rgbLedMaterial} />
         </group>
       </group>
 
-      {/* 2. LAYER 2: SWITCHES ARRAY */}
+      {/* 2. LAYER 2: GATERON/CHERRY MX SWITCHES ARRAY & STABILIZERS */}
       <group ref={switchesGroup} position={[0, -0.2, 0]}>
         {keys.map((key) => (
           <SwitchItem
@@ -489,13 +614,27 @@ export function KeyboardModel() {
             stemMat={switchStemMat}
             baseMat={switchBaseMat}
             clearMat={switchClearMat}
-            metalMat={switchMetalMat}
+            springMat={switchSpringMat}
+            ledMat={rgbLedMaterial}
             isPressed={pressedKeys.has(key.code)}
+          />
+        ))}
+
+        {/* Real Plate-Mounted Stainless Steel Stabilizers on Wide Keys */}
+        {stabilizedKeys.map((key) => (
+          <StabilizerAssembly
+            key={`stab-${key.id}`}
+            x={key.x}
+            z={key.z}
+            width={key.width}
+            stemMat={switchStemMat}
+            baseMat={switchBaseMat}
+            wireMat={wireMaterial}
           />
         ))}
       </group>
 
-      {/* 3. LAYER 3: LASER-CUT SWITCH PLATE */}
+      {/* 3. LAYER 3: LASER-CUT CNC SWITCH PLATE */}
       <group ref={plateGroup} position={[0, -0.28, 0]}>
         <Box args={[totalWidth, 0.09, 0.25]} position={[0, 0, totalDepth / 2 - 0.125]} material={plateMaterial} />
         <Box args={[totalWidth, 0.09, 0.25]} position={[0, 0, -totalDepth / 2 + 0.125]} material={plateMaterial} />
@@ -552,21 +691,35 @@ export function KeyboardModel() {
         ))}
       </group>
 
-      {/* 6. LAYER 6: CNC ALUMINUM CASE */}
+      {/* 6. LAYER 6: CNC ALUMINUM CASE WITH GOLD PINSTRIPE BEVEL */}
       <group ref={caseGroup} position={[0, -0.85, 0]}>
+        {/* Bottom Tray */}
         <Box args={[totalWidth + 0.6, 0.22, totalDepth + 0.6]} position={[0, -0.14, 0]} material={caseMaterial} />
+
+        {/* Outer Frame Walls */}
         <Box args={[totalWidth + 0.6, 0.44, 0.3]} position={[0, 0.08, totalDepth / 2 + 0.15]} material={caseMaterial} />
-        <Box args={[totalWidth + 0.44, 0.44, 0.3]} position={[0, 0.08, -totalDepth / 2 - 0.15]} material={caseMaterial} />
+        <Box args={[totalWidth + 0.6, 0.44, 0.3]} position={[0, 0.08, -totalDepth / 2 - 0.15]} material={caseMaterial} />
         <Box args={[0.3, 0.44, totalDepth + 0.6]} position={[totalWidth / 2 + 0.15, 0.08, 0]} material={caseMaterial} />
         <Box args={[0.3, 0.44, totalDepth + 0.6]} position={[-totalWidth / 2 - 0.15, 0.08, 0]} material={caseMaterial} />
 
+        {/* Gold Chamfer Accent Pinstripe along Perimeter (Matching reference image) */}
+        <Box args={[totalWidth + 0.62, 0.04, 0.04]} position={[0, 0.28, totalDepth / 2 + 0.28]} material={goldChamferMaterial} />
+        <Box args={[totalWidth + 0.62, 0.04, 0.04]} position={[0, 0.28, -totalDepth / 2 - 0.28]} material={goldChamferMaterial} />
+        <Box args={[0.04, 0.04, totalDepth + 0.62]} position={[totalWidth / 2 + 0.28, 0.28, 0]} material={goldChamferMaterial} />
+        <Box args={[0.04, 0.04, totalDepth + 0.62]} position={[-totalWidth / 2 - 0.28, 0.28, 0]} material={goldChamferMaterial} />
+
+        {/* Solid Brass Internal Resonance Weight Bar */}
         <Box args={[totalWidth - 3.2, 0.09, totalDepth - 1.8]} position={[0, -0.26, 0]} material={brassMaterial} />
+
+        {/* Rubber Feet */}
         {[-totalWidth / 2 + 1.2, totalWidth / 2 - 1.2].map((x) => (
           <group key={`feet-${x}`}>
             <Box args={[1.8, 0.06, 0.6]} position={[x, -0.27, totalDepth / 2 - 0.5]} material={new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.9 })} />
             <Box args={[1.8, 0.06, 0.6]} position={[x, -0.27, -totalDepth / 2 + 0.5]} material={new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.9 })} />
           </group>
         ))}
+
+        {/* USB-C Port Cutout */}
         <Box args={[1.2, 0.3, 0.1]} position={[-totalWidth / 2 + 2, 0.06, -totalDepth / 2 - 0.31]} material={new THREE.MeshStandardMaterial({ color: "#000000" })} />
       </group>
 
