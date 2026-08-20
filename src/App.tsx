@@ -131,13 +131,13 @@ export default function App() {
         {/* R3F 3D Canvas Layer (Centered perfectly within viewport and freely interactive via mouse drag) */}
         <div className="absolute inset-0 z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
           <Canvas
-            shadows
-            dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)]}
+            dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25)]}
             camera={{ position: [0, 5.5, 20], fov: 38 }}
             gl={{
               antialias: true,
               alpha: false,
               powerPreference: 'high-performance',
+              precision: 'mediump',
               stencil: false,
               depth: true,
             }}

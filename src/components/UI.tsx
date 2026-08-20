@@ -286,9 +286,9 @@ function StudioPanel() {
   const maxScroll = Math.max(0, savedLayouts.length - 4);
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-auto flex flex-col bg-black/50 backdrop-blur-xs">
+    <div className="fixed inset-0 z-[100] pointer-events-auto flex flex-col bg-black/60">
       {/* ─── TOP BAR ─── */}
-      <div className="h-14 flex items-center justify-between px-6 border-b border-[#2a2640]/70 shrink-0 bg-[#0c0a1a]/95 backdrop-blur-md">
+      <div className="h-14 flex items-center justify-between px-6 border-b border-[#2a2640]/70 shrink-0 bg-[#0c0a1a]">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-orange-500 text-xl font-bold">⬡</span>
@@ -378,7 +378,7 @@ function StudioPanel() {
           <div className="flex-grow relative flex flex-col pointer-events-none">
             {/* Floating Top Controls in Viewport */}
             <div className="absolute top-4 left-6 z-10 pointer-events-auto flex items-center gap-2">
-              <div className="flex items-center bg-[#0e0c1a]/85 backdrop-blur-md border border-[#2a2640]/70 rounded-xl p-1 shadow-xl">
+              <div className="flex items-center bg-[#0e0c1a] border border-[#2a2640]/70 rounded-xl p-1 shadow-xl">
                 <button
                   onClick={() => setZoomLevel(zoomLevel * 1.15)}
                   className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
@@ -407,7 +407,7 @@ function StudioPanel() {
 
               <button
                 onClick={() => setScrollProgress(0)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0e0c1a]/85 backdrop-blur-md border border-[#2a2640]/70 text-xs font-bold text-gray-300 hover:text-white hover:border-orange-500/40 transition shadow-xl cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0e0c1a] border border-[#2a2640]/70 text-xs font-bold text-gray-300 hover:text-white hover:border-orange-500/40 transition shadow-xl cursor-pointer"
               >
                 <RotateCcw size={12} className="text-orange-400" />
                 Assemble View
@@ -419,7 +419,7 @@ function StudioPanel() {
 
             {/* ── BOTTOM: Saved Layouts Carousel ── */}
             <div className="px-6 pb-4 shrink-0 pointer-events-auto">
-              <div className="bg-[#0e0c1a]/90 backdrop-blur-md border border-[#2a2640]/60 rounded-2xl p-3.5 shadow-2xl">
+              <div className="bg-[#0e0c1a] border border-[#2a2640]/60 rounded-2xl p-3.5 shadow-2xl">
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
                     <Sparkles size={13} className="text-orange-400" />
@@ -516,7 +516,7 @@ function StudioPanel() {
           </div>
 
           {/* ── RIGHT SIDEBAR: Config Controls ── */}
-          <div className="allow-internal-scroll w-[350px] shrink-0 border-l border-[#2a2640]/60 overflow-y-auto no-scrollbar bg-[#0c0a1a]/95 backdrop-blur-md">
+          <div className="allow-internal-scroll w-[350px] shrink-0 border-l border-[#2a2640]/60 overflow-y-auto no-scrollbar bg-[#0c0a1a]">
             <div className="p-4 space-y-4">
               {/* 1. LEGEND DESIGN Section */}
               <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
@@ -854,7 +854,7 @@ function StudioPanel() {
       )}
 
       {/* ─── BOTTOM STATUS BAR ─── */}
-      <div className="h-10 flex items-center justify-between px-6 border-t border-[#2a2640]/50 shrink-0 bg-[#0c0a1a]/95 backdrop-blur-md">
+      <div className="h-10 flex items-center justify-between px-6 border-t border-[#2a2640]/50 shrink-0 bg-[#0c0a1a]">
         <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold tracking-wider uppercase">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           Hardware WebGL Engine • 60 FPS
@@ -898,7 +898,7 @@ export default function UI({ scrollContainerRef }: UIProps) {
       <StudioPanel />
 
       {/* FIXED MINIMAL HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#050505]/90 border-b border-white/5 pointer-events-auto">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#050505] border-b border-white/5 pointer-events-auto">
         <div className="flex items-center gap-3">
           <span className="text-orange-500 text-xl font-bold">⬡</span>
           <h1 className="text-sm font-black tracking-widest text-white uppercase">
@@ -945,7 +945,7 @@ export default function UI({ scrollContainerRef }: UIProps) {
 
       {/* FLOATING BOTTOM LEFT ZOOM & VIEW CONTROLS (Only when Studio is closed) */}
       {!showStudio && (
-        <div className="fixed bottom-6 left-6 z-40 flex items-center bg-[#0a0a0d]/90 backdrop-blur-md border border-white/10 rounded-xl p-1 shadow-2xl pointer-events-auto">
+        <div className="fixed bottom-6 left-6 z-40 flex items-center bg-[#0a0a0d] border border-white/10 rounded-xl p-1 shadow-2xl pointer-events-auto">
           <button
             onClick={() => setZoomLevel(zoomLevel * 1.15)}
             className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"

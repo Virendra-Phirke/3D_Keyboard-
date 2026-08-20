@@ -82,11 +82,28 @@ interface KeycapItemProps {
  * Creates a single, seamless, authentic Cherry/OEM profile truncated pyramid keycap.
  * No stepped ledges or chicklet borders - pure sloped mechanical keycap geometry.
  */
-function createCherryKeycapGeometry(width: number, depth: number, height: number = 0.44) {
-  const wBottom = width - 0.05;
-  const dBottom = depth - 0.05;
-  const wTop = width - 0.18;
-  const dTop = depth - 0.16;
+const keycapGeometryCache = new Map<string, THREE.BufferGeometry>();
+
+/* ─── SCULPTED CHERRY MX PROFILE MONOLITHIC KEYCAP GEOMETRY ─── */
+function createCherryKeycapGeometry(
+  widthUnits: number = 1.0,
+  depthUnits: number = 1.0,
+  height: number = 0.44
+): THREE.BufferGeometry {
+  const cacheKey = `${widthUnits}_${depthUnits}_${height}`;
+  if (keycapGeometryCache.has(cacheKey)) {
+    return keycapGeometryCache.get(cacheKey)!;
+  }
+
+  // Base dimensions (Cherry standard: 1u = 0.96 x 0.96)
+  const unitSize = 0.96;
+  const wBottom = widthUnits * unitSize - 0.04;
+  const dBottom = depthUnits * unitSize - 0.04;
+
+  // Inward taper angle (~8 degrees on all 4 sides)
+  const taper = 0.085;
+  const wTop = Math.max(0.35, wBottom - taper * 2);
+  const dTop = Math.max(0.35, dBottom - taper * 2);
 
   const hw0 = wBottom / 2;
   const hd0 = dBottom / 2;
@@ -158,6 +175,8 @@ function createCherryKeycapGeometry(width: number, depth: number, height: number
   geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
+
+  keycapGeometryCache.set(cacheKey, geometry);
   return geometry;
 }
 
@@ -327,7 +346,6 @@ function SwitchItem({
 
       {/* 4. South-Facing SMD RGB/Amber LED Bead */}
       <Box args={[0.16, 0.05, 0.08]} position={[0, 0.08, 0.30]} material={ledMat} />
-      <pointLight position={[0, 0.14, 0.30]} intensity={0.4} distance={1.2} color="#ffaa22" />
 
       {/* 5. Precision MX Cross Stem Slider with Shoulder Platform & Guide Rails */}
       <group position={[0, isPressed ? 0.24 : 0.38, 0]}>
@@ -839,7 +857,7 @@ export function KeyboardModel() {
               >
                 <div
                   ref={ann.id === 'keycaps' ? annotationsGroup : undefined}
-                  className={`flex flex-col whitespace-nowrap px-3.5 py-2 rounded-xl bg-black/90 backdrop-blur-xl border border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-opacity duration-150 ${ann.alignRight ? "items-start text-left" : "items-end text-right"
+                  className={`flex flex-col whitespace-nowrap px-3.5 py-2 rounded-xl bg-[#0c0a14] border border-orange-500/40 shadow-xl transition-opacity duration-150 ${ann.alignRight ? "items-start text-left" : "items-end text-right"
                     }`}
                 >
                   <div className="flex items-center gap-1.5">
