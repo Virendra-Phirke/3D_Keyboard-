@@ -26,6 +26,11 @@ import {
   Save,
   Grid,
   CheckCircle2,
+  PanelRightOpen,
+  PanelRightClose,
+  Maximize2,
+  Settings2,
+  Wand2,
 } from "lucide-react";
 import {
   useAppStore,
@@ -149,61 +154,98 @@ const THEMES: {
     dotMod: "#0f172a",
     dotAccent: "#eab308",
     border: "border-cyan-500",
-    desc: "Deep ocean midnight navy with yellow",
+    desc: "Deep ocean midnight navy with gold",
   },
   {
     id: "laser",
-    label: "GMK Laser",
-    dotColor: "#3b82f6",
-    dotMod: "#581c87",
-    dotAccent: "#ec4899",
+    label: "Cyberpunk Laser",
+    dotColor: "#1e1b4b",
+    dotMod: "#3b0764",
+    dotAccent: "#06b6d4",
     border: "border-pink-500",
-    desc: "Cyber cobalt blue with neon magenta",
+    desc: "Retro synth outrun purple & hot pink",
   },
   {
-    id: "dracula",
-    label: "Dracula Gothic",
-    dotColor: "#f8fafc",
-    dotMod: "#1e1e2e",
-    dotAccent: "#bd93f9",
-    border: "border-purple-400",
-    desc: "Gotham dark slate with vampire lilac",
+    id: "hyperfuse",
+    label: "HyperFuse",
+    dotColor: "#e2e8f0",
+    dotMod: "#334155",
+    dotAccent: "#a855f7",
+    border: "border-purple-500",
+    desc: "Classic light gray with electric violet",
   },
   {
-    id: "retro",
-    label: "Retro 1984",
-    dotColor: "#f5f5f4",
-    dotMod: "#78716c",
-    dotAccent: "#dc2626",
-    border: "border-stone-400",
-    desc: "IBM Model M beige & industrial red",
+    id: "midnight",
+    label: "Midnight Blue",
+    dotColor: "#0284c7",
+    dotMod: "#0f172a",
+    dotAccent: "#38bdf8",
+    border: "border-blue-500",
+    desc: "Deep celestial blue with sapphire accents",
   },
   {
-    id: "apollo",
-    label: "Space Apollo",
-    dotColor: "#cbd5e1",
-    dotMod: "#1e293b",
-    dotAccent: "#f97316",
-    border: "border-orange-500",
-    desc: "NASA lunar graphite with safety orange",
+    id: "matrix",
+    label: "Matrix Terminal",
+    dotColor: "#022c22",
+    dotMod: "#050505",
+    dotAccent: "#22c55e",
+    border: "border-green-500",
+    desc: "Phosphor monochrome cyber CRT green",
   },
 ];
 
-const SWITCH_TYPES: { id: SwitchType; label: string; desc: string }[] = [
-  { id: "linear", label: "Linear Red", desc: "Smooth 45g • Silent & Fast" },
-  { id: "tactile", label: "Tactile Brown", desc: "Bumpy 55g • Tactile Feedback" },
-  { id: "clicky", label: "Clicky Blue", desc: "Crisp 60g • Acoustic Snap" },
+const SWITCH_TYPES: { id: SwitchType; label: string; desc: string; force: string; soundType: string }[] = [
+  {
+    id: "linear",
+    label: "Linear Red",
+    desc: "Smooth 45g • Silent & Fast Actuation",
+    force: "45g",
+    soundType: "Smooth Clack",
+  },
+  {
+    id: "tactile",
+    label: "Tactile Brown",
+    desc: "Bumpy 55g • Tactile Mechanical Feedback",
+    force: "55g",
+    soundType: "Medium Thock",
+  },
+  {
+    id: "clicky",
+    label: "Clicky Blue",
+    desc: "Crisp 60g • Acoustic Snap & Click",
+    force: "60g",
+    soundType: "High Click",
+  },
 ];
 
 const LEGEND_COLORS = [
-  '#f8fafc', '#ffffff', '#fbbf24', '#f97316', '#ef4444',
-  '#22c55e', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899', '#71717a'
+  "#ffffff",
+  "#e2e8f0",
+  "#cbd5e1",
+  "#94a3b8",
+  "#f59e0b",
+  "#ff7700",
+  "#ef4444",
+  "#ec4899",
+  "#a855f7",
+  "#06b6d4",
+  "#10b981",
+  "#000000",
 ];
 
 const PER_KEY_COLORS = [
-  '#ff8800', '#f97316', '#ef4444', '#f59e0b', '#22c55e', '#06b6d4',
-  '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#10b981', '#0ea5e9',
-  '#6366f1', '#d946ef', '#ffffff', '#a1a1aa'
+  "#ff7700",
+  "#f59e0b",
+  "#ef4444",
+  "#ec4899",
+  "#a855f7",
+  "#3b82f6",
+  "#06b6d4",
+  "#10b981",
+  "#22c55e",
+  "#eab308",
+  "#ffffff",
+  "#000000",
 ];
 
 const SWITCH_COLOR_PRESETS = [
@@ -211,91 +253,71 @@ const SWITCH_COLOR_PRESETS = [
     id: "tangerine",
     name: "C³ Tangerine",
     stem: "#06b6d4",
-    housing: "#ea580c",
-    topHousing: "#fb923c",
+    housing: "#ff6600",
+    topHousing: "#ff8533",
     spring: "#f59e0b",
-    desc: "Vibrant orange casing with teal linear stem",
-    accent: "#ea580c",
+    desc: "Vibrant orange casing with turquoise stem",
+    accent: "#ff6600",
   },
   {
-    id: "oil-king",
+    id: "oil_king",
     name: "Gateron Oil King",
-    stem: "#09090b",
-    housing: "#18181b",
+    stem: "#18181b",
+    housing: "#09090b",
     topHousing: "#27272a",
-    spring: "#f59e0b",
-    desc: "All-black nylon body with gold spring",
+    spring: "#22c55e",
+    desc: "All-black nylon body with golden factory lube",
     accent: "#18181b",
   },
   {
-    id: "holy-panda",
+    id: "holy_panda",
     name: "Holy Panda",
-    stem: "#fb923c",
+    stem: "#ff7700",
     housing: "#f8fafc",
     topHousing: "#ffffff",
     spring: "#f59e0b",
-    desc: "Milky pearl base with salmon tactile stem",
-    accent: "#fb923c",
+    desc: "Ivory white base with salmon tactile stem",
+    accent: "#ff7700",
   },
   {
-    id: "ink-black",
+    id: "ink_black",
     name: "Gateron Ink V2",
     stem: "#18181b",
     housing: "#1e1e24",
-    topHousing: "#334155",
+    topHousing: "#3f3f46",
     spring: "#f59e0b",
-    desc: "Smoky translucent casing with black stem",
-    accent: "#334155",
+    desc: "Smoky translucent casing with pitch stem",
+    accent: "#3f3f46",
   },
   {
-    id: "boba-u4t",
-    name: "Boba U4T",
-    stem: "#eab308",
-    housing: "#f1f5f9",
-    topHousing: "#ffffff",
-    spring: "#f59e0b",
-    desc: "Pearl white casing with tactile yellow stem",
-    accent: "#eab308",
+    id: "banana_split",
+    name: "Banana Split",
+    stem: "#fbbf24",
+    housing: "#f472b6",
+    topHousing: "#fbcfe8",
+    spring: "#eab308",
+    desc: "Pastel pink housing with creamy banana stem",
+    accent: "#f472b6",
   },
   {
-    id: "cream",
-    name: "NovelKeys Cream",
-    stem: "#fef3c7",
-    housing: "#fef3c7",
-    topHousing: "#fffbeb",
-    spring: "#d97706",
-    desc: "Full POM solid butter-cream aesthetic",
-    accent: "#fef3c7",
-  },
-  {
-    id: "aqua-king",
-    name: "Aqua King",
+    id: "alpacas",
+    name: "Silent Alpaca",
     stem: "#38bdf8",
-    housing: "#ffffff",
-    topHousing: "#f0f9ff",
-    spring: "#e2e8f0",
-    desc: "Ultra-clear water ice transparency",
+    housing: "#334155",
+    topHousing: "#64748b",
+    spring: "#94a3b8",
+    desc: "Slate grey housing with sky blue stem",
     accent: "#38bdf8",
   },
   {
     id: "lavender",
-    name: "Durock Lavender",
-    stem: "#a855f7",
-    housing: "#e9d5ff",
-    topHousing: "#f3e8ff",
+    name: "JWK Lavender",
+    stem: "#c084fc",
+    housing: "#7e22ce",
+    topHousing: "#a855f7",
     spring: "#f59e0b",
-    desc: "Pastel lilac housing with violet stem",
+    desc: "Deep violet nylon shell with lilac stem",
     accent: "#a855f7",
-  },
-  {
-    id: "sakura",
-    name: "Akko Sakura",
-    stem: "#f43f5e",
-    housing: "#fce7f3",
-    topHousing: "#fdf2f8",
-    spring: "#fb7185",
-    desc: "Japanese cherry blossom pink with rose stem",
-    accent: "#f43f5e",
   },
   {
     id: "matcha",
@@ -328,7 +350,7 @@ const PART_CUSTOMIZERS: { key: keyof CustomColors; label: string; presetColors: 
   { key: 'bgColor', label: 'Studio Background', presetColors: ['#18181b', '#27272a', '#3f3f46', '#0f172a', '#1e293b', '#09090b', '#050505', '#f1f5f9'] },
 ];
 
-/* ─── Studio Custom Slider ─── */
+/* ─── Studio Custom Slider (Block Style) ─── */
 function StudioSlider({
   value,
   onChange,
@@ -351,23 +373,23 @@ function StudioSlider({
     <div
       ref={trackRef}
       onPointerDown={handlePointer}
-      className="h-5 flex items-center cursor-pointer select-none group relative"
+      className="h-6 flex items-center cursor-pointer select-none group relative py-1"
     >
-      <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative">
+      <div className="w-full h-2 bg-zinc-800/80 rounded-md overflow-hidden relative border border-white/5">
         <div
-          className="h-full rounded-full transition-all"
+          className="h-full rounded-md transition-all"
           style={{ width: `${value}%`, backgroundColor: accentColor }}
         />
       </div>
       <div
-        className="w-3.5 h-3.5 rounded-full bg-white shadow-md border-2 absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-transform group-hover:scale-125"
+        className="w-4 h-4 rounded-md bg-white shadow-lg border-2 absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-transform group-hover:scale-110"
         style={{ left: `${value}%`, borderColor: accentColor }}
       />
     </div>
   );
 }
 
-/* ─── Mini Keyboard Thumbnail Card ─── */
+/* ─── Mini Keyboard Thumbnail Card (Block Bento Style) ─── */
 function MiniKeyboardCard({
   layout,
   isActive,
@@ -391,12 +413,12 @@ function MiniKeyboardCard({
       onClick={onClick}
       className={`group relative rounded-xl border transition-all duration-200 cursor-pointer overflow-hidden text-left ${
         isActive
-          ? 'border-orange-500 ring-2 ring-orange-500/30 bg-[#161324]'
-          : 'border-white/10 hover:border-white/25 bg-[#100e1c] hover:bg-[#151224]'
+          ? 'border-orange-500 ring-1 ring-orange-500/40 bg-zinc-900/90 shadow-lg shadow-orange-500/10'
+          : 'border-zinc-800/90 hover:border-zinc-700 bg-zinc-950/80 hover:bg-zinc-900/60'
       }`}
     >
       {/* Mini Keyboard Graphical Preview */}
-      <div className="h-16 p-2 flex flex-col justify-between relative overflow-hidden bg-black/40">
+      <div className="h-16 p-2 flex flex-col justify-between relative overflow-hidden bg-black/50 border-b border-white/5">
         {/* Chassis outline */}
         <div
           className="w-full h-full rounded-lg p-1 flex flex-col justify-between border shadow-inner transition-colors"
@@ -448,54 +470,70 @@ function MiniKeyboardCard({
               style={{ backgroundColor: layout.customColors.keycapsMod || '#121215' }}
             >
               <div
-                className="absolute inset-x-2 top-0.5 bottom-0.5 rounded-full"
+                className="absolute inset-0 rounded-xs blur-[2px] opacity-70"
                 style={{ backgroundColor: layout.customColors.ledColor || '#ff8800' }}
               />
             </div>
             <div
               className="w-2.5 h-1.5 rounded-xs"
-              style={{ backgroundColor: layout.customColors.keycapsMod || '#121215' }}
+              style={{ backgroundColor: layout.customColors.keycapsAccent || '#ea580c' }}
             />
           </div>
         </div>
-
-        {/* Ambient Underglow Light Spill */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-1 blur-xs opacity-70"
-          style={{ backgroundColor: layout.customColors.ledColor || '#ff8800' }}
-        />
       </div>
 
-      {/* Info Footer */}
-      <div className="px-2.5 py-1.5 flex items-center justify-between bg-[#0d0b17]">
-        <div className="truncate flex-grow mr-2">
+      {/* Card Info & Meta */}
+      <div className="p-3">
+        <div className="flex items-center justify-between gap-1 mb-1">
           {isEditing ? (
-            <input 
+            <input
+              type="text"
               value={editName}
-              onChange={e => setEditName(e.target.value)}
+              onChange={(e) => setEditName(e.target.value)}
               onBlur={() => {
                 setIsEditing(false);
-                if (editName.trim() && onRename) onRename(editName.trim());
+                if (onRename && editName.trim()) {
+                  onRename(editName.trim());
+                }
               }}
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   setIsEditing(false);
-                  if (editName.trim() && onRename) onRename(editName.trim());
+                  if (onRename && editName.trim()) {
+                    onRename(editName.trim());
+                  }
                 }
               }}
               autoFocus
-              className="w-full bg-white/10 text-[11px] font-bold text-white px-1 py-0.5 rounded outline-none"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-black/60 border border-orange-500 rounded px-1.5 py-0.5 text-xs text-white font-bold w-full outline-none"
             />
           ) : (
-            <div className="text-[11px] font-bold text-gray-200 truncate group-hover:text-white" onDoubleClick={() => onRename && setIsEditing(true)}>
+            <span
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              className="text-xs font-bold text-white tracking-wide truncate group-hover:text-orange-400 transition"
+              title="Double click to rename"
+            >
               {layout.name}
-            </div>
+            </span>
           )}
-          <div className="text-[9px] text-gray-500 uppercase tracking-wider">{layout.colorTheme}</div>
+
+          {isActive && (
+            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 shrink-0">
+              Active
+            </span>
+          )}
         </div>
-        {isActive && (
-          <span className="w-2 h-2 rounded-full bg-orange-500 ring-2 ring-orange-500/40 shrink-0" />
-        )}
+
+        <div className="flex items-center justify-between text-[10px] text-zinc-400">
+          <span className="capitalize font-mono">{layout.colorTheme}</span>
+          <span className="font-mono text-zinc-500 text-[9px]">
+            {new Date(layout.timestamp).toLocaleDateString()}
+          </span>
+        </div>
       </div>
 
       {/* Hover Actions */}
@@ -506,7 +544,7 @@ function MiniKeyboardCard({
               e.stopPropagation();
               onDuplicate();
             }}
-            className="p-1 rounded-md bg-black/60 text-white hover:bg-gray-700 cursor-pointer backdrop-blur-md"
+            className="p-1 rounded bg-black/70 text-white hover:bg-zinc-800 cursor-pointer backdrop-blur-md border border-white/10"
             title="Duplicate preset"
           >
             <Layers size={11} />
@@ -518,7 +556,7 @@ function MiniKeyboardCard({
               e.stopPropagation();
               onDelete();
             }}
-            className="p-1 rounded-md bg-red-600/90 text-white hover:bg-red-500 cursor-pointer shadow-md"
+            className="p-1 rounded bg-red-950/80 text-red-300 hover:bg-red-900 cursor-pointer border border-red-500/40"
             title="Delete preset"
           >
             <Trash2 size={11} />
@@ -529,7 +567,7 @@ function MiniKeyboardCard({
   );
 }
 
-/* ─── Full-Screen Studio Panel ─── */
+/* ─── Full-Screen Responsive Block Studio Panel ─── */
 function StudioPanel() {
   const {
     colorTheme,
@@ -553,19 +591,17 @@ function StudioPanel() {
 
   const scrollProgress = useCustomScroll();
 
-  const [layoutScroll, setLayoutScroll] = useState(0);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredLayouts = savedLayouts.filter(l => l.name.toLowerCase().includes(searchQuery.toLowerCase()));
-  const maxScroll = Math.max(0, filteredLayouts.length - 4);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger shortcuts if user is typing in an input field
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
@@ -589,6 +625,8 @@ function StudioPanel() {
       if (e.key === 'Escape') {
         if (showShortcuts) {
           setShowShortcuts(false);
+        } else if (mobileDrawerOpen) {
+          setMobileDrawerOpen(false);
         } else {
           setShowStudio(false);
         }
@@ -596,82 +634,94 @@ function StudioPanel() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showShortcuts]);
+  }, [showShortcuts, mobileDrawerOpen]);
 
   if (!showStudio) return null;
 
   return (
-    <div className="fixed inset-0 z-30 pointer-events-none flex flex-col">
-      {/* ─── TOP BAR ─── */}
-      <div className="h-14 flex items-center justify-between px-6 border-b border-[#2a2640]/70 shrink-0 bg-[#0c0a1a] pointer-events-auto">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-orange-500 text-xl font-bold">⬡</span>
-            <span className="text-sm font-black tracking-wider text-white uppercase hidden sm:inline">
+    <div className="fixed inset-0 z-30 pointer-events-none flex flex-col font-sans">
+      {/* ─── BLOCK HEADER: TOP BAR ─── */}
+      <header className="h-14 flex items-center justify-between px-3 sm:px-6 border-b border-zinc-800/80 shrink-0 bg-[#090812]/95 backdrop-blur-xl pointer-events-auto">
+        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Brand Block */}
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-zinc-900/80 border border-zinc-800">
+            <span className="text-orange-500 text-lg font-black">⬡</span>
+            <span className="text-xs font-black tracking-wider text-white uppercase hidden sm:inline">
               Keycraft <span className="text-orange-400">Studio</span>
             </span>
           </div>
 
-          {/* Workspace vs Saved Sets Tabs */}
-          <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5 border border-white/10">
+          {/* Mode Switch Block (Workspace vs Saved Sets) */}
+          <div className="flex items-center bg-zinc-950/80 rounded-lg p-0.5 border border-zinc-800">
             <button
               onClick={() => setStudioTab("workspace")}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase transition cursor-pointer flex items-center gap-1.5 ${
                 studioTab === "workspace"
-                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/40"
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/40 shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              <SlidersHorizontal size={13} />
-              Workspace
+              <SlidersHorizontal size={12} />
+              <span className="hidden xs:inline">Workspace</span>
             </button>
             <button
               onClick={() => setStudioTab("saved")}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase transition cursor-pointer flex items-center gap-1.5 ${
                 studioTab === "saved"
-                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/40"
-                  : "text-gray-400 hover:text-gray-200"
+                  ? "bg-orange-500/20 text-orange-400 border border-orange-500/40 shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              <Grid size={13} />
-              Saved Sets ({savedLayouts.length})
+              <Grid size={12} />
+              <span>Saved ({savedLayouts.length})</span>
             </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Annotations Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Annotations Toggle Block */}
           <button
             onClick={toggleAnnotations}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold tracking-wide transition cursor-pointer flex items-center gap-1.5 ${
+            className={`hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[11px] font-bold tracking-wide transition cursor-pointer ${
               showAnnotations
                 ? "bg-orange-500/20 text-orange-400 border-orange-500/40"
-                : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20"
+                : "bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:border-zinc-700"
             }`}
           >
-            <Info size={13} />
-            {showAnnotations ? "Labels ON" : "Labels OFF"}
+            <Info size={12} />
+            <span>{showAnnotations ? "Labels ON" : "Labels OFF"}</span>
           </button>
 
-          {/* Sound Toggle */}
+          {/* Sound Toggle Block */}
           <button
             onClick={toggleSound}
             className={`p-2 rounded-lg border transition cursor-pointer ${
               soundEnabled
                 ? "bg-orange-500/20 text-orange-400 border-orange-500/40"
-                : "bg-white/5 text-gray-400 border-white/10 hover:text-white"
+                : "bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:text-white"
             }`}
-            title={soundEnabled ? "Mute Acoustics" : "Unmute Acoustics"}
+            title={soundEnabled ? "Mute Switch Sound" : "Unmute Switch Sound"}
           >
-            {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
 
-          {/* Quick theme indicator badge */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-gray-300">
+          {/* Current Theme Edition Block */}
+          <div className="hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/80 border border-zinc-800 text-[11px] text-zinc-300">
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-            <span className="capitalize font-bold text-orange-400">{colorTheme}</span> Edition
+            <span className="capitalize font-bold text-orange-400">{colorTheme}</span>
           </div>
 
+          {/* Save Current Preset Block Button */}
+          <button
+            onClick={() => setShowSaveInput(true)}
+            className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white font-bold text-[11px] uppercase tracking-wider rounded-lg transition cursor-pointer"
+            title="Save layout preset"
+          >
+            <Save size={12} className="text-orange-400" />
+            <span>Save</span>
+          </button>
+
+          {/* Export Preset Block Button */}
           <button
             onClick={() => {
               const data = JSON.stringify(
@@ -697,59 +747,115 @@ function StudioPanel() {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="px-4 py-1.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-black font-black text-xs tracking-wider uppercase rounded-lg transition shadow-lg shadow-orange-500/20 cursor-pointer flex items-center gap-1.5"
+            className="px-2.5 sm:px-3.5 py-1.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-black font-black text-[11px] tracking-wider uppercase rounded-lg transition shadow-md shadow-orange-500/20 cursor-pointer flex items-center gap-1.5"
+            title="Export JSON Config"
           >
-            <Download size={13} /> Export Preset
+            <Download size={12} />
+            <span className="hidden sm:inline">Export</span>
           </button>
 
+          {/* Mobile Inspector Drawer Trigger Button (Only visible on < lg screens) */}
           <button
-            onClick={() => setShowShortcuts(true)}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
-            title="Keyboard Shortcuts (?)"
+            onClick={() => setMobileDrawerOpen(prev => !prev)}
+            className={`lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-black uppercase tracking-wider transition cursor-pointer ${
+              mobileDrawerOpen
+                ? "bg-orange-500 text-black border-orange-500"
+                : "bg-orange-500/20 text-orange-400 border-orange-500/40"
+            }`}
           >
-            <Info size={18} />
+            <Sliders size={13} />
+            <span>{mobileDrawerOpen ? "Close" : "Customize"}</span>
           </button>
 
           {/* Close Studio Button */}
           <button
             onClick={() => setShowStudio(false)}
-            className="p-1.5 px-2.5 rounded-lg text-gray-300 hover:text-white bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 transition cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+            className="p-1.5 px-2.5 rounded-lg text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-red-500/20 border border-zinc-800 hover:border-red-500/40 transition cursor-pointer flex items-center gap-1 text-[11px] font-bold"
             title="Close Studio (ESC)"
           >
-            <X size={15} />
-            <span>Close</span>
+            <X size={14} />
+            <span className="hidden sm:inline">Close</span>
           </button>
         </div>
-      </div>
+      </header>
+
+      {/* Save Preset Dialog Modal */}
+      {showSaveInput && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4">
+          <div className="bg-[#0f0e1a] border border-zinc-800 rounded-2xl p-5 shadow-2xl max-w-sm w-full">
+            <h3 className="text-white font-black uppercase tracking-wider text-sm mb-1 flex items-center gap-2">
+              <Save size={15} className="text-orange-400" />
+              Save Preset Configuration
+            </h3>
+            <p className="text-xs text-zinc-400 mb-4">
+              Give your personalized custom build a name to access in Saved Sets.
+            </p>
+            <input
+              type="text"
+              placeholder="e.g. Amber Cyberpunk V1"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-orange-500 mb-4"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowSaveInput(false);
+                  setSaveName("");
+                }}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (saveName.trim()) {
+                    saveCurrentLayout(saveName.trim());
+                    setShowSaveInput(false);
+                    setSaveName("");
+                  }
+                }}
+                className="px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider bg-orange-500 hover:bg-orange-400 text-black cursor-pointer shadow-md shadow-orange-500/20"
+              >
+                Save Preset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Shortcuts Modal */}
       {showShortcuts && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto">
-          <div className="bg-[#0e0c1a] border border-[#2a2640] rounded-2xl p-6 shadow-2xl max-w-sm w-full">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4">
+          <div className="bg-[#0f0e1a] border border-zinc-800 rounded-2xl p-5 shadow-2xl max-w-sm w-full">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-black uppercase tracking-wider">Keyboard Shortcuts</h3>
-              <button onClick={() => setShowShortcuts(false)} className="text-gray-400 hover:text-white"><X size={16}/></button>
+              <h3 className="text-white font-black uppercase tracking-wider text-sm flex items-center gap-2">
+                <Info size={15} className="text-orange-400" />
+                Keyboard Shortcuts
+              </h3>
+              <button onClick={() => setShowShortcuts(false)} className="text-zinc-400 hover:text-white"><X size={15}/></button>
             </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center text-sm text-gray-300">
-                <span>Undo</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + Z</kbd>
+            <div className="space-y-2.5">
+              <div className="flex justify-between items-center text-xs text-zinc-300">
+                <span>Undo Action</span>
+                <kbd className="px-2 py-0.5 bg-zinc-900 rounded font-mono text-[10px] border border-zinc-700 text-zinc-200">Ctrl + Z</kbd>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-300">
-                <span>Redo</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + Shift + Z</kbd>
+              <div className="flex justify-between items-center text-xs text-zinc-300">
+                <span>Redo Action</span>
+                <kbd className="px-2 py-0.5 bg-zinc-900 rounded font-mono text-[10px] border border-zinc-700 text-zinc-200">Ctrl + Shift + Z</kbd>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-300">
+              <div className="flex justify-between items-center text-xs text-zinc-300">
                 <span>Save Preset</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + S</kbd>
+                <kbd className="px-2 py-0.5 bg-zinc-900 rounded font-mono text-[10px] border border-zinc-700 text-zinc-200">Ctrl + S</kbd>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-300">
+              <div className="flex justify-between items-center text-xs text-zinc-300">
                 <span>Toggle Shortcuts</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">?</kbd>
+                <kbd className="px-2 py-0.5 bg-zinc-900 rounded font-mono text-[10px] border border-zinc-700 text-zinc-200">?</kbd>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-300 pt-2 border-t border-white/10 mt-2">
-                <span>Typing</span>
-                <span className="text-xs text-gray-400">Keys animate and click!</span>
+              <div className="flex justify-between items-center text-xs text-zinc-300 pt-2 border-t border-zinc-800">
+                <span>Interactive Typing</span>
+                <span className="text-[10px] text-orange-400 font-bold">Physical Switches & Acoustics</span>
               </div>
             </div>
           </div>
@@ -758,71 +864,76 @@ function StudioPanel() {
 
       {/* ─── TAB 1: WORKSPACE VIEW ─── */}
       {studioTab === "workspace" ? (
-        <div className="flex-grow flex min-h-0">
-          {/* ── LEFT: 3D Keyboard Viewport ── */}
+        <div className="flex-grow flex min-h-0 relative">
+          
+          {/* ── VIEWPORT CONTAINER (With Responsive Floating Bento Controls) ── */}
           <div className="flex-grow relative flex flex-col pointer-events-none">
-            {/* Floating Top Controls in Viewport */}
-            <div className="absolute top-4 left-6 z-10 pointer-events-auto flex items-center gap-2">
-              <div className="flex items-center bg-[#0e0c1a] border border-[#2a2640]/70 rounded-xl p-1 shadow-xl">
+            
+            {/* FLOATING BENTO CONTROLS: DESKTOP (Top-Left) & MOBILE (Bottom Center) */}
+            <div className="absolute top-4 left-3 sm:left-6 z-10 pointer-events-auto flex flex-wrap items-center gap-1.5 sm:gap-2 max-w-[calc(100vw-24px)]">
+              {/* Zoom Block */}
+              <div className="flex items-center bg-[#090812]/95 border border-zinc-800/90 rounded-xl p-0.5 shadow-xl backdrop-blur-md">
                 <button
                   onClick={() => setZoomLevel(zoomLevel * 1.15)}
-                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+                  className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer"
                   title="Zoom In"
                 >
-                  <ZoomIn size={15} />
+                  <ZoomIn size={14} />
                 </button>
                 <button
                   onClick={() => setZoomLevel(zoomLevel / 1.15)}
-                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+                  className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer"
                   title="Zoom Out"
                 >
-                  <ZoomOut size={15} />
+                  <ZoomOut size={14} />
                 </button>
                 <button
                   onClick={() => {
                     setZoomLevel(1.0);
                     resetCamera();
                   }}
-                  className="px-2.5 py-1 text-xs font-mono font-bold text-orange-400 hover:bg-white/10 rounded-lg transition cursor-pointer"
-                  title="Reset View"
+                  className="px-2 py-1 text-[11px] font-mono font-bold text-orange-400 hover:bg-zinc-800 rounded-lg transition cursor-pointer"
+                  title="Reset Zoom"
                 >
                   {Math.round(zoomLevel * 100)}%
                 </button>
               </div>
 
-              <div className="flex items-center bg-[#0e0c1a] border border-[#2a2640]/70 rounded-xl p-1 shadow-xl">
+              {/* History Undo/Redo Block */}
+              <div className="flex items-center bg-[#090812]/95 border border-zinc-800/90 rounded-xl p-0.5 shadow-xl backdrop-blur-md">
                 <button
                   onClick={() => undo()}
                   disabled={!canUndo()}
-                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Undo (Ctrl+Z)"
                 >
-                  <RotateCcw size={15} />
+                  <RotateCcw size={14} />
                 </button>
                 <button
                   onClick={() => redo()}
                   disabled={!canRedo()}
-                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Redo (Ctrl+Shift+Z)"
                   style={{ transform: 'scaleX(-1)' }}
                 >
-                  <RotateCcw size={15} />
+                  <RotateCcw size={14} />
                 </button>
               </div>
 
-              {/* Explode / Assembly Interactive Slider */}
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0e0c1a] border border-[#2a2640]/70 rounded-xl shadow-xl">
+              {/* Explode / Assembly Interactive Slider Block */}
+              <div className="flex items-center gap-2 px-3 py-1 bg-[#090812]/95 border border-zinc-800/90 rounded-xl shadow-xl backdrop-blur-md">
                 <Layers size={13} className="text-orange-400" />
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Explode</span>
-                <div className="w-20">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider hidden sm:inline">Explode</span>
+                <div className="w-16 sm:w-20">
                   <StudioSlider value={Math.round(scrollProgress * 100)} onChange={(v) => setScrollProgress(v / 100)} />
                 </div>
                 <span className="text-[10px] font-mono text-orange-400 font-bold w-7 text-right">{Math.round(scrollProgress * 100)}%</span>
               </div>
 
+              {/* Assemble Quick Reset Button */}
               <button
                 onClick={() => setScrollProgress(0)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0e0c1a] border border-[#2a2640]/70 text-xs font-bold text-gray-300 hover:text-white hover:border-orange-500/40 transition shadow-xl cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#090812]/95 border border-zinc-800/90 text-[11px] font-bold text-zinc-300 hover:text-white hover:border-orange-500/40 transition shadow-xl backdrop-blur-md cursor-pointer"
                 title="Reset to fully assembled view"
               >
                 <Eye size={12} className="text-orange-400" />
@@ -830,54 +941,113 @@ function StudioPanel() {
               </button>
             </div>
 
-            {/* Viewport Center (Transparent - Three.js canvas visible behind) */}
+            {/* Mobile Bottom Quick-Action Floating Pill (When drawer is closed on < lg) */}
+            {!mobileDrawerOpen && (
+              <div className="lg:hidden absolute bottom-5 right-4 z-20 pointer-events-auto">
+                <button
+                  onClick={() => setMobileDrawerOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-orange-500 text-black font-black text-xs uppercase tracking-wider shadow-2xl shadow-orange-500/40 cursor-pointer hover:bg-orange-400 active:scale-95 transition"
+                >
+                  <Settings2 size={16} />
+                  <span>Customize Build</span>
+                </button>
+              </div>
+            )}
+
+            {/* Viewport Center Canvas area */}
             <div className="flex-grow pointer-events-none" />
           </div>
 
-          {/* ── RIGHT SIDEBAR: Config Controls ── */}
-          <div className="allow-internal-scroll w-[350px] shrink-0 border-l border-[#2a2640]/60 overflow-y-auto no-scrollbar bg-[#0c0a1a] flex flex-col pointer-events-auto">
-            
-            {/* Inspector Tabs */}
-            <div className="p-4 pb-0 shrink-0">
-              <div className="flex bg-[#13111f] rounded-xl p-1 border border-[#2a2640]/60">
+          {/* ── MOBILE BACKDROP OVERLAY (When drawer is open on mobile) ── */}
+          {mobileDrawerOpen && (
+            <div
+              onClick={() => setMobileDrawerOpen(false)}
+              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-40 pointer-events-auto transition-opacity"
+            />
+          )}
+
+          {/* ── RIGHT STUDIO INSPECTOR (Desktop Sidebar & Mobile Drawer) ── */}
+          <aside
+            className={`
+              allow-internal-scroll
+              pointer-events-auto
+              flex flex-col
+              bg-[#0a0914]/98
+              border-zinc-800/90
+              backdrop-blur-2xl
+              transition-all duration-300 ease-out
+              z-50
+              
+              /* Desktop Sidebar Style */
+              lg:static lg:w-[370px] xl:w-[410px] lg:shrink-0 lg:border-l lg:max-h-none lg:translate-y-0 lg:rounded-none lg:shadow-none
+
+              /* Mobile Slide-Up Drawer Style */
+              fixed inset-x-0 bottom-0 max-h-[85vh] rounded-t-3xl border-t shadow-2xl
+              ${mobileDrawerOpen ? "translate-y-0" : "translate-y-full lg:translate-y-0"}
+            `}
+          >
+            {/* Mobile Drawer Top Drag Bar & Close */}
+            <div className="lg:hidden flex flex-col items-center pt-2.5 pb-1 px-4 border-b border-zinc-800/60 shrink-0">
+              <div className="w-12 h-1 bg-zinc-700 rounded-full mb-2" />
+              <div className="w-full flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wand2 size={14} className="text-orange-400" />
+                  <span className="text-xs font-black uppercase tracking-wider text-white">Studio Inspector</span>
+                </div>
                 <button
-                  onClick={() => setInspectorTab('basic')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
-                    inspectorTab === 'basic' 
-                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-md" 
-                    : "text-gray-400 hover:text-white"
-                  }`}
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="p-1 rounded-lg text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800"
                 >
-                  Basic
-                </button>
-                <button
-                  onClick={() => setInspectorTab('advanced')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
-                    inspectorTab === 'advanced' 
-                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-md" 
-                    : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  Advanced
+                  <X size={15} />
                 </button>
               </div>
             </div>
 
-            <div className="p-4 space-y-4 flex-grow">
-              {/* If basic, show Presets and Legend. If advanced, show Lighting and per-component Colors */}
+            {/* Inspector Tab Switcher Block (Basic vs Advanced) */}
+            <div className="p-3 sm:p-4 pb-0 shrink-0">
+              <div className="flex bg-zinc-950/90 rounded-xl p-1 border border-zinc-800/80">
+                <button
+                  onClick={() => setInspectorTab('basic')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                    inspectorTab === 'basic' 
+                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/40 shadow-xs" 
+                    : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  <Palette size={12} />
+                  Basic Craft
+                </button>
+                <button
+                  onClick={() => setInspectorTab('advanced')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                    inspectorTab === 'advanced' 
+                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/40 shadow-xs" 
+                    : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  <Sliders size={12} />
+                  Advanced Studio
+                </button>
+              </div>
+            </div>
+
+            {/* Inspector Bento Cards Container */}
+            <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 overflow-y-auto no-scrollbar flex-grow">
               
               {inspectorTab === 'basic' ? (
                 <>
-                  {/* Basic: Theme Presets */}
-                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
+                  {/* BENTO BLOCK 1: Theme Presets */}
+                  <div className="bg-[#100f1c]/95 border border-zinc-800/90 rounded-2xl p-3.5 sm:p-4 shadow-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Palette size={14} className="text-orange-400" />
+                        <Palette size={13} className="text-orange-400" />
                         <span className="text-xs font-black text-white tracking-wider uppercase">
-                          Theme Presets
+                          Theme Colorways
                         </span>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-mono font-medium">{THEMES.length} Presets</span>
+                      <span className="text-[10px] text-zinc-400 font-mono font-medium px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
+                        {THEMES.length} Presets
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto no-scrollbar pr-0.5">
@@ -889,35 +1059,37 @@ function StudioPanel() {
                             onClick={() => setColorTheme(th.id)}
                             className={`flex flex-col gap-1 p-2.5 rounded-xl border text-left transition cursor-pointer ${
                               isSelected
-                                ? `${th.border} bg-orange-500/10 text-white shadow-md ring-1 ring-orange-500/50`
-                                : "border-white/10 bg-black/40 text-gray-400 hover:border-white/25 hover:bg-white/5"
+                                ? `${th.border} bg-orange-500/15 text-white shadow-md ring-1 ring-orange-500/40`
+                                : "border-zinc-800/80 bg-zinc-950/70 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/50"
                             }`}
                           >
                             <div className="flex justify-between items-center w-full">
                               <span className="text-[11px] font-bold text-white truncate flex-grow mr-1">{th.label}</span>
                               <div className="flex items-center -space-x-1 shrink-0">
-                                <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: th.dotColor }} />
-                                <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: th.dotMod }} />
-                                <span className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-xs" style={{ backgroundColor: th.dotAccent }} />
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/50" style={{ backgroundColor: th.dotColor }} />
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/50" style={{ backgroundColor: th.dotMod }} />
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/50 shadow-xs" style={{ backgroundColor: th.dotAccent }} />
                               </div>
                             </div>
-                            <span className="text-[9px] text-gray-400 line-clamp-1">{th.desc}</span>
+                            <span className="text-[9px] text-zinc-400 line-clamp-1">{th.desc}</span>
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Basic: 4. SWITCH PROFILE & COLORWAYS Section */}
-                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg space-y-3.5">
+                  {/* BENTO BLOCK 2: Switch Profile & Sound */}
+                  <div className="bg-[#100f1c]/95 border border-zinc-800/90 rounded-2xl p-3.5 sm:p-4 shadow-lg space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Sliders size={14} className="text-orange-400" />
+                        <Sliders size={13} className="text-orange-400" />
                         <span className="text-xs font-black text-white tracking-wider uppercase">
-                          Switch Profile & Sound
+                          Mechanical Switches
                         </span>
                       </div>
-                      <span className="text-[10px] text-orange-400 font-mono font-bold uppercase">{switchType}</span>
+                      <span className="text-[10px] text-orange-400 font-mono font-bold uppercase px-2 py-0.5 rounded bg-orange-500/10 border border-orange-500/20">
+                        {switchType}
+                      </span>
                     </div>
 
                     <div className="space-y-1.5">
@@ -928,34 +1100,37 @@ function StudioPanel() {
                             setSwitchType(sw.id);
                             playSwitchSound(sw.id);
                           }}
-                          className={`w-full flex items-center justify-between p-2 rounded-xl border text-left transition cursor-pointer ${
+                          className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition cursor-pointer ${
                             switchType === sw.id
-                              ? "border-orange-500 bg-orange-500/15 text-white"
-                              : "border-white/10 bg-black/40 text-gray-400 hover:border-white/20"
+                              ? "border-orange-500 bg-orange-500/15 text-white shadow-xs ring-1 ring-orange-500/30"
+                              : "border-zinc-800/80 bg-zinc-950/70 text-zinc-400 hover:border-zinc-700"
                           }`}
                         >
                           <div>
-                            <div className="text-[11px] font-bold text-white">{sw.label}</div>
-                            <div className="text-[9px] text-gray-400">{sw.desc}</div>
+                            <div className="text-[11px] font-bold text-white flex items-center gap-2">
+                              <span>{sw.label}</span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300">{sw.force}</span>
+                            </div>
+                            <div className="text-[9px] text-zinc-400 mt-0.5">{sw.desc}</div>
                           </div>
                           {switchType === sw.id && (
-                            <Check size={13} className="text-orange-400" />
+                            <Check size={14} className="text-orange-400 shrink-0" />
                           )}
                         </button>
                       ))}
                     </div>
 
                     {/* Switch Colorway Presets */}
-                    <div className="pt-2 border-t border-white/10">
+                    <div className="pt-2.5 border-t border-zinc-800/80">
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-[10px] font-bold text-gray-300 uppercase tracking-widest flex items-center gap-1.5">
+                        <label className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
                           <Sparkles size={11} className="text-orange-400" />
                           Switch Colorways
                         </label>
-                        <span className="text-[9px] text-gray-500">1-Click Apply</span>
+                        <span className="text-[9px] text-zinc-500">1-Click Apply</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto no-scrollbar pr-0.5">
+                      <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto no-scrollbar pr-0.5">
                         {SWITCH_COLOR_PRESETS.map((preset) => {
                           const isSelected = 
                             customColors.switchStem.toLowerCase() === preset.stem.toLowerCase() &&
@@ -970,20 +1145,20 @@ function StudioPanel() {
                                 setCustomColor("switchTopHousing", preset.topHousing);
                                 setCustomColor("switchSpring", preset.spring);
                               }}
-                              className={`p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between min-h-[54px] ${
+                              className={`p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between min-h-[52px] ${
                                 isSelected
-                                  ? "border-orange-500 bg-orange-500/15 shadow-xs ring-1 ring-orange-500/50"
-                                  : "border-white/10 bg-black/40 hover:border-white/30 hover:bg-white/5"
+                                  ? "border-orange-500 bg-orange-500/15 shadow-xs ring-1 ring-orange-500/30"
+                                  : "border-zinc-800/80 bg-zinc-950/70 hover:border-zinc-700 hover:bg-zinc-900/50"
                               }`}
                             >
                               <div className="flex items-center justify-between w-full mb-0.5">
                                 <span className="text-[10.5px] font-bold text-white truncate mr-1">{preset.name}</span>
                                 <div className="flex items-center -space-x-1 shrink-0">
-                                  <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: preset.housing }} title="Base Housing" />
-                                  <span className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-xs" style={{ backgroundColor: preset.stem }} title="Stem Slider" />
+                                  <span className="w-2.5 h-2.5 rounded-full border border-black/50" style={{ backgroundColor: preset.housing }} title="Base Housing" />
+                                  <span className="w-2.5 h-2.5 rounded-full border border-black/50 shadow-xs" style={{ backgroundColor: preset.stem }} title="Stem Slider" />
                                 </div>
                               </div>
-                              <span className="text-[8.5px] text-gray-400 line-clamp-1 leading-tight">{preset.desc}</span>
+                              <span className="text-[8.5px] text-zinc-400 line-clamp-1">{preset.desc}</span>
                             </button>
                           );
                         })}
@@ -991,14 +1166,14 @@ function StudioPanel() {
                     </div>
 
                     {/* Quick Switch Part Color Tuners */}
-                    <div className="pt-2 border-t border-white/10 space-y-2">
-                      <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-1.5">
-                        Custom Switch Parts
+                    <div className="pt-2.5 border-t border-zinc-800/80 space-y-2">
+                      <div className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-1">
+                        Precision Switch Parts
                       </div>
 
                       {/* Stem */}
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 font-medium">Stem Slider</span>
+                        <span className="text-zinc-400 font-medium">Stem Slider</span>
                         <div className="flex items-center gap-1.5">
                           <input
                             type="color"
@@ -1006,13 +1181,13 @@ function StudioPanel() {
                             onChange={(e) => setCustomColor("switchStem", e.target.value)}
                             className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
                           />
-                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchStem}</span>
+                          <span className="font-mono text-zinc-300 text-[9px] w-14 text-right">{customColors.switchStem}</span>
                         </div>
                       </div>
 
                       {/* Housing Base */}
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 font-medium">Base Housing</span>
+                        <span className="text-zinc-400 font-medium">Base Housing</span>
                         <div className="flex items-center gap-1.5">
                           <input
                             type="color"
@@ -1020,13 +1195,13 @@ function StudioPanel() {
                             onChange={(e) => setCustomColor("switchHousing", e.target.value)}
                             className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
                           />
-                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchHousing}</span>
+                          <span className="font-mono text-zinc-300 text-[9px] w-14 text-right">{customColors.switchHousing}</span>
                         </div>
                       </div>
 
                       {/* Top Shell */}
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 font-medium">Top Clear Shell</span>
+                        <span className="text-zinc-400 font-medium">Top Clear Shell</span>
                         <div className="flex items-center gap-1.5">
                           <input
                             type="color"
@@ -1034,13 +1209,13 @@ function StudioPanel() {
                             onChange={(e) => setCustomColor("switchTopHousing", e.target.value)}
                             className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
                           />
-                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchTopHousing}</span>
+                          <span className="font-mono text-zinc-300 text-[9px] w-14 text-right">{customColors.switchTopHousing}</span>
                         </div>
                       </div>
 
                       {/* Internal Spring */}
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 font-medium">Internal Spring</span>
+                        <span className="text-zinc-400 font-medium">Internal Spring</span>
                         <div className="flex items-center gap-1.5">
                           <input
                             type="color"
@@ -1048,7 +1223,7 @@ function StudioPanel() {
                             onChange={(e) => setCustomColor("switchSpring", e.target.value)}
                             className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
                           />
-                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchSpring}</span>
+                          <span className="font-mono text-zinc-300 text-[9px] w-14 text-right">{customColors.switchSpring}</span>
                         </div>
                       </div>
                     </div>
@@ -1056,288 +1231,292 @@ function StudioPanel() {
                 </>
               ) : (
                 <>
-                  {/* Advanced: 1. LEGEND DESIGN Section */}
-                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                    <div className="flex items-center gap-2 mb-3.5">
-                      <Type size={14} className="text-orange-400" />
+                  {/* BENTO BLOCK 3: Legend & Typography */}
+                  <div className="bg-[#100f1c]/95 border border-zinc-800/90 rounded-2xl p-3.5 sm:p-4 shadow-lg space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Type size={13} className="text-orange-400" />
                       <span className="text-xs font-black text-white tracking-wider uppercase">
-                        Legend Design
+                        Keycap Typography
                       </span>
                     </div>
 
-                {/* Font Style */}
-                <div className="mb-3.5">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
-                    Font Style
-                  </label>
-                  <div className="flex gap-1.5">
-                    {(["modern", "classic", "script"] as FontStyle[]).map((style) => (
-                      <button
-                        key={style}
-                        onClick={() => setFontStyle(style)}
-                        className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold tracking-wide capitalize transition cursor-pointer border ${
-                          fontStyle === style
-                            ? "border-orange-500 bg-orange-500/15 text-orange-400 shadow-xs"
-                            : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
-                        }`}
-                      >
-                        {style}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                    {/* Font Style */}
+                    <div>
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1.5">
+                        Font Family
+                      </label>
+                      <div className="flex gap-1.5">
+                        {(["modern", "classic", "script"] as FontStyle[]).map((style) => (
+                          <button
+                            key={style}
+                            onClick={() => setFontStyle(style)}
+                            className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold tracking-wide capitalize transition cursor-pointer border ${
+                              fontStyle === style
+                                ? "border-orange-500 bg-orange-500/15 text-orange-400 shadow-xs"
+                                : "border-zinc-800 bg-zinc-950/80 text-zinc-400 hover:border-zinc-700"
+                            }`}
+                          >
+                            {style}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Font Size */}
-                <div className="mb-3.5">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                      Font Size
-                    </label>
-                    <span className="text-[10px] font-mono text-orange-400 font-black">
-                      {fontSize}px
-                    </span>
-                  </div>
-                  <StudioSlider
-                    value={((fontSize - 24) / 56) * 100}
-                    onChange={(v) => setFontSize(Math.round(24 + (v / 100) * 56))}
-                  />
-                </div>
-
-                {/* Legend Color */}
-                <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
-                    Legend Color
-                  </label>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {LEGEND_COLORS.map((hex) => (
-                      <button
-                        key={hex}
-                        onClick={() => setLegendColor(hex)}
-                        className={`w-6 h-6 rounded-md transition shrink-0 cursor-pointer border ${
-                          legendColor.toLowerCase() === hex.toLowerCase()
-                            ? "border-orange-400 ring-2 ring-orange-500/50 scale-110"
-                            : "border-white/15 hover:scale-105"
-                        }`}
-                        style={{ backgroundColor: hex }}
+                    {/* Font Size */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                          Legend Scale
+                        </label>
+                        <span className="text-[10px] font-mono text-orange-400 font-black">
+                          {fontSize}px
+                        </span>
+                      </div>
+                      <StudioSlider
+                        value={((fontSize - 24) / 56) * 100}
+                        onChange={(v) => setFontSize(Math.round(24 + (v / 100) * 56))}
                       />
-                    ))}
-                    <input
-                      type="color"
-                      value={legendColor}
-                      onChange={(e) => setLegendColor(e.target.value)}
-                      className="w-6 h-6 rounded-md border border-white/20 cursor-pointer bg-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
+                    </div>
 
-              {/* 2. LIGHTING FX Section */}
-              <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center gap-2 mb-3.5">
-                  <Lightbulb size={14} className="text-orange-400" />
-                  <span className="text-xs font-black text-white tracking-wider uppercase">
-                    Lighting FX
-                  </span>
-                </div>
-
-                {/* Effect Type */}
-                <div className="mb-3.5">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
-                    Effect Type
-                  </label>
-                  <div className="flex gap-1.5">
-                    {(["static", "wave", "breathe"] as LightingEffect[]).map((fx) => (
-                      <button
-                        key={fx}
-                        onClick={() => setLightingEffect(fx)}
-                        className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold tracking-wide capitalize transition cursor-pointer border ${
-                          lightingEffect === fx
-                            ? "border-orange-500 bg-orange-500/15 text-orange-400"
-                            : "border-white/10 bg-white/5 text-gray-400 hover:border-white/20"
-                        }`}
-                      >
-                        {fx}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Speed */}
-                <div className="mb-3.5">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                      Speed
-                    </label>
-                    <span className="text-[10px] font-mono text-orange-400 font-black">
-                      {lightingSpeed}%
-                    </span>
-                  </div>
-                  <StudioSlider value={lightingSpeed} onChange={setLightingSpeed} />
-                </div>
-
-                {/* Brightness */}
-                <div className="mb-3.5">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                      Brightness
-                    </label>
-                    <span className="text-[10px] font-mono text-orange-400 font-black">
-                      {lightingBrightness}%
-                    </span>
-                  </div>
-                  <StudioSlider
-                    value={lightingBrightness}
-                    onChange={setLightingBrightness}
-                    accentColor="#f59e0b"
-                  />
-                </div>
-
-                {/* Per Key Color Grid */}
-                <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
-                    RGB Glow Swatch
-                  </label>
-                  <div className="grid grid-cols-8 gap-1.5">
-                    {PER_KEY_COLORS.map((hex) => (
-                      <button
-                        key={hex}
-                        onClick={() => setCustomColor("ledColor", hex)}
-                        className={`w-full aspect-square rounded-md transition cursor-pointer border ${
-                          customColors.ledColor.toLowerCase() === hex.toLowerCase()
-                            ? "border-white ring-2 ring-orange-500/60 scale-110"
-                            : "border-transparent hover:scale-105"
-                        }`}
-                        style={{ backgroundColor: hex }}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <input
-                      type="color"
-                      value={customColors.ledColor}
-                      onChange={(e) => setCustomColor("ledColor", e.target.value)}
-                      className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
-                    />
-                    <span className="text-[10px] font-mono text-gray-300">
-                      {customColors.ledColor}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. COMPONENT COLORS Section */}
-              <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center gap-2 mb-3.5">
-                  <Layers size={14} className="text-orange-400" />
-                  <span className="text-xs font-black text-white tracking-wider uppercase">
-                    Component Colors
-                  </span>
-                </div>
-
-                {/* Theme Presets */}
-                <div className="mb-3.5">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
-                    Base Presets
-                  </label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {THEMES.map((th) => (
-                      <button
-                        key={th.id}
-                        onClick={() => setColorTheme(th.id)}
-                        className={`flex items-center gap-2 p-2 rounded-lg border text-left text-[11px] font-bold transition cursor-pointer ${
-                          colorTheme === th.id
-                            ? `${th.border} bg-white/10 text-white shadow-xs`
-                            : "border-white/10 bg-black/40 text-gray-400 hover:border-white/30"
-                        }`}
-                      >
-                        <div className="flex -space-x-1 shrink-0">
-                          <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotColor }} />
-                          <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotAccent }} />
-                        </div>
-                        <span className="truncate">{th.label}</span>
-                        {colorTheme === th.id && (
-                          <Check size={12} className="ml-auto text-orange-400 shrink-0" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Individual Part Pickers */}
-                <div className="space-y-2">
-                  {PART_CUSTOMIZERS.map((part) => {
-                    const currentVal = customColors[part.key] || part.presetColors[0] || '#18181b';
-                    return (
-                      <div key={part.key} className="flex items-center gap-2">
-                        <div className="w-24 text-[10px] font-bold text-gray-400 truncate">
-                          {part.label}
-                        </div>
-                        <div className="flex items-center gap-1 flex-grow overflow-x-auto no-scrollbar">
-                          {part.presetColors.slice(0, 5).map((hex) => (
-                            <button
-                              key={hex}
-                              onClick={() => setCustomColor(part.key, hex)}
-                              className={`w-5 h-5 rounded-md shrink-0 transition cursor-pointer border ${
-                                currentVal.toLowerCase() === hex.toLowerCase()
-                                  ? "border-orange-400 ring-1 ring-orange-500/50 scale-110"
-                                  : "border-white/10 hover:scale-105"
-                              }`}
-                              style={{ backgroundColor: hex }}
-                            />
-                          ))}
-                        </div>
+                    {/* Legend Color */}
+                    <div>
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1.5">
+                        Legend Color
+                      </label>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {LEGEND_COLORS.map((hex) => (
+                          <button
+                            key={hex}
+                            onClick={() => setLegendColor(hex)}
+                            className={`w-6 h-6 rounded-md transition shrink-0 cursor-pointer border ${
+                              legendColor.toLowerCase() === hex.toLowerCase()
+                                ? "border-orange-400 ring-2 ring-orange-500/50 scale-110"
+                                : "border-white/15 hover:scale-105"
+                            }`}
+                            style={{ backgroundColor: hex }}
+                          />
+                        ))}
                         <input
                           type="color"
-                          value={currentVal}
-                          onChange={(e) => setCustomColor(part.key, e.target.value)}
-                          className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent shrink-0"
+                          value={legendColor}
+                          onChange={(e) => setLegendColor(e.target.value)}
+                          className="w-6 h-6 rounded-md border border-white/20 cursor-pointer bg-transparent"
                         />
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-              </>
+                    </div>
+                  </div>
+
+                  {/* BENTO BLOCK 4: Lighting FX & Underglow */}
+                  <div className="bg-[#100f1c]/95 border border-zinc-800/90 rounded-2xl p-3.5 sm:p-4 shadow-lg space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Lightbulb size={13} className="text-orange-400" />
+                      <span className="text-xs font-black text-white tracking-wider uppercase">
+                        RGB Backlight & Glow
+                      </span>
+                    </div>
+
+                    {/* Effect Type */}
+                    <div>
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1.5">
+                        Lighting Animation
+                      </label>
+                      <div className="flex gap-1.5">
+                        {(["static", "wave", "breathe"] as LightingEffect[]).map((fx) => (
+                          <button
+                            key={fx}
+                            onClick={() => setLightingEffect(fx)}
+                            className={`flex-1 py-1.5 rounded-lg text-[11px] font-bold tracking-wide capitalize transition cursor-pointer border ${
+                              lightingEffect === fx
+                                ? "border-orange-500 bg-orange-500/15 text-orange-400 shadow-xs"
+                                : "border-zinc-800 bg-zinc-950/80 text-zinc-400 hover:border-zinc-700"
+                            }`}
+                          >
+                            {fx}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Speed Slider */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                          Animation Speed
+                        </label>
+                        <span className="text-[10px] font-mono text-orange-400 font-black">
+                          {lightingSpeed}%
+                        </span>
+                      </div>
+                      <StudioSlider value={lightingSpeed} onChange={setLightingSpeed} />
+                    </div>
+
+                    {/* Brightness Slider */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+                          LED Lumens
+                        </label>
+                        <span className="text-[10px] font-mono text-orange-400 font-black">
+                          {lightingBrightness}%
+                        </span>
+                      </div>
+                      <StudioSlider
+                        value={lightingBrightness}
+                        onChange={setLightingBrightness}
+                        accentColor="#f59e0b"
+                      />
+                    </div>
+
+                    {/* Per Key Color Grid */}
+                    <div>
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1.5">
+                        RGB Glow Palette
+                      </label>
+                      <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5">
+                        {PER_KEY_COLORS.map((hex) => (
+                          <button
+                            key={hex}
+                            onClick={() => setCustomColor("ledColor", hex)}
+                            className={`w-full aspect-square rounded-md transition cursor-pointer border ${
+                              customColors.ledColor.toLowerCase() === hex.toLowerCase()
+                                ? "border-white ring-2 ring-orange-500/60 scale-110"
+                                : "border-transparent hover:scale-105"
+                            }`}
+                            style={{ backgroundColor: hex }}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="color"
+                          value={customColors.ledColor}
+                          onChange={(e) => setCustomColor("ledColor", e.target.value)}
+                          className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
+                        />
+                        <span className="text-[10px] font-mono text-zinc-300">
+                          {customColors.ledColor}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BENTO BLOCK 5: Component Colors & Chassis Finishes */}
+                  <div className="bg-[#100f1c]/95 border border-zinc-800/90 rounded-2xl p-3.5 sm:p-4 shadow-lg space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Layers size={13} className="text-orange-400" />
+                      <span className="text-xs font-black text-white tracking-wider uppercase">
+                        Component Parts & Finishes
+                      </span>
+                    </div>
+
+                    {/* Theme Presets Quick Swatches */}
+                    <div>
+                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-1.5">
+                        Quick Base Themes
+                      </label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {THEMES.map((th) => (
+                          <button
+                            key={th.id}
+                            onClick={() => setColorTheme(th.id)}
+                            className={`flex items-center gap-2 p-2 rounded-lg border text-left text-[11px] font-bold transition cursor-pointer ${
+                              colorTheme === th.id
+                                ? `${th.border} bg-white/10 text-white shadow-xs`
+                                : "border-zinc-800 bg-zinc-950/70 text-zinc-400 hover:border-zinc-700"
+                            }`}
+                          >
+                            <div className="flex -space-x-1 shrink-0">
+                              <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotColor }} />
+                              <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotAccent }} />
+                            </div>
+                            <span className="truncate">{th.label}</span>
+                            {colorTheme === th.id && (
+                              <Check size={12} className="ml-auto text-orange-400 shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Individual Part Pickers */}
+                    <div className="pt-2 border-t border-zinc-800/80 space-y-2">
+                      <div className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-1">
+                        Individual Part Swatches
+                      </div>
+                      {PART_CUSTOMIZERS.map((part) => {
+                        const currentVal = customColors[part.key] || part.presetColors[0] || '#18181b';
+                        return (
+                          <div key={part.key} className="flex items-center gap-2">
+                            <div className="w-24 text-[10px] font-bold text-zinc-400 truncate">
+                              {part.label}
+                            </div>
+                            <div className="flex items-center gap-1 flex-grow overflow-x-auto no-scrollbar">
+                              {part.presetColors.slice(0, 5).map((hex) => (
+                                <button
+                                  key={hex}
+                                  onClick={() => setCustomColor(part.key, hex)}
+                                  className={`w-5 h-5 rounded-md shrink-0 transition cursor-pointer border ${
+                                    currentVal.toLowerCase() === hex.toLowerCase()
+                                      ? "border-orange-400 ring-1 ring-orange-500/50 scale-110"
+                                      : "border-white/10 hover:scale-105"
+                                  }`}
+                                  style={{ backgroundColor: hex }}
+                                />
+                              ))}
+                            </div>
+                            <input
+                              type="color"
+                              value={currentVal}
+                              onChange={(e) => setCustomColor(part.key, e.target.value)}
+                              className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent shrink-0"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
-          </div>
+          </aside>
         </div>
       ) : (
-        /* ─── TAB 2: SAVED SETS FULL GRID GALLERY ─── */
-        <div className="flex-grow p-8 overflow-y-auto no-scrollbar bg-[#080614] pointer-events-auto">
+        /* ─── TAB 2: SAVED SETS FULL GRID GALLERY (BENTO CARDS) ─── */
+        <div className="flex-grow p-4 sm:p-8 overflow-y-auto no-scrollbar bg-[#080614] pointer-events-auto">
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-lg font-black text-white uppercase tracking-wider">
+                <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Grid size={16} className="text-orange-400" />
                   Saved Keyboard Sets & Themes
                 </h2>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  Manage and load your personalized custom colorways and layout configurations
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Manage and load your custom crafted keyboard colorways and configurations
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <input
                   type="text"
                   placeholder="Search presets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white w-48 outline-none focus:ring-1 focus:ring-orange-500"
+                  className="bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-white w-full sm:w-48 outline-none focus:border-orange-500"
                 />
                 <button
                   onClick={() => setStudioTab("workspace")}
-                  className="px-4 py-2 bg-orange-500 hover:bg-orange-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer"
+                  className="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer shrink-0 shadow-md shadow-orange-500/20"
                 >
-                  Back to Workspace
+                  Back
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {filteredLayouts.map((layout) => (
                 <div
                   key={layout.id}
-                  className="bg-[#100e1c] border border-white/10 hover:border-orange-500/50 rounded-2xl p-4 transition-all hover:shadow-xl flex flex-col justify-between group"
+                  className="bg-[#0f0e1a] border border-zinc-800 hover:border-orange-500/50 rounded-2xl p-3.5 transition-all hover:shadow-xl flex flex-col justify-between group"
                 >
                   <MiniKeyboardCard
                     layout={layout}
@@ -1355,8 +1534,8 @@ function StudioPanel() {
                     onDuplicate={() => duplicateLayout(layout)}
                   />
 
-                  <div className="mt-3 flex items-center justify-between pt-2 border-t border-white/5">
-                    <span className="text-[10px] text-gray-400 font-mono font-bold">
+                  <div className="mt-3 flex items-center justify-between pt-2 border-t border-zinc-800/80">
+                    <span className="text-[10px] text-zinc-400 font-mono font-bold">
                       {layout.lightingEffect.toUpperCase()}
                     </span>
                     <button
@@ -1364,7 +1543,7 @@ function StudioPanel() {
                         loadLayout(layout);
                         setStudioTab("workspace");
                       }}
-                      className="px-3 py-1 rounded-lg bg-white/10 hover:bg-orange-500 hover:text-black text-white text-[10px] font-black uppercase tracking-wider transition cursor-pointer"
+                      className="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-orange-500 hover:text-black text-white text-[10px] font-black uppercase tracking-wider transition cursor-pointer border border-zinc-800 hover:border-orange-500"
                     >
                       Load Config
                     </button>
@@ -1380,7 +1559,7 @@ function StudioPanel() {
   );
 }
 
-/* ─── Main Landing UI Export ─── */
+/* ─── Main Landing UI Export (Responsive Block Design) ─── */
 export default function UI({ scrollContainerRef }: UIProps) {
   const {
     colorTheme,
@@ -1399,35 +1578,35 @@ export default function UI({ scrollContainerRef }: UIProps) {
 
       {/* CLEAN HEADER (When Studio is closed) */}
       {!showStudio && (
-        <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 bg-[#050505]/90 border-b border-white/5 pointer-events-auto">
-          <div className="flex items-center gap-3">
-            <span className="text-orange-500 text-xl font-bold">⬡</span>
-            <h1 className="text-sm font-black tracking-widest text-white uppercase">
-              Keycraft <span className="text-gray-500 font-medium text-xs">3D</span>
+        <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 bg-[#050505]/90 backdrop-blur-xl border-b border-zinc-800/80 pointer-events-auto">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="text-orange-500 text-lg font-black">⬡</span>
+            <h1 className="text-xs sm:text-sm font-black tracking-widest text-white uppercase">
+              Keycraft <span className="text-zinc-500 font-medium text-xs">3D</span>
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Annotations Toggle */}
             <button
               onClick={toggleAnnotations}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-bold tracking-wide transition cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg border text-[11px] font-bold tracking-wide transition cursor-pointer flex items-center gap-1.5 ${
                 showAnnotations
                   ? "bg-orange-500/20 text-orange-400 border-orange-500/40"
-                  : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20"
+                  : "bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:border-zinc-700"
               }`}
             >
-              <Info size={13} />
-              {showAnnotations ? "Labels ON" : "Labels OFF"}
+              <Info size={12} />
+              <span className="hidden sm:inline">{showAnnotations ? "Labels ON" : "Labels OFF"}</span>
             </button>
 
             {/* Sound Toggle */}
             <button
               onClick={toggleSound}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition cursor-pointer"
+              className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-white transition cursor-pointer"
               title={soundEnabled ? "Mute Acoustics" : "Unmute Acoustics"}
             >
-              {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+              {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
             </button>
 
             {/* Studio Mode Button */}
@@ -1436,49 +1615,49 @@ export default function UI({ scrollContainerRef }: UIProps) {
                 setScrollProgress(0);
                 setShowStudio(true);
               }}
-              className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition cursor-pointer flex items-center gap-1.5"
+              className="px-3 sm:px-4 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-black font-black text-[11px] uppercase tracking-wider shadow-lg shadow-orange-500/20 transition cursor-pointer flex items-center gap-1.5"
             >
-              <Palette size={14} />
-              Studio Configurator
+              <Palette size={13} />
+              <span>Studio Configurator</span>
             </button>
           </div>
         </header>
       )}
 
-      {/* FLOATING BOTTOM LEFT ZOOM & VIEW CONTROLS (When Studio is closed) */}
+      {/* FLOATING BOTTOM ZOOM & VIEW CONTROLS (When Studio is closed) */}
       {!showStudio && (
-        <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2 pointer-events-auto">
-          <div className="flex items-center bg-[#0a0a0d] border border-white/10 rounded-xl p-1 shadow-2xl">
+        <div className="fixed bottom-4 sm:bottom-6 left-3 sm:left-6 z-40 flex flex-wrap items-center gap-2 pointer-events-auto max-w-[calc(100vw-24px)]">
+          <div className="flex items-center bg-[#090812]/95 border border-zinc-800 rounded-xl p-0.5 shadow-2xl backdrop-blur-xl">
             <button
               onClick={() => setZoomLevel(zoomLevel * 1.15)}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer"
               title="Zoom In"
             >
-              <ZoomIn size={16} />
+              <ZoomIn size={15} />
             </button>
             <button
               onClick={() => {
                 setZoomLevel(1.0);
                 resetCamera();
               }}
-              className="px-3 py-1 text-xs font-mono font-bold text-orange-400 hover:bg-white/10 rounded-lg transition cursor-pointer"
+              className="px-2.5 py-1 text-xs font-mono font-bold text-orange-400 hover:bg-zinc-800 rounded-lg transition cursor-pointer"
               title="Reset Zoom"
             >
               {Math.round(zoomLevel * 100)}% ↺
             </button>
             <button
               onClick={() => setZoomLevel(zoomLevel / 1.15)}
-              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition cursor-pointer"
               title="Zoom Out"
             >
-              <ZoomOut size={16} />
+              <ZoomOut size={15} />
             </button>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#0a0a0d] border border-white/10 rounded-xl shadow-2xl">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#090812]/95 border border-zinc-800 rounded-xl shadow-2xl backdrop-blur-xl">
             <Layers size={13} className="text-orange-400" />
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Explode</span>
-            <div className="w-20">
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider hidden sm:inline">Explode</span>
+            <div className="w-16 sm:w-20">
               <StudioSlider value={Math.round(scrollProgress * 100)} onChange={(v) => setScrollProgress(v / 100)} />
             </div>
             <span className="text-[10px] font-mono text-orange-400 font-bold w-7 text-right">{Math.round(scrollProgress * 100)}%</span>
