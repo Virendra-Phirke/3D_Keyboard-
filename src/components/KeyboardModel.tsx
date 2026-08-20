@@ -1,6 +1,6 @@
 import { RoundedBox, Box, Cylinder, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { generateKeyboardLayout, KeyInfo } from "../utils/keyboardLayout";
 import {
@@ -22,6 +22,9 @@ const usbShieldMat = new THREE.MeshStandardMaterial({ color: "#e2e8f0", metalnes
 const rubberFootMat = new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.9 });
 const usbPortMat = new THREE.MeshStandardMaterial({ color: "#000000" });
 const knobTopMat = new THREE.MeshStandardMaterial({ color: "#0d0d0f", roughness: 0.35, metalness: 0.85 });
+const knobDishMat = new THREE.MeshStandardMaterial({ color: "#09090b", roughness: 0.45, metalness: 0.80 });
+const indicatorMat = new THREE.MeshStandardMaterial({ color: "#f8fafc", roughness: 0.1, metalness: 0.95, emissive: "#ffffff", emissiveIntensity: 0.3 });
+const brassCollarMat = new THREE.MeshStandardMaterial({ color: "#f59e0b", roughness: 0.28, metalness: 0.96 });
 
 const mapLinear = THREE.MathUtils.mapLinear;
 const clamp = THREE.MathUtils.clamp;
@@ -38,43 +41,43 @@ const LAYER_ANNOTATIONS = [
   {
     id: 'switches',
     title: '02. CUSTOM MECHANICAL SWITCHES',
-    spec: 'Clear PC Top • Lubed MX Stem • South-Facing SMD LED',
-    yOffset: 4.0,
+    spec: 'Cherry MX / Gateron • 5-Pin Hot-Swap • 45g Actuation',
+    yOffset: 4.2,
     alignRight: true,
   },
   {
     id: 'plate',
-    title: '03. CNC ANODIZED ALUMINUM PLATE',
-    spec: '6063 Aircraft Alloy • Stainless Steel Stabilizers • Gasket Mounts',
-    yOffset: 2.2,
+    title: '03. CNC SWITCH PLATE',
+    spec: '1.5mm Anodized Aluminum / Brass • Per-Key Cutouts • Gasket Mount',
+    yOffset: 2.48,
     alignRight: false,
   },
   {
     id: 'pcb',
-    title: '04. HOT-SWAP RGB CIRCUIT BOARD',
-    spec: 'South-Facing SMD RGB • Kailh Sockets • 1000Hz Polling Rate',
-    yOffset: 0.5,
+    title: '04. HOT-SWAP PCB & MCU',
+    spec: 'Kailh Hot-Swap Sockets • South-Facing RGB • 32-Bit ARM Controller',
+    yOffset: 0.98,
     alignRight: true,
   },
   {
     id: 'internals',
-    title: '05. PORON & SILICONE INTERNALS',
-    spec: 'Multi-Stage Acoustic Sound Barrier • Eliminates Hollow Ping',
-    yOffset: -1.2,
+    title: '05. ACOUSTIC PORON FOAM',
+    spec: 'High-Density Sound Dampening • IXPE Switch Pads • Deep Thock Profile',
+    yOffset: -0.58,
     alignRight: false,
   },
   {
     id: 'case',
-    title: '06. CNC ALUMINUM CASE & HARDWARE',
-    spec: 'Sandblasted & Anodized Shell • Solid Brass Weight Bar',
-    yOffset: -2.8,
+    title: '06. CNC ALUMINUM CASE',
+    spec: '6063 Solid Billet Aluminum • 7° Typing Angle • Beveled Chamfer Edges',
+    yOffset: -1.95,
     alignRight: true,
   },
   {
     id: 'hardware',
-    title: '07. FLOATING BRASS HARDWARE',
-    spec: 'Precision CNC Standoffs & Golden M2 Screws',
-    yOffset: -4.5,
+    title: '07. BRASS WEIGHT & HARDWARE',
+    spec: 'Mirror-Polished Pure Brass Weight Bar • Gold Torx Hardware • Silicone Feet',
+    yOffset: -3.3,
     alignRight: false,
   },
 ];
@@ -427,6 +430,126 @@ function StabilizerAssembly({
   );
 }
 
+/* ─── REALISTIC CNC MACHINED ROTARY ENCODER KNOB WITH KNURLED RIBS & HARDWARE ─── */
+function RotaryKnobAssembly({
+  x,
+  z,
+  color,
+  chamferMat,
+  ledMat,
+}: {
+  x: number;
+  z: number;
+  color: string;
+  chamferMat: THREE.MeshStandardMaterial;
+  ledMat: THREE.MeshStandardMaterial;
+}) {
+  const targetRotation = useRef(0.45);
+  const knobGroupRef = useRef<THREE.Group>(null);
+
+  const knobCoreMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: color || '#141416',
+      roughness: 0.22,
+      metalness: 0.92,
+    });
+  }, [color]);
+
+  const gripRibMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: color || '#141416',
+      roughness: 0.35,
+      metalness: 0.88,
+    });
+  }, [color]);
+
+  // 18 precision CNC milled vertical grip flutes around perimeter
+  const gripFlutes = useMemo(() => {
+    const ribs = [];
+    const count = 18;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      const radius = 0.535;
+      ribs.push({
+        id: i,
+        x: Math.cos(angle) * radius,
+        z: Math.sin(angle) * radius,
+        rotY: -angle,
+      });
+    }
+    return ribs;
+  }, []);
+
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    targetRotation.current += Math.PI / 3;
+  };
+
+  useFrame((_, delta) => {
+    if (knobGroupRef.current) {
+      knobGroupRef.current.rotation.y = THREE.MathUtils.damp(
+        knobGroupRef.current.rotation.y,
+        targetRotation.current,
+        14,
+        Math.min(delta, 0.05)
+      );
+    }
+  });
+
+  return (
+    <group position={[x, 0.38, z]}>
+      {/* ── UNDER-KNOB ALPS ENCODER HARDWARE ── */}
+      <group position={[0, -0.28, 0]}>
+        {/* Hexagonal Locking Nut */}
+        <Cylinder args={[0.32, 0.32, 0.08, 6]} position={[0, 0.04, 0]} material={brassCollarMat} />
+        {/* Threaded Collar Bushing */}
+        <Cylinder args={[0.24, 0.24, 0.18, 24]} position={[0, 0.14, 0]} material={brassCollarMat} />
+        {/* Steel D-Profile Center Shaft */}
+        <Cylinder args={[0.14, 0.14, 0.36, 24]} position={[0, 0.26, 0]} material={chamferMat} />
+      </group>
+
+      {/* ── ROTATING CNC ANODIZED KNOB CAP ── */}
+      <group ref={knobGroupRef} onClick={handleClick}>
+        {/* 1. Translucent LED Halo Base (Underglow) */}
+        <Cylinder args={[0.56, 0.56, 0.06, 36]} position={[0, -0.16, 0]} material={ledMat} />
+
+        {/* 2. Lower Beveled Mirror Chamfer Ring */}
+        <Cylinder args={[0.57, 0.54, 0.08, 36]} position={[0, -0.12, 0]} material={chamferMat} />
+
+        {/* 3. Main Anodized Metal Barrel Core */}
+        <Cylinder args={[0.525, 0.525, 0.44, 36]} position={[0, 0.08, 0]} material={knobCoreMat} />
+
+        {/* 4. 18 Precision CNC Knurled Flute Grips */}
+        {gripFlutes.map((rib) => (
+          <Box
+            key={rib.id}
+            args={[0.032, 0.36, 0.045]}
+            position={[rib.x, 0.08, rib.z]}
+            rotation={[0, rib.rotY, 0]}
+            material={gripRibMat}
+          />
+        ))}
+
+        {/* 5. Upper Step & Beveled Lip */}
+        <Cylinder args={[0.50, 0.53, 0.06, 36]} position={[0, 0.26, 0]} material={chamferMat} />
+
+        {/* 6. Concentric Stepped Top Face Ring */}
+        <Cylinder args={[0.47, 0.47, 0.04, 36]} position={[0, 0.28, 0]} material={knobCoreMat} />
+
+        {/* 7. Ergonomic Sunken Thumb Concave Dish */}
+        <Cylinder args={[0.38, 0.32, 0.05, 36]} position={[0, 0.29, 0]} material={knobDishMat} />
+
+        {/* 8. Center Brass Pivot Accent */}
+        <Cylinder args={[0.09, 0.09, 0.02, 24]} position={[0, 0.30, 0]} material={brassCollarMat} />
+
+        {/* 9. Machined Indicator Dot / Position Notch */}
+        <Box args={[0.04, 0.03, 0.14]} position={[0, 0.30, -0.32]} material={indicatorMat} />
+        <Cylinder args={[0.035, 0.035, 0.03, 16]} position={[0, 0.30, -0.41]} material={indicatorMat} />
+      </group>
+    </group>
+  );
+}
+
 export function KeyboardModel() {
   const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, pressedKeys, fontStyle, fontSize } = useAppStore();
 
@@ -734,17 +857,14 @@ export function KeyboardModel() {
           />
         ))}
 
-        {/* CNC Metallic Rotary Encoder Knob with Concentric Bevels */}
-        <group position={[knob.x, 0.38, knob.z]}>
-          {/* Outer Beveled Brass/Gold Chamfer Ring */}
-          <Cylinder args={[0.58, 0.58, 0.42, 36]} material={goldChamferMaterial} />
-          {/* Inner Textured Anodized Core */}
-          <Cylinder args={[0.52, 0.52, 0.46, 36]} material={useMemo(() => new THREE.MeshStandardMaterial({ color: customColors.knobColor || "#141416", roughness: 0.22, metalness: 0.90 }), [customColors.knobColor])} />
-          {/* Top Knurled Radial Inset */}
-          <Cylinder args={[0.45, 0.45, 0.05, 36]} position={[0, 0.24, 0]} material={knobTopMat} />
-          {/* Glowing LED Halo Base */}
-          <Cylinder args={[0.56, 0.56, 0.06, 36]} position={[0, -0.16, 0]} material={rgbLedMaterial} />
-        </group>
+        {/* Real CNC Machined Rotary Encoder Knob Assembly */}
+        <RotaryKnobAssembly
+          x={knob.x}
+          z={knob.z}
+          color={customColors.knobColor}
+          chamferMat={goldChamferMaterial}
+          ledMat={rgbLedMaterial}
+        />
       </group>
 
       {/* 2. LAYER 2: GATERON/CHERRY MX SWITCHES ARRAY & STABILIZERS */}
