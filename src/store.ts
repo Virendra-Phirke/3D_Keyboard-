@@ -3,6 +3,8 @@ import { SwitchType } from './utils/audio';
 
 export type ColorTheme = 'ember' | 'arctic' | 'synthwave' | 'stealth';
 export type RGBMode = 'ember' | 'rainbow' | 'breathe' | 'pulse' | 'off';
+export type FontStyle = 'modern' | 'classic' | 'script';
+export type LightingEffect = 'static' | 'wave' | 'breathe';
 
 export interface CustomColors {
   keycapsAlpha: string;
@@ -16,6 +18,20 @@ export interface CustomColors {
   caseColor: string;
   weightBar: string;
   ledColor: string;
+}
+
+export interface SavedLayout {
+  id: string;
+  name: string;
+  colorTheme: ColorTheme;
+  customColors: CustomColors;
+  rgbMode: RGBMode;
+  fontStyle: FontStyle;
+  fontSize: number;
+  legendColor: string;
+  lightingEffect: LightingEffect;
+  lightingSpeed: number;
+  lightingBrightness: number;
 }
 
 export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
@@ -73,6 +89,69 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
   },
 };
 
+const DEFAULT_SAVED_LAYOUTS: SavedLayout[] = [
+  {
+    id: 'sunburst',
+    name: 'Sunburst',
+    colorTheme: 'ember',
+    customColors: { ...DEFAULT_CUSTOM_COLORS.ember },
+    rgbMode: 'ember',
+    fontStyle: 'modern',
+    fontSize: 56,
+    legendColor: '#f3f4f6',
+    lightingEffect: 'static',
+    lightingSpeed: 50,
+    lightingBrightness: 75,
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    colorTheme: 'arctic',
+    customColors: { ...DEFAULT_CUSTOM_COLORS.arctic },
+    rgbMode: 'breathe',
+    fontStyle: 'classic',
+    fontSize: 48,
+    legendColor: '#0f172a',
+    lightingEffect: 'wave',
+    lightingSpeed: 40,
+    lightingBrightness: 60,
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    colorTheme: 'stealth',
+    customColors: {
+      ...DEFAULT_CUSTOM_COLORS.stealth,
+      keycapsAlpha: '#052e16',
+      keycapsMod: '#022c22',
+      keycapsAccent: '#065f46',
+      keycapsText: '#86efac',
+      ledColor: '#22c55e',
+      switchStem: '#16a34a',
+    },
+    rgbMode: 'breathe',
+    fontStyle: 'modern',
+    fontSize: 52,
+    legendColor: '#86efac',
+    lightingEffect: 'breathe',
+    lightingSpeed: 30,
+    lightingBrightness: 50,
+  },
+  {
+    id: 'default',
+    name: 'Default',
+    colorTheme: 'ember',
+    customColors: { ...DEFAULT_CUSTOM_COLORS.ember },
+    rgbMode: 'off',
+    fontStyle: 'modern',
+    fontSize: 56,
+    legendColor: '#f3f4f6',
+    lightingEffect: 'static',
+    lightingSpeed: 50,
+    lightingBrightness: 75,
+  },
+];
+
 interface AppState {
   scrollProgress: number;
   colorTheme: ColorTheme;
@@ -85,6 +164,16 @@ interface AppState {
   pressedKeys: Set<string>;
   activeStageIndex: number;
   cameraResetNonce: number;
+  // New Studio fields
+  fontStyle: FontStyle;
+  fontSize: number;
+  legendColor: string;
+  lightingEffect: LightingEffect;
+  lightingSpeed: number;
+  lightingBrightness: number;
+  savedLayouts: SavedLayout[];
+  showStudio: boolean;
+  studioTab: 'workspace' | 'saved';
 }
 
 const state: AppState = {
@@ -99,6 +188,16 @@ const state: AppState = {
   pressedKeys: new Set<string>(),
   activeStageIndex: 0,
   cameraResetNonce: 0,
+  // New Studio defaults
+  fontStyle: 'modern',
+  fontSize: 56,
+  legendColor: '#f3f4f6',
+  lightingEffect: 'static',
+  lightingSpeed: 50,
+  lightingBrightness: 75,
+  savedLayouts: [...DEFAULT_SAVED_LAYOUTS],
+  showStudio: false,
+  studioTab: 'workspace',
 };
 
 type StateListener = () => void;
@@ -206,6 +305,93 @@ export const resetCamera = () => {
 };
 
 export const getCameraResetNonce = () => state.cameraResetNonce;
+
+// New Studio Actions
+export const setFontStyle = (style: FontStyle) => {
+  state.fontStyle = style;
+  notify();
+};
+
+export const setFontSize = (size: number) => {
+  state.fontSize = Math.max(24, Math.min(80, size));
+  notify();
+};
+
+export const setLegendColor = (color: string) => {
+  state.legendColor = color;
+  state.customColors = { ...state.customColors, keycapsText: color };
+  notify();
+};
+
+export const setLightingEffect = (effect: LightingEffect) => {
+  state.lightingEffect = effect;
+  // Map to RGB mode
+  if (effect === 'static') state.rgbMode = 'ember';
+  else if (effect === 'wave') state.rgbMode = 'rainbow';
+  else if (effect === 'breathe') state.rgbMode = 'breathe';
+  notify();
+};
+
+export const setLightingSpeed = (speed: number) => {
+  state.lightingSpeed = Math.max(0, Math.min(100, speed));
+  notify();
+};
+
+export const setLightingBrightness = (brightness: number) => {
+  state.lightingBrightness = Math.max(0, Math.min(100, brightness));
+  notify();
+};
+
+export const toggleStudio = () => {
+  state.showStudio = !state.showStudio;
+  notify();
+};
+
+export const setShowStudio = (show: boolean) => {
+  state.showStudio = show;
+  notify();
+};
+
+export const setStudioTab = (tab: 'workspace' | 'saved') => {
+  state.studioTab = tab;
+  notify();
+};
+
+export const saveCurrentLayout = (name: string) => {
+  const layout: SavedLayout = {
+    id: `custom_${Date.now()}`,
+    name,
+    colorTheme: state.colorTheme,
+    customColors: { ...state.customColors },
+    rgbMode: state.rgbMode,
+    fontStyle: state.fontStyle,
+    fontSize: state.fontSize,
+    legendColor: state.legendColor,
+    lightingEffect: state.lightingEffect,
+    lightingSpeed: state.lightingSpeed,
+    lightingBrightness: state.lightingBrightness,
+  };
+  state.savedLayouts = [...state.savedLayouts, layout];
+  notify();
+};
+
+export const loadLayout = (layout: SavedLayout) => {
+  state.colorTheme = layout.colorTheme;
+  state.customColors = { ...layout.customColors };
+  state.rgbMode = layout.rgbMode;
+  state.fontStyle = layout.fontStyle;
+  state.fontSize = layout.fontSize;
+  state.legendColor = layout.legendColor;
+  state.lightingEffect = layout.lightingEffect;
+  state.lightingSpeed = layout.lightingSpeed;
+  state.lightingBrightness = layout.lightingBrightness;
+  notify();
+};
+
+export const deleteLayout = (id: string) => {
+  state.savedLayouts = state.savedLayouts.filter((l) => l.id !== id);
+  notify();
+};
 
 export function useAppStore(): AppState {
   const [, setTick] = useState(0);
