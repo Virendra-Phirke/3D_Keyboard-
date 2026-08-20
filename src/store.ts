@@ -242,6 +242,11 @@ export const resetZoom = () => {
   notify();
 };
 
+export const setZoomLevel = (level: number) => {
+  state.zoomLevel = Math.max(0.4, Math.min(2.5, level));
+  notify();
+};
+
 export const getZoomLevel = () => state.zoomLevel;
 
 export const setColorTheme = (theme: ColorTheme) => {
@@ -283,6 +288,11 @@ export const getSwitchType = () => state.switchType;
 
 export const setSoundEnabled = (enabled: boolean) => {
   state.soundEnabled = enabled;
+  notify();
+};
+
+export const toggleSound = () => {
+  state.soundEnabled = !state.soundEnabled;
   notify();
 };
 
@@ -344,11 +354,17 @@ export const setLightingBrightness = (brightness: number) => {
 
 export const toggleStudio = () => {
   state.showStudio = !state.showStudio;
+  if (state.showStudio) {
+    state.scrollProgress = 0;
+  }
   notify();
 };
 
 export const setShowStudio = (show: boolean) => {
   state.showStudio = show;
+  if (show) {
+    state.scrollProgress = 0;
+  }
   notify();
 };
 
