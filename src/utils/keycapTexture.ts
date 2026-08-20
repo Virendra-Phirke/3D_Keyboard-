@@ -150,52 +150,52 @@ export function getKeycapTexture(
     return textureCache.get(cacheKey)!;
   }
 
-  // Ultra-crisp 512x512 texture for laser-sharp legibility at any distance
+  // Ultra-crisp, lightweight 256x256 texture for maximum 60fps performance and minimal VRAM
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
   // 1. Solid Matte PBT Body (Uniform, realistic micro-textured plastic)
   ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
-  // 2. Subtle Vertical Dish Lighting Gradient (Never distorts horizontally on wide keys!)
-  const vertGrad = ctx.createLinearGradient(0, 0, 0, 512);
+  // 2. Subtle Vertical Dish Lighting Gradient
+  const vertGrad = ctx.createLinearGradient(0, 0, 0, 256);
   vertGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
   vertGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.02)');
   vertGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.08)');
   vertGrad.addColorStop(1, 'rgba(0, 0, 0, 0.28)');
   ctx.fillStyle = vertGrad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   // 3. Subtle Chamfered Inset Border
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(8, 8, 496, 496);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(4, 4, 248, 248);
 
   // 4. Spacebar Glowing Accent Line (Matching reference image)
   if (type === 'space' || label === '') {
     ctx.fillStyle = colors.accentGlow || '#f97316';
     ctx.shadowColor = colors.accentGlow || '#f97316';
-    ctx.shadowBlur = 12;
-    ctx.fillRect(180, 248, 152, 16);
+    ctx.shadowBlur = 6;
+    ctx.fillRect(90, 124, 76, 8);
     ctx.shadowBlur = 0;
   }
 
   // 5. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
   if (subLabel) {
-    ctx.font = `bold ${Math.round(72 * fontScale)}px ${fontFamily}`;
+    ctx.font = `bold ${Math.round(36 * fontScale)}px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.globalAlpha = 0.70;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 64, 64);
+    ctx.fillText(subLabel, 32, 32);
 
     // Main Number
-    ctx.font = `bold ${Math.round(96 * fontScale)}px ${fontFamily}`;
+    ctx.font = `bold ${Math.round(48 * fontScale)}px ${fontFamily}`;
     ctx.globalAlpha = 0.95;
-    ctx.fillText(label, 64, 260);
+    ctx.fillText(label, 32, 130);
   } else if (label) {
     // 6. Single Legends (Letters, Modifiers, Function keys)
     ctx.globalAlpha = 0.95;
@@ -205,20 +205,20 @@ export function getKeycapTexture(
 
     if (label.length === 1) {
       // Single Alphabet Key (A-Z)
-      ctx.font = `bold ${Math.round(112 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 256, 256);
+      ctx.font = `bold ${Math.round(56 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(label, 128, 128);
     } else if (label.length <= 3) {
       // Short modifiers (ESC, TAB, WIN, ALT, DEL, etc.)
-      ctx.font = `bold ${Math.round(80 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 256, 256);
+      ctx.font = `bold ${Math.round(40 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(label, 128, 128);
     } else if (label.length <= 5) {
       // Medium modifiers (SHIFT, ENTER, CAPS, SPACE)
-      ctx.font = `bold ${Math.round(64 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 256, 256);
+      ctx.font = `bold ${Math.round(32 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(label, 128, 128);
     } else {
       // Long modifiers (BACKSPACE, CAPSLOCK)
-      ctx.font = `bold ${Math.round(54 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 256, 256);
+      ctx.font = `bold ${Math.round(27 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(label, 128, 128);
     }
   }
 
@@ -229,7 +229,7 @@ export function getKeycapTexture(
   texture.generateMipmaps = true;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
-  texture.anisotropy = 8;
+  texture.anisotropy = 4;
   texture.needsUpdate = true;
 
   textureCache.set(cacheKey, texture);

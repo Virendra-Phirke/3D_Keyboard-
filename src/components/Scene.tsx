@@ -19,11 +19,6 @@ export default function Scene() {
         position={[8, 20, 10]}
         intensity={3.8}
         color="#ffffff"
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-near={1}
-        shadow-camera-far={35}
-        shadow-bias={-0.0001}
       />
 
       {/* Left Cool Studio Fill */}
