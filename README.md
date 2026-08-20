@@ -4,6 +4,32 @@ An interactive 3D web experience showcasing a custom 75% mechanical keyboard wit
 
 ---
 
+### 11. 12 Iconic Theme Presets & UI Inspector Polish
+- **12 Curated Mechanical Keyboard Themes**:
+  1. 🔥 **Ember Dark**: Burnt copper & industrial amber glow with anodized dark shell.
+  2. ❄️ **Arctic Frost**: Frost white & oceanic cyan accents.
+  3. 🌿 **GMK Botanical**: Forest sage green alphas with deep moss dark green mods and succulent mint accents.
+  4. 🌸 **GMK Olivia**: Rose gold and soft blush pink keycaps with rose gold CNC chamfer.
+  5. 🌆 **Synthwave 80s**: Cyberpunk neon violet, vibrant cyan, and laser magenta.
+  6. 🖤 **Stealth Black**: Matte black with industrial brass gold accents.
+  7. ☕ **GMK Café**: Warm dark espresso with creamy caramel latte alphas.
+  8. 🌊 **GMK Nautilus**: Deep ocean midnight navy with hazardous oceanic cyan & yellow.
+  9. ⚡ **GMK Laser**: Cyber cobalt blue with neon electric magenta and violet.
+  10. 🧛 **Dracula Gothic**: Gotham dark slate with vampire lilac, pink, and toxic lime.
+  11. 🕹️ **Retro 1984**: IBM Model M vintage beige alphas with industrial carmine red.
+  12. 🚀 **Space Apollo**: NASA lunar graphite with aerospace safety orange.
+- **UI & Layout Polish**:
+  - **Tri-Color Swatch Circles**: Each theme card now displays a coordinated 3-color cluster showing Alphas + Modifiers + Accent colors at a glance.
+  - **Refined Switch Colorways Cards**: Solved text-clipping issues with comfortable 54px min-height cards, high-contrast labels, and dual-dot indicator badges.
+  - **Active State Highlights**: Selected themes and switches feature sleek orange rings, subtle glow backgrounds, and instant 3D model synchronization.
+
+## Verification
+- Clean build verified via `npm run build` (0 TypeScript errors).
+- All 12 themes render with custom laser-sharp keycap textures and matching materials.
+- Pushed to GitHub main (`9805051`).
+
+---
+
 ## ✨ Features
 
 - **🎮 Full 3D Mouse & Touch Interaction**:

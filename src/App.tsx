@@ -9,7 +9,6 @@ import UI from "./components/UI";
 import { Suspense, useEffect, useRef } from "react";
 import { setScrollProgress, getScrollProgress, setKeyPressed, useAppStore } from "./store";
 import { playSwitchSound } from "./utils/audio";
-import { Stats } from "@react-three/drei";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export default function App() {
@@ -163,7 +162,6 @@ export default function App() {
               }}
             >
               <Scene />
-              <Stats className="!absolute !bottom-14 !left-6 !top-auto !right-auto z-50 rounded-lg overflow-hidden border border-white/10 shadow-xl opacity-80" />
             </Canvas>
           </ErrorBoundary>
         </div>
