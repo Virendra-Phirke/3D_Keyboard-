@@ -568,9 +568,9 @@ export function KeyboardModel() {
     return positions;
   }, [totalWidth, totalDepth]);
 
-  // Wide keys requiring stabilizers
-  const stabilizedKeys = useMemo(() => {
-    return keys.filter(k => k.width >= 1.75);
+  // Only Spacebar has the 2 stabilizer housings & linking stainless steel wire
+  const spacebarKey = useMemo(() => {
+    return keys.find(k => k.type === 'space' || k.code === 'Space' || k.width >= 5.0);
   }, [keys]);
 
   // Render loop with smooth easing
@@ -728,18 +728,17 @@ export function KeyboardModel() {
           />
         ))}
 
-        {/* Real Plate-Mounted Stainless Steel Stabilizers on Wide Keys */}
-        {stabilizedKeys.map((key) => (
+        {/* Real Plate-Mounted Stainless Steel Stabilizer (Only 2 on Spacebar) */}
+        {spacebarKey && (
           <StabilizerAssembly
-            key={`stab-${key.id}`}
-            x={key.x}
-            z={key.z}
-            width={key.width}
+            x={spacebarKey.x}
+            z={spacebarKey.z}
+            width={spacebarKey.width}
             stemMat={switchStemMat}
             baseMat={switchBaseMat}
             wireMat={wireMaterial}
           />
-        ))}
+        )}
       </group>
 
       {/* 3. LAYER 3: LASER-CUT CNC SWITCH PLATE */}
