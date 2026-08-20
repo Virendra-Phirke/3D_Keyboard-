@@ -102,50 +102,28 @@ function KeycapItem({
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.38,
-      metalness: 0.04,
+      roughness: 0.5,
+      metalness: 0.15,
     });
   }, [texture]);
 
-  const skirtMaterial = useMemo(() => {
-    const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
-    const baseCol = keyInfo.type === 'modifier' ? colors.modBase : colors.alphaBase;
-    return new THREE.MeshStandardMaterial({
-      color: isPressed ? '#1c1c1f' : isHovered ? '#2c2c32' : baseCol,
-      roughness: 0.42,
-      metalness: 0.06,
-    });
-  }, [theme, keyInfo.type, isPressed, isHovered]);
-
   useFrame((_, delta) => {
     if (keycapRef.current) {
-      const targetY = isPressed ? -0.16 : isHovered ? 0.04 : 0;
+      const targetY = isPressed ? -0.15 : isHovered ? 0.05 : 0;
       currentY.current = THREE.MathUtils.damp(currentY.current, targetY, 25, delta);
       keycapRef.current.position.y = 0.2 + currentY.current;
     }
   });
 
-  const w = keyInfo.width - 0.06;
-  const d = keyInfo.depth - 0.06;
-
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
       <group ref={keycapRef} position={[0, 0.2, 0]}>
-        {/* Sculpted Bottom Skirt */}
         <RoundedBox
-          args={[w, 0.32, d]}
-          radius={0.05}
-          smoothness={3}
-          material={skirtMaterial}
-          position={[0, 0.16, 0]}
-        />
-        {/* Sculpted Top Dish Face with High-Res Texture */}
-        <RoundedBox
-          args={[w - 0.08, 0.16, d - 0.08]}
+          args={[keyInfo.width - 0.08, 0.42, keyInfo.depth - 0.08]}
           radius={0.06}
-          smoothness={3}
+          smoothness={2}
           material={keycapMaterial}
-          position={[0, 0.28, 0]}
+          position={[0, 0.21, 0]}
           onPointerDown={(e) => {
             e.stopPropagation();
             onPress(keyInfo.code);
@@ -614,9 +592,8 @@ export function KeyboardModel() {
               >
                 <div
                   ref={ann.id === 'keycaps' ? annotationsGroup : undefined}
-                  className={`flex flex-col whitespace-nowrap px-3.5 py-2 rounded-xl bg-black/90 backdrop-blur-xl border border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-opacity duration-150 ${
-                    ann.alignRight ? "items-start text-left" : "items-end text-right"
-                  }`}
+                  className={`flex flex-col whitespace-nowrap px-3.5 py-2 rounded-xl bg-black/90 backdrop-blur-xl border border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.3)] transition-opacity duration-150 ${ann.alignRight ? "items-start text-left" : "items-end text-right"
+                    }`}
                 >
                   <div className="flex items-center gap-1.5">
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
