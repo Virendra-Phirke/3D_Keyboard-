@@ -14,24 +14,37 @@ export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { switchType, soundEnabled } = useAppStore();
 
-  // Robust wheel listener for disassembly scroll animation
+  // Buttery-smooth virtual momentum wheel listener
   useEffect(() => {
+    let target = getScrollProgress();
+    let current = target;
+    let rafId: number;
+
+    const tick = () => {
+      const diff = target - current;
+      if (Math.abs(diff) > 0.0001) {
+        current += diff * 0.12;
+        setScrollProgress(current);
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
     const handleWheel = (e: WheelEvent) => {
-      const target = e.target as HTMLElement;
-      if (target && target.closest('.allow-internal-scroll')) {
+      const elem = e.target as HTMLElement;
+      if (elem && elem.closest('.allow-internal-scroll')) {
         return;
       }
 
-      const current = getScrollProgress();
-      // Smooth responsive wheel scroll sensitivity
-      const delta = (e.deltaY > 0 ? 1 : -1) * Math.min(Math.abs(e.deltaY), 120) * 0.0015;
-      const next = Math.max(0, Math.min(1, current + delta));
-      setScrollProgress(next);
+      // Smooth proportional wheel impulse
+      const impulse = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 120) * 0.0011;
+      target = Math.max(0, Math.min(1, target + impulse));
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     return () => {
       window.removeEventListener('wheel', handleWheel);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -56,7 +69,7 @@ export default function App() {
       }
 
       const touchY = e.touches[0].clientY;
-      const deltaY = (touchStartY - touchY) * 0.0025;
+      const deltaY = (touchStartY - touchY) * 0.0022;
       touchStartY = touchY;
 
       const current = getScrollProgress();

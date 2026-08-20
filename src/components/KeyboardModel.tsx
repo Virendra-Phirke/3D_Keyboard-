@@ -376,46 +376,48 @@ export function KeyboardModel() {
       annotationsGroup.current.style.display = annotationsVisibility > 0.01 ? 'block' : 'none';
     }
 
-    // 2. LAYER EXPLOSIONS
-    const keycapsProgress = getProgress(0.10, 0.34);
+    const smoothStep = (t: number) => t * t * (3 - 2 * t);
+
+    // 2. LAYER EXPLOSIONS WITH BUTTERY SMOOTHSTEP EASING
+    const keycapsProgress = getProgress(0.06, 0.40);
     if (keycapsGroup.current) {
-      const ease = 1 - Math.pow(1 - keycapsProgress, 3);
+      const ease = smoothStep(keycapsProgress);
       keycapsGroup.current.position.y = ease * 6.0;
     }
 
-    const switchesProgress = getProgress(0.22, 0.44);
+    const switchesProgress = getProgress(0.18, 0.52);
     if (switchesGroup.current) {
-      const ease = 1 - Math.pow(1 - switchesProgress, 2.5);
+      const ease = smoothStep(switchesProgress);
       switchesGroup.current.position.y = -0.2 + ease * 4.2;
     }
 
-    const plateProgress = getProgress(0.34, 0.56);
+    const plateProgress = getProgress(0.30, 0.64);
     if (plateGroup.current) {
-      const ease = 1 - Math.pow(1 - plateProgress, 2.5);
+      const ease = smoothStep(plateProgress);
       plateGroup.current.position.y = -0.28 + ease * 2.48;
     }
 
-    const pcbProgress = getProgress(0.46, 0.68);
+    const pcbProgress = getProgress(0.42, 0.76);
     if (pcbGroup.current) {
-      const ease = 1 - Math.pow(1 - pcbProgress, 2.5);
+      const ease = smoothStep(pcbProgress);
       pcbGroup.current.position.y = -0.48 + ease * 0.98;
     }
 
-    const internalsProgress = getProgress(0.58, 0.78);
+    const internalsProgress = getProgress(0.54, 0.84);
     if (internalsGroup.current) {
-      const ease = 1 - Math.pow(1 - internalsProgress, 2.5);
+      const ease = smoothStep(internalsProgress);
       internalsGroup.current.position.y = -0.62 - ease * 0.58;
     }
 
-    const caseProgress = getProgress(0.68, 0.88);
+    const caseProgress = getProgress(0.64, 0.92);
     if (caseGroup.current) {
-      const ease = 1 - Math.pow(1 - caseProgress, 2.5);
+      const ease = smoothStep(caseProgress);
       caseGroup.current.position.y = -0.85 - ease * 1.95;
     }
 
-    const hardwareProgress = getProgress(0.76, 0.94);
+    const hardwareProgress = getProgress(0.72, 0.98);
     if (hardwareGroup.current) {
-      const ease = 1 - Math.pow(1 - hardwareProgress, 2.5);
+      const ease = smoothStep(hardwareProgress);
       hardwareGroup.current.position.y = -1.2 - ease * 3.3;
     }
 

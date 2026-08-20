@@ -321,7 +321,7 @@ export default function UI({ scrollContainerRef }: UIProps) {
       {/* Top Global Scroll Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-white/10 z-50 pointer-events-none">
         <div
-          className="h-full bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600 transition-all duration-75 shadow-[0_0_10px_rgba(249,115,22,0.8)]"
+          className="h-full bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600 transition-all duration-75"
           style={{ width: `${Math.min(100, Math.max(0, scrollProgress * 100))}%` }}
         />
       </div>
@@ -329,12 +329,12 @@ export default function UI({ scrollContainerRef }: UIProps) {
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col lg:w-[calc(100%-22rem)]">
         {/* Top Navbar */}
-        <nav className="w-full h-20 flex justify-between items-center px-8 md:px-12 sticky top-0 z-50 pointer-events-auto bg-black/40 backdrop-blur-md border-b border-white/10">
+        <nav className="w-full h-20 flex justify-between items-center px-8 md:px-12 sticky top-0 z-50 pointer-events-auto bg-[#050505]/90 border-b border-white/5">
           <div
             onClick={() => scrollToSection(0)}
             className="flex items-center gap-3 text-lg font-black tracking-widest uppercase cursor-pointer"
           >
-            <span className="text-orange-500 text-2xl drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]">⬡</span>
+            <span className="text-orange-500 text-2xl">⬡</span>
             <span>MECHCRAFT <span className="text-gray-400 text-xs font-normal tracking-wider ml-1">KEYBOARDS</span></span>
           </div>
 
