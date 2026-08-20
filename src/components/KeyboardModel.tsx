@@ -82,11 +82,11 @@ interface KeycapItemProps {
  * Creates a single, seamless, authentic Cherry/OEM profile truncated pyramid keycap.
  * No stepped ledges or chicklet borders - pure sloped mechanical keycap geometry.
  */
-function createCherryKeycapGeometry(width: number, depth: number, height: number = 0.50) {
+function createCherryKeycapGeometry(width: number, depth: number, height: number = 0.44) {
   const wBottom = width - 0.05;
   const dBottom = depth - 0.05;
-  const wTop = width - 0.22;
-  const dTop = depth - 0.20;
+  const wTop = width - 0.18;
+  const dTop = depth - 0.16;
 
   const hw0 = wBottom / 2;
   const hd0 = dBottom / 2;
@@ -94,11 +94,11 @@ function createCherryKeycapGeometry(width: number, depth: number, height: number
   const hd1 = dTop / 2;
 
   const positions = new Float32Array([
-    // Top face (y = height)
-    -hw1, height, -hd1,
-     hw1, height, -hd1,
-     hw1, height,  hd1,
+    // Top face (y = height) - Counter-Clockwise
     -hw1, height,  hd1,
+     hw1, height,  hd1,
+     hw1, height, -hd1,
+    -hw1, height, -hd1,
 
     // Front face
     -hw0, 0,  hd0,
@@ -123,21 +123,14 @@ function createCherryKeycapGeometry(width: number, depth: number, height: number
      hw0, 0, -hd0,
      hw1, height, -hd1,
      hw1, height,  hd1,
-
-    // Bottom face (y = 0)
-    -hw0, 0,  hd0,
-    -hw0, 0, -hd0,
-     hw0, 0, -hd0,
-     hw0, 0,  hd0,
   ]);
 
-  // UV mapping: Top face receives full texture with legends; side faces sample top edge
   const uvs = new Float32Array([
     // Top face
-    0, 1,
-    1, 1,
-    1, 0,
     0, 0,
+    1, 0,
+    1, 1,
+    0, 1,
 
     // Front face
     0, 0,  1, 0,  1, 0.05,  0, 0.05,
@@ -149,9 +142,6 @@ function createCherryKeycapGeometry(width: number, depth: number, height: number
     0, 0,  1, 0,  1, 0.05,  0, 0.05,
 
     // Right face
-    0, 0,  1, 0,  1, 0.05,  0, 0.05,
-
-    // Bottom face
     0, 0,  1, 0,  1, 0.05,  0, 0.05,
   ]);
 
@@ -161,7 +151,6 @@ function createCherryKeycapGeometry(width: number, depth: number, height: number
     8, 9, 10, 8, 10, 11,      // Back
     12, 13, 14, 12, 14, 15,   // Left
     16, 17, 18, 16, 18, 19,   // Right
-    20, 21, 22, 20, 22, 23,   // Bottom
   ];
 
   const geometry = new THREE.BufferGeometry();
@@ -206,12 +195,13 @@ function KeycapItem({
       map: texture,
       roughness: 0.44,
       metalness: 0.04,
+      side: THREE.DoubleSide,
     });
   }, [texture]);
 
   // Seamless truncated pyramid mechanical keycap geometry
   const geometry = useMemo(() => {
-    return createCherryKeycapGeometry(keyInfo.width, keyInfo.depth, 0.50);
+    return createCherryKeycapGeometry(keyInfo.width, keyInfo.depth, 0.44);
   }, [keyInfo.width, keyInfo.depth]);
 
   // Cherry sculpt profile row tilts
@@ -242,6 +232,7 @@ function KeycapItem({
         <mesh
           geometry={geometry}
           material={keycapMaterial}
+          position={[0, 0, 0]}
           onPointerDown={(e) => {
             e.stopPropagation();
             onPress(keyInfo.code);
@@ -250,6 +241,15 @@ function KeycapItem({
             e.stopPropagation();
             onRelease(keyInfo.code);
           }}
+        />
+
+        {/* Beveled Concave Dish Top */}
+        <RoundedBox
+          args={[keyInfo.width - 0.20, 0.04, keyInfo.depth - 0.18]}
+          radius={0.02}
+          smoothness={2}
+          material={keycapMaterial}
+          position={[0, 0.44, 0]}
         />
 
         {/* Underside Switch Stem Socket */}
