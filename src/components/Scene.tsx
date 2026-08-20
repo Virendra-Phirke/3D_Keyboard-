@@ -1,4 +1,4 @@
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, AdaptiveDpr, AdaptiveEvents, Preload, BakeShadows } from "@react-three/drei";
 import { KeyboardModel } from "./KeyboardModel";
 import { useAppStore } from "../store";
 import { THEME_CONFIGS } from "../utils/keycapTexture";
@@ -10,6 +10,12 @@ export default function Scene() {
   return (
     <>
       <color attach="background" args={["#08080c"]} />
+
+      {/* Adaptive GPU & Event optimizations for high-frame-rate rendering */}
+      <AdaptiveDpr pixelated={false} />
+      <AdaptiveEvents />
+      <BakeShadows />
+      <Preload all />
 
       {/* BALANCED HIGH-FIDELITY STUDIO LIGHTING */}
       <ambientLight intensity={1.8} color="#ffffff" />

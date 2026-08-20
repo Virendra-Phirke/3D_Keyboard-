@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import Scene from "./components/Scene";
 import UI from "./components/UI";
@@ -176,7 +177,7 @@ export default function App() {
         <div className="absolute inset-0 z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
           <ErrorBoundary>
             <Canvas
-              dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25)]}
+              dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)]}
               camera={{ position: [0, 5.5, 20], fov: 38 }}
               gl={{
                 antialias: true,
@@ -185,6 +186,10 @@ export default function App() {
                 precision: 'mediump',
                 stencil: false,
                 depth: true,
+              }}
+              onCreated={({ gl }) => {
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
+                gl.toneMappingExposure = 1.02;
               }}
             >
               <Scene />
