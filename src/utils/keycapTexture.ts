@@ -270,75 +270,131 @@ export function getKeycapTexture(
     return textureCache.get(cacheKey)!;
   }
 
-  // Ultra-crisp, lightweight 256x256 texture for maximum 60fps performance and minimal VRAM
+  // Ultra-crisp, high-fidelity 512x512 texture for maximum realism and razor-sharp legends
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 512;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
-  // 1. Solid Matte PBT Body (Uniform, realistic micro-textured plastic)
+  // 1. Solid Base PBT Plastic Body
   ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillRect(0, 0, 512, 512);
 
-  // 2. Subtle Vertical Dish Lighting Gradient
-  const vertGrad = ctx.createLinearGradient(0, 0, 0, 256);
-  vertGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
-  vertGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.02)');
-  vertGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.08)');
-  vertGrad.addColorStop(1, 'rgba(0, 0, 0, 0.28)');
+  // 2. Realistic Cylindrical Concave Dish Lighting Gradient
+  const vertGrad = ctx.createLinearGradient(0, 0, 0, 512);
+  vertGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.14)');
+  vertGrad.addColorStop(0.15, 'rgba(255, 255, 255, 0.04)');
+  vertGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.02)');
+  vertGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.12)');
+  vertGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.36)');
   ctx.fillStyle = vertGrad;
-  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillRect(0, 0, 512, 512);
 
-  // 3. Subtle Chamfered Inset Border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+  // 3. Subtle Spherical Inset Radial Dish Vignette
+  const radGrad = ctx.createRadialGradient(256, 230, 40, 256, 256, 260);
+  radGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.06)');
+  radGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.0)');
+  radGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.22)');
+  ctx.fillStyle = radGrad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // 4. Subtle Injection-Molded PBT Matte Micro-Grain Noise
+  const imgData = ctx.getImageData(0, 0, 512, 512);
+  const data = imgData.data;
+  // Deterministic seed noise based on label
+  let seed = 0;
+  for (let i = 0; i < label.length; i++) seed += label.charCodeAt(i);
+  for (let i = 0; i < data.length; i += 16) {
+    seed = (seed * 9301 + 49297) % 233280;
+    const noise = ((seed / 233280) - 0.5) * 7;
+    data[i] = Math.min(255, Math.max(0, data[i] + noise));
+    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
+    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
+  }
+  ctx.putImageData(imgData, 0, 0);
+
+  // 5. Precision Chamfered Dish Inset Lip Borders (Light Top Highlight & Dark Bottom Shadow)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(10, 10, 492, 492);
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.24)';
   ctx.lineWidth = 2;
-  ctx.strokeRect(4, 4, 248, 248);
+  ctx.strokeRect(14, 14, 484, 484);
 
-  // 4. Spacebar Glowing Accent Line (Matching reference image)
+  // 6. Tactile Homing Bars on 'F' and 'J' Keys (Enthusiast Touch Typing Feature)
+  if (label === 'F' || label === 'J') {
+    // 3D Raised Homing Ridge with specular top and shadow bottom
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.fillRect(176, 396, 160, 14);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.fillRect(176, 392, 160, 4);
+  }
+
+  // 7. Spacebar Glowing Accent Line
   if (type === 'space' || label === '') {
     ctx.fillStyle = colors.accentGlow || '#f97316';
     ctx.shadowColor = colors.accentGlow || '#f97316';
-    ctx.shadowBlur = 6;
-    ctx.fillRect(90, 124, 76, 8);
+    ctx.shadowBlur = 12;
+    ctx.fillRect(160, 248, 192, 16);
     ctx.shadowBlur = 0;
+
+    // Small laser center dot
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(256, 256, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // 5. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
+  // 8. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
   if (subLabel) {
-    ctx.font = `bold ${Math.round(36 * fontScale)}px ${fontFamily}`;
+    // Top Sub-Legend (Symbols)
+    ctx.font = `bold ${Math.round(68 * fontScale)}px ${fontFamily}`;
     ctx.fillStyle = textColor;
-    ctx.globalAlpha = 0.70;
+    ctx.globalAlpha = 0.72;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 32, 32);
+    ctx.fillText(subLabel, 64, 60);
 
-    // Main Number
-    ctx.font = `bold ${Math.round(48 * fontScale)}px ${fontFamily}`;
-    ctx.globalAlpha = 0.95;
-    ctx.fillText(label, 32, 130);
+    // Bottom Main Legend (Numbers)
+    ctx.font = `bold ${Math.round(92 * fontScale)}px ${fontFamily}`;
+    ctx.globalAlpha = 0.96;
+    ctx.fillText(label, 64, 260);
   } else if (label) {
-    // 6. Single Legends (Letters, Modifiers, Function keys)
-    ctx.globalAlpha = 0.95;
+    // 9. Single Legends (Letters, Modifiers, Function keys)
+    ctx.globalAlpha = 0.96;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    if (label.length === 1) {
-      // Single Alphabet Key (A-Z)
-      ctx.font = `bold ${Math.round(56 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 128, 128);
-    } else if (label.length <= 3) {
-      // Short modifiers (ESC, TAB, WIN, ALT, DEL, etc.)
-      ctx.font = `bold ${Math.round(40 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 128, 128);
-    } else if (label.length <= 5) {
-      // Medium modifiers (SHIFT, ENTER, CAPS, SPACE)
-      ctx.font = `bold ${Math.round(32 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 128, 128);
+    let displayLabel = label;
+    if (label === 'ENTER') displayLabel = '↵ ENTER';
+    else if (label === 'SHIFT') displayLabel = '⇧ SHIFT';
+    else if (label === 'TAB') displayLabel = '⇥ TAB';
+    else if (label === 'CAPS') displayLabel = '⇪ CAPS';
+    else if (label === 'BACK') displayLabel = '⌫ BACK';
+    else if (label === 'WIN') displayLabel = '❖ WIN';
+    else if (label === 'UP') displayLabel = '▲';
+    else if (label === 'DOWN') displayLabel = '▼';
+    else if (label === 'LEFT') displayLabel = '◀';
+    else if (label === 'RIGHT') displayLabel = '▶';
+
+    if (displayLabel.length === 1) {
+      // Single Alphabet Key (A-Z) - Classic upper-left Cherry position or bold center
+      ctx.font = `bold ${Math.round(112 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 256, 246);
+    } else if (displayLabel.length <= 3) {
+      // Short modifiers (ESC, DEL, END, ALT, etc.)
+      ctx.font = `bold ${Math.round(76 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 256, 256);
+    } else if (displayLabel.length <= 6) {
+      // Medium modifiers (⇧ SHIFT, ↵ ENTER, ⇥ TAB, ⇪ CAPS)
+      ctx.font = `bold ${Math.round(62 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 256, 256);
     } else {
       // Long modifiers (BACKSPACE, CAPSLOCK)
-      ctx.font = `bold ${Math.round(27 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(label, 128, 128);
+      ctx.font = `bold ${Math.round(52 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 256, 256);
     }
   }
 

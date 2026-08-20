@@ -233,8 +233,8 @@ function KeycapItem({
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.44,
-      metalness: 0.04,
+      roughness: 0.38,
+      metalness: 0.02,
       side: THREE.DoubleSide,
     });
   }, [texture]);
@@ -283,21 +283,31 @@ function KeycapItem({
           }}
         />
 
-        {/* Beveled Concave Dish Top */}
+        {/* Beveled Cylindrical Concave Dish Top */}
         <RoundedBox
-          args={[keyInfo.width - 0.20, 0.04, keyInfo.depth - 0.18]}
-          radius={0.02}
-          smoothness={2}
+          args={[keyInfo.width - 0.18, 0.045, keyInfo.depth - 0.16]}
+          radius={0.024}
+          smoothness={3}
           material={keycapMaterial}
           position={[0, 0.44, 0]}
         />
 
-        {/* Underside Switch Stem Socket */}
-        <Cylinder
-          args={[0.16, 0.16, 0.14, 12]}
-          position={[0, 0.06, 0]}
-          material={socketMaterial}
-        />
+        {/* Realistic Underside MX Cross Stem Mount Socket */}
+        <group position={[0, 0.08, 0]}>
+          {/* Outer Cylindrical Stem Sleeve */}
+          <Cylinder
+            args={[0.20, 0.20, 0.16, 16]}
+            material={socketMaterial}
+          />
+          {/* Internal MX Cross Female Slotted Ribs */}
+          <Box args={[0.04, 0.16, 0.16]} material={socketMaterial} />
+          <Box args={[0.16, 0.16, 0.04]} material={socketMaterial} />
+          {/* Diagonal Structural Reinforcement Gussets */}
+          <Box args={[0.03, 0.12, 0.10]} position={[0.11, 0, 0.11]} rotation={[0, Math.PI / 4, 0]} material={socketMaterial} />
+          <Box args={[0.03, 0.12, 0.10]} position={[-0.11, 0, 0.11]} rotation={[0, -Math.PI / 4, 0]} material={socketMaterial} />
+          <Box args={[0.03, 0.12, 0.10]} position={[0.11, 0, -0.11]} rotation={[0, -Math.PI / 4, 0]} material={socketMaterial} />
+          <Box args={[0.03, 0.12, 0.10]} position={[-0.11, 0, -0.11]} rotation={[0, Math.PI / 4, 0]} material={socketMaterial} />
+        </group>
       </group>
     </group>
   );
