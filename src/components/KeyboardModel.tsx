@@ -32,6 +32,14 @@ const pcbStaticMat = new THREE.MeshStandardMaterial({ color: "#18181b", roughnes
 const mapLinear = THREE.MathUtils.mapLinear;
 const clamp = THREE.MathUtils.clamp;
 
+// No-op raycast function to skip raycasting on non-interactive meshes.
+// R3F raycasts every mesh on click/pointer events; disabling it on structural
+// meshes eliminates the 150-400ms click handler violations.
+const noRaycast = () => null;
+
+// Pre-allocated temp color to avoid per-frame garbage in rainbow RGB mode
+const _tempColor = new THREE.Color();
+
 // Layer annotation data for exploded view
 const LAYER_ANNOTATIONS = [
   {
@@ -290,10 +298,11 @@ const KeycapItem = memo(function KeycapItem({
           smoothness={3}
           material={keycapMaterial}
           position={[0, 0.44, 0]}
+          raycast={noRaycast as any}
         />
 
         {/* Realistic Underside MX Cross Stem Mount Socket */}
-        <group position={[0, 0.08, 0]}>
+        <group position={[0, 0.08, 0]} raycast={noRaycast as any}>
           {/* Outer Cylindrical Stem Sleeve */}
           <Cylinder
             args={[0.20, 0.20, 0.16, 16]}
@@ -344,7 +353,7 @@ const SwitchItem = memo(function SwitchItem({
   });
 
   return (
-    <group position={[keyInfo.x, 0, keyInfo.z]}>
+    <group position={[keyInfo.x, 0, keyInfo.z]} raycast={noRaycast as any}>
       {/* 1. Lower Nylon Housing Base with Plate Flange & Side Snap Latches */}
       <Box args={[0.82, 0.05, 0.82]} position={[0, 0.025, 0]} material={baseMat} />
       <Box args={[0.74, 0.14, 0.74]} position={[0, -0.06, 0]} material={baseMat} />
@@ -907,9 +916,9 @@ export function KeyboardModel() {
         underglowLight.current.color.set(customColors.ledColor || '#ff8800');
       } else if (rgbMode === "rainbow") {
         const hue = (time * 0.25) % 1;
-        const color = new THREE.Color().setHSL(hue, 1, 0.55);
-        amberBacklight.current.color = color;
-        underglowLight.current.color = color;
+        _tempColor.setHSL(hue, 1, 0.55);
+        amberBacklight.current.color.copy(_tempColor);
+        underglowLight.current.color.copy(_tempColor);
         amberBacklight.current.intensity = 3.5;
         underglowLight.current.intensity = 3.5;
       } else if (rgbMode === "breathe") {
@@ -955,7 +964,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 2. LAYER 2: GATERON/CHERRY MX SWITCHES ARRAY & STABILIZERS */}
-      <group ref={switchesGroup} position={[0, -0.2, 0]}>
+      <group ref={switchesGroup} position={[0, -0.2, 0]} raycast={noRaycast as any}>
         {keys.map((key) => (
           <SwitchItem
             key={`switch-${key.id}`}
@@ -982,7 +991,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 3. LAYER 3: LASER-CUT CNC SWITCH PLATE */}
-      <group ref={plateGroup} position={[0, -0.28, 0]}>
+      <group ref={plateGroup} position={[0, -0.28, 0]} raycast={noRaycast as any}>
         <Box args={[totalWidth, 0.09, 0.25]} position={[0, 0, totalDepth / 2 - 0.125]} material={plateMaterial} />
         <Box args={[totalWidth, 0.09, 0.25]} position={[0, 0, -totalDepth / 2 + 0.125]} material={plateMaterial} />
         <Box args={[0.25, 0.09, totalDepth]} position={[totalWidth / 2 - 0.125, 0, 0]} material={plateMaterial} />
@@ -1013,7 +1022,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 4. LAYER 4: HOT-SWAP PCB */}
-      <group ref={pcbGroup} position={[0, -0.48, 0]}>
+      <group ref={pcbGroup} position={[0, -0.48, 0]} raycast={noRaycast as any}>
         <Box args={[totalWidth, 0.06, totalDepth]} material={pcbMaterial} />
 
         {/* Soldered ALPS EC11 Rotary Encoder Module */}
@@ -1045,7 +1054,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 5. LAYER 5: PORON & SILICONE INTERNALS */}
-      <group ref={internalsGroup} position={[0, -0.62, 0]}>
+      <group ref={internalsGroup} position={[0, -0.62, 0]} raycast={noRaycast as any}>
         <Box args={[totalWidth, 0.14, totalDepth]} material={foamMaterial} />
         {/* Encoder Base Cutout */}
         <Box args={[0.74, 0.02, 0.74]} position={[knob.x, 0.072, knob.z]} material={pcbMaterial} />
@@ -1055,7 +1064,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 6. LAYER 6: CNC ALUMINUM CASE WITH GOLD PINSTRIPE BEVEL */}
-      <group ref={caseGroup} position={[0, -0.85, 0]}>
+      <group ref={caseGroup} position={[0, -0.85, 0]} raycast={noRaycast as any}>
         {/* Bottom Tray */}
         <Box args={[totalWidth + 0.6, 0.22, totalDepth + 0.6]} position={[0, -0.14, 0]} material={caseMaterial} />
 
@@ -1081,7 +1090,7 @@ export function KeyboardModel() {
       </group>
 
       {/* 7. LAYER 7: FLOATING BRASS HARDWARE */}
-      <group ref={hardwareGroup} position={[0, -1.2, 0]}>
+      <group ref={hardwareGroup} position={[0, -1.2, 0]} raycast={noRaycast as any}>
         {screwPositions.map(([sx, sz], i) => (
           <group key={`screw-${i}`} position={[sx, 0, sz]}>
             <Cylinder args={[0.2, 0.2, 0.09, 12]} material={brassMaterial} />
