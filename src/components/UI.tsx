@@ -315,11 +315,7 @@ export default function UI({ scrollContainerRef }: UIProps) {
               <span className="hidden sm:inline">STUDIO</span>
             </button>
 
-            {/* Pre-Order Button */}
-            <button className="border border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-black font-bold px-4 py-2 rounded-lg text-xs tracking-wider transition flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-              <span>🛒 PRE-ORDER NOW</span>
-              <span className="font-bold">›</span>
-            </button>
+
           </div>
         </nav>
 
