@@ -204,15 +204,28 @@ const state: AppState = {
 
 type StateListener = () => void;
 const listeners = new Set<StateListener>();
+const scrollListeners = new Set<StateListener>();
 
 function notify() {
   listeners.forEach((l) => l());
 }
 
+function notifyScroll() {
+  scrollListeners.forEach((l) => l());
+}
+
 export const setScrollProgress = (p: number) => {
-  state.scrollProgress = Math.max(0, Math.min(1, p));
-  state.activeStageIndex = Math.min(6, Math.floor(state.scrollProgress * 7.2));
-  notify();
+  const clamped = Math.max(0, Math.min(1, p));
+  if (Math.abs(state.scrollProgress - clamped) < 0.00005) return;
+  state.scrollProgress = clamped;
+  const newStage = Math.min(6, Math.floor(state.scrollProgress * 7.2));
+  const stageChanged = newStage !== state.activeStageIndex;
+  state.activeStageIndex = newStage;
+
+  notifyScroll();
+  if (stageChanged) {
+    notify();
+  }
 };
 
 export const getScrollProgress = () => state.scrollProgress;
@@ -524,9 +537,9 @@ export function useCustomScroll() {
 
   useEffect(() => {
     const listener = () => setProgress(state.scrollProgress);
-    listeners.add(listener);
+    scrollListeners.add(listener);
     return () => {
-      listeners.delete(listener);
+      scrollListeners.delete(listener);
     };
   }, []);
 

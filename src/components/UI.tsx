@@ -30,7 +30,6 @@ import {
 import {
   useAppStore,
   setColorTheme,
-  setRgbMode,
   setSwitchType,
   toggleSound,
   toggleAnnotations,

@@ -586,8 +586,9 @@ export function KeyboardModel() {
   // Render loop with smooth easing
   useFrame(({ clock }, delta) => {
     const rawOffset = getScrollProgress();
-    smoothedScroll.current = THREE.MathUtils.damp(smoothedScroll.current, rawOffset, 14, delta);
-    smoothedZoom.current = THREE.MathUtils.damp(smoothedZoom.current, zoomLevel, 12, delta);
+    const clampedDelta = Math.min(delta, 0.05);
+    smoothedScroll.current = THREE.MathUtils.damp(smoothedScroll.current, rawOffset, 18, clampedDelta);
+    smoothedZoom.current = THREE.MathUtils.damp(smoothedZoom.current, zoomLevel, 14, clampedDelta);
     const scrollOffset = smoothedScroll.current;
     const time = clock.getElapsedTime();
 

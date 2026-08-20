@@ -16,18 +16,24 @@ export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { switchType, soundEnabled } = useAppStore();
 
-  // Buttery-smooth virtual momentum wheel listener
+  // Buttery-smooth virtual momentum wheel listener with kinetic inertia
   useEffect(() => {
     let target = getScrollProgress();
     let current = target;
+    let velocity = 0;
     let rafId: number;
 
     const tick = () => {
       const diff = target - current;
-      if (Math.abs(diff) > 0.0001) {
-        current += diff * 0.12;
-        setScrollProgress(current);
+      velocity = velocity * 0.82 + diff * 0.16;
+      current += velocity;
+
+      if (Math.abs(target - current) < 0.00005 && Math.abs(velocity) < 0.00005) {
+        current = target;
+        velocity = 0;
       }
+
+      setScrollProgress(current);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -38,26 +44,38 @@ export default function App() {
         return;
       }
 
-      // Smooth proportional wheel impulse
-      const impulse = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 120) * 0.0011;
+      const isTrackpad = Math.abs(e.deltaY) < 50 && !Number.isInteger(e.deltaY);
+      const factor = isTrackpad ? 0.00065 : 0.00085;
+      const impulse = e.deltaY * factor;
       target = Math.max(0, Math.min(1, target + impulse));
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        target = Math.min(1, target + 0.08);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        target = Math.max(0, target - 0.08);
+      }
+    };
+
     window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
     return () => {
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
       cancelAnimationFrame(rafId);
     };
   }, []);
 
-  // Touch swipe listener for mobile scrolling
+  // Touch swipe listener for mobile scrolling with kinetic glide
   useEffect(() => {
-    let touchStartY = 0;
+    let lastTouchY = 0;
     let isDragging = false;
 
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
-        touchStartY = e.touches[0].clientY;
+        lastTouchY = e.touches[0].clientY;
         isDragging = true;
       }
     };
@@ -71,12 +89,11 @@ export default function App() {
       }
 
       const touchY = e.touches[0].clientY;
-      const deltaY = (touchStartY - touchY) * 0.0022;
-      touchStartY = touchY;
+      const deltaY = (lastTouchY - touchY) * 0.0028;
+      lastTouchY = touchY;
 
       const current = getScrollProgress();
-      const next = Math.max(0, Math.min(1, current + deltaY));
-      setScrollProgress(next);
+      setScrollProgress(Math.max(0, Math.min(1, current + deltaY)));
     };
 
     const handleTouchEnd = () => {
