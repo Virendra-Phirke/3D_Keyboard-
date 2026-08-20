@@ -25,6 +25,8 @@ const knobTopMat = new THREE.MeshStandardMaterial({ color: "#0d0d0f", roughness:
 const knobDishMat = new THREE.MeshStandardMaterial({ color: "#09090b", roughness: 0.45, metalness: 0.80 });
 const indicatorMat = new THREE.MeshStandardMaterial({ color: "#f8fafc", roughness: 0.1, metalness: 0.95, emissive: "#ffffff", emissiveIntensity: 0.3 });
 const brassCollarMat = new THREE.MeshStandardMaterial({ color: "#f59e0b", roughness: 0.28, metalness: 0.96 });
+const goldTraceStaticMat = new THREE.MeshStandardMaterial({ color: "#fbbf24", metalness: 0.95, roughness: 0.15 });
+const pcbStaticMat = new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.45 });
 
 const mapLinear = THREE.MathUtils.mapLinear;
 const clamp = THREE.MathUtils.clamp;
@@ -430,8 +432,8 @@ function StabilizerAssembly({
   );
 }
 
-/* ─── REALISTIC CNC MACHINED ROTARY ENCODER KNOB WITH KNURLED RIBS & HARDWARE ─── */
-function RotaryKnobAssembly({
+/* ─── LAYER 1: ROTATING CNC ANODIZED KNOB CAP ─── */
+function RotaryKnobCap({
   x,
   z,
   color,
@@ -498,17 +500,6 @@ function RotaryKnobAssembly({
 
   return (
     <group position={[x, 0.38, z]}>
-      {/* ── UNDER-KNOB ALPS ENCODER HARDWARE ── */}
-      <group position={[0, -0.28, 0]}>
-        {/* Hexagonal Locking Nut */}
-        <Cylinder args={[0.32, 0.32, 0.08, 6]} position={[0, 0.04, 0]} material={brassCollarMat} />
-        {/* Threaded Collar Bushing */}
-        <Cylinder args={[0.24, 0.24, 0.18, 24]} position={[0, 0.14, 0]} material={brassCollarMat} />
-        {/* Steel D-Profile Center Shaft */}
-        <Cylinder args={[0.14, 0.14, 0.36, 24]} position={[0, 0.26, 0]} material={chamferMat} />
-      </group>
-
-      {/* ── ROTATING CNC ANODIZED KNOB CAP ── */}
       <group ref={knobGroupRef} onClick={handleClick}>
         {/* 1. Translucent LED Halo Base (Underglow) */}
         <Cylinder args={[0.56, 0.56, 0.06, 36]} position={[0, -0.16, 0]} material={ledMat} />
@@ -545,7 +536,84 @@ function RotaryKnobAssembly({
         {/* 9. Machined Indicator Dot / Position Notch */}
         <Box args={[0.04, 0.03, 0.14]} position={[0, 0.30, -0.32]} material={indicatorMat} />
         <Cylinder args={[0.035, 0.035, 0.03, 16]} position={[0, 0.30, -0.41]} material={indicatorMat} />
+
+        {/* 10. Underside D-Shaft Female Socket Tube */}
+        <Cylinder args={[0.18, 0.18, 0.24, 24]} position={[0, -0.06, 0]} material={kailhSocketMat} />
       </group>
+    </group>
+  );
+}
+
+/* ─── LAYER 3: ALPS ENCODER PLATE COLLAR & D-SHAFT ─── */
+function EncoderPlateMount({
+  x,
+  z,
+  chamferMat,
+}: {
+  x: number;
+  z: number;
+  chamferMat: THREE.MeshStandardMaterial;
+}) {
+  return (
+    <group position={[x, 0, z]}>
+      {/* Plate Retaining Bezel Ring */}
+      <Cylinder args={[0.54, 0.54, 0.08, 36]} position={[0, 0.04, 0]} material={chamferMat} />
+      {/* Brass Hexagonal Locking Nut */}
+      <Cylinder args={[0.34, 0.34, 0.12, 6]} position={[0, 0.14, 0]} material={brassCollarMat} />
+      {/* Threaded Brass Bushing Sleeve */}
+      <Cylinder args={[0.24, 0.24, 0.28, 24]} position={[0, 0.28, 0]} material={brassCollarMat} />
+      {/* Stainless Steel D-Profile Rotating Shaft Standing Up */}
+      <group position={[0, 0.44, 0]}>
+        <Cylinder args={[0.15, 0.15, 0.42, 24]} material={chamferMat} />
+        <Box args={[0.06, 0.42, 0.28]} position={[0.13, 0, 0]} material={chamferMat} />
+      </group>
+    </group>
+  );
+}
+
+/* ─── LAYER 4: ALPS EC11 SOLDERED PCB MODULE ─── */
+function AlpsEncoderPcbModule({
+  x,
+  z,
+  ledMat,
+}: {
+  x: number;
+  z: number;
+  ledMat: THREE.MeshStandardMaterial;
+}) {
+  return (
+    <group position={[x, 0.032, z]}>
+      {/* Gold Solder Landing Traces on PCB */}
+      <Box args={[0.78, 0.012, 0.78]} material={goldTraceStaticMat} />
+      <Box args={[0.68, 0.016, 0.68]} material={pcbStaticMat} />
+
+      {/* South-Facing SMD RGB LED for Halo */}
+      <Box args={[0.22, 0.04, 0.16]} position={[0, 0.02, -0.26]} material={ledMat} />
+
+      {/* ALPS EC11 Metal Shielded Enclosure Box */}
+      <Box args={[0.62, 0.32, 0.62]} position={[0, 0.16, 0]} material={kailhSocketMat} />
+      {/* Metal Embossed Top Cover Plate */}
+      <Box args={[0.60, 0.04, 0.60]} position={[0, 0.33, 0]} material={usbShieldMat} />
+
+      {/* Grounding Wing Solder Tabs (Left & Right) */}
+      <Box args={[0.08, 0.28, 0.18]} position={[-0.34, 0.08, 0]} material={usbShieldMat} />
+      <Box args={[0.08, 0.28, 0.18]} position={[0.34, 0.08, 0]} material={usbShieldMat} />
+
+      {/* 3 Pulse Channel Solder Pins (Top: A, COM, B) */}
+      {[-0.20, 0, 0.20].map((px) => (
+        <group key={`pin-pulse-${px}`} position={[px, -0.06, 0.34]}>
+          <Cylinder args={[0.03, 0.03, 0.16, 12]} material={usbShieldMat} />
+          <Cylinder args={[0.06, 0.06, 0.02, 12]} position={[0, 0.07, 0]} material={goldTraceStaticMat} />
+        </group>
+      ))}
+
+      {/* 2 Push-Switch Contact Solder Pins (Bottom) */}
+      {[-0.18, 0.18].map((px) => (
+        <group key={`pin-sw-${px}`} position={[px, -0.06, -0.34]}>
+          <Cylinder args={[0.03, 0.03, 0.16, 12]} material={usbShieldMat} />
+          <Cylinder args={[0.06, 0.06, 0.02, 12]} position={[0, 0.07, 0]} material={goldTraceStaticMat} />
+        </group>
+      ))}
     </group>
   );
 }
@@ -857,8 +925,8 @@ export function KeyboardModel() {
           />
         ))}
 
-        {/* Real CNC Machined Rotary Encoder Knob Assembly */}
-        <RotaryKnobAssembly
+        {/* 1. Real CNC Machined Rotary Encoder Knob Cap */}
+        <RotaryKnobCap
           x={knob.x}
           z={knob.z}
           color={customColors.knobColor}
@@ -902,6 +970,13 @@ export function KeyboardModel() {
         <Box args={[0.25, 0.09, totalDepth]} position={[totalWidth / 2 - 0.125, 0, 0]} material={plateMaterial} />
         <Box args={[0.25, 0.09, totalDepth]} position={[-totalWidth / 2 + 0.125, 0, 0]} material={plateMaterial} />
 
+        {/* Encoder Plate Retaining Bezel Ring & D-Shaft */}
+        <EncoderPlateMount
+          x={knob.x}
+          z={knob.z}
+          chamferMat={goldChamferMaterial}
+        />
+
         {keys.map((k) => (
           <group key={`plate-hole-${k.id}`} position={[k.x, 0, k.z]}>
             <Box args={[k.width + 0.02, 0.08, 0.08]} position={[0, 0, 0.44]} material={plateMaterial} />
@@ -922,6 +997,13 @@ export function KeyboardModel() {
       {/* 4. LAYER 4: HOT-SWAP PCB */}
       <group ref={pcbGroup} position={[0, -0.48, 0]}>
         <Box args={[totalWidth, 0.06, totalDepth]} material={pcbMaterial} />
+
+        {/* Soldered ALPS EC11 Rotary Encoder Module */}
+        <AlpsEncoderPcbModule
+          x={knob.x}
+          z={knob.z}
+          ledMat={rgbLedMaterial}
+        />
 
         {keys.map((k) => (
           <group key={`pcb-key-${k.id}`} position={[k.x, 0.032, k.z]}>
@@ -947,6 +1029,8 @@ export function KeyboardModel() {
       {/* 5. LAYER 5: PORON & SILICONE INTERNALS */}
       <group ref={internalsGroup} position={[0, -0.62, 0]}>
         <Box args={[totalWidth, 0.14, totalDepth]} material={foamMaterial} />
+        {/* Encoder Base Cutout */}
+        <Box args={[0.74, 0.02, 0.74]} position={[knob.x, 0.072, knob.z]} material={pcbMaterial} />
         {keys.map((k) => (
           <Box key={`foam-hole-${k.id}`} args={[0.62, 0.02, 0.62]} position={[k.x, 0.072, k.z]} material={pcbMaterial} />
         ))}
