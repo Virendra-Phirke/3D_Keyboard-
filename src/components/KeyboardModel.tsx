@@ -384,30 +384,6 @@ function StabilizerAssembly({
         <Box args={[0.08, 0.24, 0.24]} position={[0, 0.32, 0]} material={stemMat} />
         <Box args={[0.24, 0.24, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
       </group>
-
-      {/* Solid Stainless Steel Wire Rod connecting left and right stabilizers */}
-      <group position={[0, 0.08, 0.16]}>
-        {/* Horizontal Main Wire Span */}
-        <Cylinder
-          args={[0.024, 0.024, halfSpan * 2, 12]}
-          rotation={[0, 0, Math.PI / 2]}
-          material={wireMat}
-        />
-        {/* Left 90-degree Arm */}
-        <Cylinder
-          args={[0.024, 0.024, 0.18, 12]}
-          position={[-halfSpan, 0.06, -0.07]}
-          rotation={[Math.PI / 2.5, 0, 0]}
-          material={wireMat}
-        />
-        {/* Right 90-degree Arm */}
-        <Cylinder
-          args={[0.024, 0.024, 0.18, 12]}
-          position={[halfSpan, 0.06, -0.07]}
-          rotation={[Math.PI / 2.5, 0, 0]}
-          material={wireMat}
-        />
-      </group>
     </group>
   );
 }
