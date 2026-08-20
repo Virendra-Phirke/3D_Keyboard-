@@ -206,7 +206,7 @@ const PER_KEY_COLORS = [
   '#6366f1', '#d946ef', '#ffffff', '#a1a1aa'
 ];
 
-export const SWITCH_COLOR_PRESETS = [
+const SWITCH_COLOR_PRESETS = [
   {
     id: "tangerine",
     name: "C³ Tangerine",
