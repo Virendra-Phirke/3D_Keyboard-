@@ -86,7 +86,6 @@ function KeycapItem({
   onPress,
   onRelease,
 }: KeycapItemProps) {
-  const [isHovered, setIsHovered] = useState_light();
   const keycapRef = useRef<THREE.Group>(null);
   const currentY = useRef(0);
 
@@ -96,7 +95,7 @@ function KeycapItem({
       keyInfo.label,
       keyInfo.subLabel,
       keyInfo.type,
-      isHovered,
+      false,
       isPressed,
       {
         keycapsAlpha: customColors.keycapsAlpha,
@@ -105,7 +104,7 @@ function KeycapItem({
         keycapsText: customColors.keycapsText,
       }
     );
-  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isHovered, isPressed, customColors]);
+  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors]);
 
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -117,8 +116,8 @@ function KeycapItem({
 
   useFrame((_, delta) => {
     if (keycapRef.current) {
-      const targetY = isPressed ? -0.15 : isHovered ? 0.05 : 0;
-      currentY.current = THREE.MathUtils.damp(currentY.current, targetY, 25, delta);
+      const targetY = isPressed ? -0.12 : 0;
+      currentY.current = THREE.MathUtils.damp(currentY.current, targetY, 28, delta);
       keycapRef.current.position.y = 0.2 + currentY.current;
     }
   });
@@ -139,15 +138,6 @@ function KeycapItem({
           onPointerUp={(e) => {
             e.stopPropagation();
             onRelease(keyInfo.code);
-          }}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            setIsHovered(true);
-            document.body.style.cursor = 'pointer';
-          }}
-          onPointerOut={() => {
-            setIsHovered(false);
-            document.body.style.cursor = 'auto';
           }}
         />
       </group>

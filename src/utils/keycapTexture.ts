@@ -102,7 +102,7 @@ export function getKeycapTexture(
   const accentBase = customColors?.keycapsAccent || colors.accentBase;
   const textColor = customColors?.keycapsText || (type === 'modifier' ? colors.modText : colors.alphaText);
 
-  const cacheKey = `${alphaBase}_${modBase}_${accentBase}_${textColor}_${label}_${subLabel || ''}_${type}_${isHovered}_${isPressed}`;
+  const cacheKey = `${alphaBase}_${modBase}_${accentBase}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}`;
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey)!;
   }
@@ -121,8 +121,6 @@ export function getKeycapTexture(
 
   if (isPressed) {
     bgColor = '#27272a';
-  } else if (isHovered) {
-    bgColor = '#2d2d33';
   }
 
   // Draw Matte Keycap Texture
@@ -137,9 +135,9 @@ export function getKeycapTexture(
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 256, 256);
 
-  // Subtle Border Inset
-  ctx.strokeStyle = isHovered ? '#ff8800' : 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = isHovered ? 6 : 2;
+  // Clean Subtle Border Inset (No orange highlight)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 2;
   ctx.strokeRect(6, 6, 244, 244);
 
   // SubLabel (e.g. ! @ # $)
