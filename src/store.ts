@@ -422,6 +422,13 @@ export const setScrollProgress = (p: number) => {
   }
 };
 
+export const subscribeScroll = (listener: StateListener) => {
+  scrollListeners.add(listener);
+  return () => {
+    scrollListeners.delete(listener);
+  };
+};
+
 export const getScrollProgress = () => state.scrollProgress;
 
 export const setShowAnnotations = (show: boolean) => {

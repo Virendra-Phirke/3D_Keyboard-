@@ -7,7 +7,7 @@ import { Canvas } from "@react-three/fiber";
 import Scene from "./components/Scene";
 import UI from "./components/UI";
 import { Suspense, useEffect, useRef } from "react";
-import { setScrollProgress, getScrollProgress, setKeyPressed, useAppStore } from "./store";
+import { setScrollProgress, getScrollProgress, subscribeScroll, setKeyPressed, useAppStore } from "./store";
 import { playSwitchSound } from "./utils/audio";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
@@ -21,18 +21,39 @@ export default function App() {
     let current = target;
     let velocity = 0;
     let rafId: number;
+    let isInternalUpdating = false;
+
+    // Synchronize target when updated from UI sliders or preset clicks
+    const unsub = subscribeScroll(() => {
+      if (!isInternalUpdating) {
+        const ext = getScrollProgress();
+        if (Math.abs(ext - current) > 0.005) {
+          target = ext;
+          current = ext;
+          velocity = 0;
+        }
+      }
+    });
 
     const tick = () => {
       const diff = target - current;
-      velocity = velocity * 0.82 + diff * 0.16;
+      velocity = velocity * 0.84 + diff * 0.14;
       current += velocity;
 
-      if (Math.abs(target - current) < 0.00005 && Math.abs(velocity) < 0.00005) {
-        current = target;
-        velocity = 0;
+      if (Math.abs(diff) < 0.00001 && Math.abs(velocity) < 0.00001) {
+        if (current !== target) {
+          current = target;
+          velocity = 0;
+          isInternalUpdating = true;
+          setScrollProgress(current);
+          isInternalUpdating = false;
+        }
+      } else {
+        isInternalUpdating = true;
+        setScrollProgress(current);
+        isInternalUpdating = false;
       }
 
-      setScrollProgress(current);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -44,7 +65,7 @@ export default function App() {
       }
 
       const isTrackpad = Math.abs(e.deltaY) < 50 && !Number.isInteger(e.deltaY);
-      const factor = isTrackpad ? 0.00065 : 0.00085;
+      const factor = isTrackpad ? 0.0007 : 0.00088;
       const impulse = e.deltaY * factor;
       target = Math.max(0, Math.min(1, target + impulse));
     };
@@ -52,15 +73,20 @@ export default function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        target = Math.min(1, target + 0.08);
+        target = Math.min(1, target + 0.06);
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        target = Math.max(0, target - 0.08);
+        target = Math.max(0, target - 0.06);
+      } else if (e.key === 'Home') {
+        target = 0;
+      } else if (e.key === 'End') {
+        target = 1;
       }
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('keydown', handleKeyDown, { passive: true });
     return () => {
+      unsub();
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       cancelAnimationFrame(rafId);
