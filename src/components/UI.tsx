@@ -317,10 +317,10 @@ function StudioPanel() {
   const maxScroll = Math.max(0, savedLayouts.length - 4);
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-auto flex flex-col" style={{ background: 'linear-gradient(135deg, #0c0a1a 0%, #0a0a12 50%, #0d0b18 100%)' }}>
+    <div className="fixed inset-0 z-[100] pointer-events-auto flex flex-col bg-black/60">
 
       {/* ─── TOP BAR ─── */}
-      <div className="h-14 flex items-center justify-between px-6 border-b border-[#2a2640]/60 shrink-0">
+      <div className="h-14 flex items-center justify-between px-6 border-b border-[#2a2640]/60 shrink-0 bg-[#0c0a1a]/95 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <span className="text-orange-500 text-xl">⬡</span>
           <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
@@ -375,17 +375,12 @@ function StudioPanel() {
       <div className="flex-grow flex min-h-0">
 
         {/* ─── LEFT: 3D Keyboard Preview Area ─── */}
-        <div className="flex-grow relative flex flex-col">
+        <div className="flex-grow relative flex flex-col pointer-events-none">
           {/* Transparent - lets the 3D canvas show through */}
-          <div className="flex-grow flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-gray-600 text-xs tracking-widest uppercase font-bold mb-2">Live 3D Preview</div>
-              <div className="text-gray-700 text-[10px]">Scroll to disassemble • Drag to rotate</div>
-            </div>
-          </div>
+          <div className="flex-grow" />
 
           {/* ─── BOTTOM: Saved Layouts Carousel ─── */}
-          <div className="px-6 pb-5 shrink-0">
+          <div className="px-6 pb-5 shrink-0 pointer-events-auto">
             <div className="bg-[#0f0d1a]/80 border border-[#2a2640]/50 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-xs font-bold text-white tracking-wider uppercase">Saved Layouts</div>
@@ -487,7 +482,7 @@ function StudioPanel() {
         </div>
 
         {/* ─── RIGHT SIDEBAR ─── */}
-        <div className="allow-internal-scroll w-[340px] shrink-0 border-l border-[#2a2640]/50 overflow-y-auto no-scrollbar">
+        <div className="allow-internal-scroll w-[340px] shrink-0 border-l border-[#2a2640]/50 overflow-y-auto no-scrollbar bg-[#0c0a1a]/95 backdrop-blur-md">
           <div className="p-5 space-y-5">
 
             {/* ── LEGEND DESIGN Section ── */}
@@ -731,7 +726,7 @@ function StudioPanel() {
       </div>
 
       {/* ─── BOTTOM BAR ─── */}
-      <div className="h-11 flex items-center justify-end px-6 border-t border-[#2a2640]/40 shrink-0">
+      <div className="h-11 flex items-center justify-end px-6 border-t border-[#2a2640]/40 shrink-0 bg-[#0c0a1a]/95 backdrop-blur-md">
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Real-Time Rendering</span>
           <div className="w-10 h-5 rounded-full bg-orange-500 flex items-center justify-end px-0.5 cursor-pointer">
