@@ -1,0 +1,8 @@
+{
+  "name": "Keycraft 3D",
+  "description": "A premium interactive 3D landing page for a mechanical keyboard with progressive dismantling on scroll.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
