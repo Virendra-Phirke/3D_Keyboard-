@@ -197,7 +197,7 @@ const state: AppState = {
   lightingSpeed: 50,
   lightingBrightness: 75,
   savedLayouts: [...DEFAULT_SAVED_LAYOUTS],
-  showStudio: true,
+  showStudio: false,
   studioTab: 'workspace',
   inspectorTab: 'basic',
 };

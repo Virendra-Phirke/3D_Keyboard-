@@ -364,10 +364,17 @@ function StudioPanel() {
         e.preventDefault();
         setShowShortcuts(prev => !prev);
       }
+      if (e.key === 'Escape') {
+        if (showShortcuts) {
+          setShowShortcuts(false);
+        } else {
+          setShowStudio(false);
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [showShortcuts]);
 
   if (!showStudio) return null;
 
@@ -479,6 +486,16 @@ function StudioPanel() {
             title="Keyboard Shortcuts (?)"
           >
             <Info size={18} />
+          </button>
+
+          {/* Close Studio Button */}
+          <button
+            onClick={() => setShowStudio(false)}
+            className="p-1.5 px-2.5 rounded-lg text-gray-300 hover:text-white bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 transition cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+            title="Close Studio (ESC)"
+          >
+            <X size={15} />
+            <span>Close</span>
           </button>
         </div>
       </div>
@@ -1129,10 +1146,109 @@ function StudioPanel() {
 
 /* ─── Main Landing UI Export ─── */
 export default function UI({ scrollContainerRef }: UIProps) {
+  const {
+    colorTheme,
+    soundEnabled,
+    showAnnotations,
+    zoomLevel,
+    showStudio,
+  } = useAppStore();
+
+  const scrollProgress = useCustomScroll();
+
   return (
     <>
       {/* FULL-SCREEN STUDIO PANEL */}
       <StudioPanel />
+
+      {/* CLEAN HEADER (When Studio is closed) */}
+      {!showStudio && (
+        <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 bg-[#050505]/90 border-b border-white/5 pointer-events-auto">
+          <div className="flex items-center gap-3">
+            <span className="text-orange-500 text-xl font-bold">⬡</span>
+            <h1 className="text-sm font-black tracking-widest text-white uppercase">
+              Keycraft <span className="text-gray-500 font-medium text-xs">3D</span>
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Annotations Toggle */}
+            <button
+              onClick={toggleAnnotations}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-bold tracking-wide transition cursor-pointer flex items-center gap-1.5 ${
+                showAnnotations
+                  ? "bg-orange-500/20 text-orange-400 border-orange-500/40"
+                  : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20"
+              }`}
+            >
+              <Info size={13} />
+              {showAnnotations ? "Labels ON" : "Labels OFF"}
+            </button>
+
+            {/* Sound Toggle */}
+            <button
+              onClick={toggleSound}
+              className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white transition cursor-pointer"
+              title={soundEnabled ? "Mute Acoustics" : "Unmute Acoustics"}
+            >
+              {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            </button>
+
+            {/* Studio Mode Button */}
+            <button
+              onClick={() => {
+                setScrollProgress(0);
+                setShowStudio(true);
+              }}
+              className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-500/20 transition cursor-pointer flex items-center gap-1.5"
+            >
+              <Palette size={14} />
+              Studio Configurator
+            </button>
+          </div>
+        </header>
+      )}
+
+      {/* FLOATING BOTTOM LEFT ZOOM & VIEW CONTROLS (When Studio is closed) */}
+      {!showStudio && (
+        <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2 pointer-events-auto">
+          <div className="flex items-center bg-[#0a0a0d] border border-white/10 rounded-xl p-1 shadow-2xl">
+            <button
+              onClick={() => setZoomLevel(zoomLevel * 1.15)}
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn size={16} />
+            </button>
+            <button
+              onClick={() => {
+                setZoomLevel(1.0);
+                resetCamera();
+              }}
+              className="px-3 py-1 text-xs font-mono font-bold text-orange-400 hover:bg-white/10 rounded-lg transition cursor-pointer"
+              title="Reset Zoom"
+            >
+              {Math.round(zoomLevel * 100)}% ↺
+            </button>
+            <button
+              onClick={() => setZoomLevel(zoomLevel / 1.15)}
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut size={16} />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-2 bg-[#0a0a0d] border border-white/10 rounded-xl shadow-2xl">
+            <Layers size={13} className="text-orange-400" />
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider hidden sm:inline">Explode</span>
+            <div className="w-20">
+              <StudioSlider value={Math.round(scrollProgress * 100)} onChange={(v) => setScrollProgress(v / 100)} />
+            </div>
+            <span className="text-[10px] font-mono text-orange-400 font-bold w-7 text-right">{Math.round(scrollProgress * 100)}%</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
