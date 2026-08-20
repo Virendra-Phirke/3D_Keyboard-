@@ -265,103 +265,86 @@ export function getKeycapTexture(
   }
 
   const fontFamily = getFontFamily(fontStyle);
-  const cacheKey = `${bgColor}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}_${fontStyle}_${fontScale}`;
+  const cacheKey = `${bgColor}_${textColor}_${label}_${subLabel || ''}_${type}_${fontStyle}_${fontScale}`;
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey)!;
   }
 
-  // Ultra-crisp, high-fidelity 512x512 texture for maximum realism and razor-sharp legends
+  // Ultra-crisp, lightweight 256x256 texture for 60fps performance and instant render
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
   // 1. Solid Base PBT Plastic Body
   ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   // 2. Realistic Cylindrical Concave Dish Lighting Gradient
-  const vertGrad = ctx.createLinearGradient(0, 0, 0, 512);
-  vertGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.14)');
-  vertGrad.addColorStop(0.15, 'rgba(255, 255, 255, 0.04)');
-  vertGrad.addColorStop(0.5, 'rgba(0, 0, 0, 0.02)');
-  vertGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.12)');
-  vertGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.36)');
+  const vertGrad = ctx.createLinearGradient(0, 0, 0, 256);
+  vertGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.12)');
+  vertGrad.addColorStop(0.2, 'rgba(255, 255, 255, 0.03)');
+  vertGrad.addColorStop(0.6, 'rgba(0, 0, 0, 0.04)');
+  vertGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.32)');
   ctx.fillStyle = vertGrad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   // 3. Subtle Spherical Inset Radial Dish Vignette
-  const radGrad = ctx.createRadialGradient(256, 230, 40, 256, 256, 260);
-  radGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.06)');
+  const radGrad = ctx.createRadialGradient(128, 115, 20, 128, 128, 130);
+  radGrad.addColorStop(0.0, 'rgba(255, 255, 255, 0.05)');
   radGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.0)');
-  radGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.22)');
+  radGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.18)');
   ctx.fillStyle = radGrad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
-  // 4. Subtle Injection-Molded PBT Matte Micro-Grain Noise
-  const imgData = ctx.getImageData(0, 0, 512, 512);
-  const data = imgData.data;
-  // Deterministic seed noise based on label
-  let seed = 0;
-  for (let i = 0; i < label.length; i++) seed += label.charCodeAt(i);
-  for (let i = 0; i < data.length; i += 16) {
-    seed = (seed * 9301 + 49297) % 233280;
-    const noise = ((seed / 233280) - 0.5) * 7;
-    data[i] = Math.min(255, Math.max(0, data[i] + noise));
-    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
-    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
-  }
-  ctx.putImageData(imgData, 0, 0);
-
-  // 5. Precision Chamfered Dish Inset Lip Borders (Light Top Highlight & Dark Bottom Shadow)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(10, 10, 492, 492);
-
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.24)';
+  // 4. Precision Chamfered Dish Inset Lip Borders (Light Top Highlight & Dark Bottom Shadow)
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.10)';
   ctx.lineWidth = 2;
-  ctx.strokeRect(14, 14, 484, 484);
+  ctx.strokeRect(5, 5, 246, 246);
 
-  // 6. Tactile Homing Bars on 'F' and 'J' Keys (Enthusiast Touch Typing Feature)
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.20)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(7, 7, 242, 242);
+
+  // 5. Tactile Homing Bars on 'F' and 'J' Keys (Enthusiast Touch Typing Feature)
   if (label === 'F' || label === 'J') {
-    // 3D Raised Homing Ridge with specular top and shadow bottom
     ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-    ctx.fillRect(176, 396, 160, 14);
+    ctx.fillRect(88, 198, 80, 7);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.fillRect(176, 392, 160, 4);
+    ctx.fillRect(88, 196, 80, 2);
   }
 
-  // 7. Spacebar Glowing Accent Line
+  // 6. Spacebar Glowing Accent Line
   if (type === 'space' || label === '') {
     ctx.fillStyle = colors.accentGlow || '#f97316';
     ctx.shadowColor = colors.accentGlow || '#f97316';
-    ctx.shadowBlur = 12;
-    ctx.fillRect(160, 248, 192, 16);
+    ctx.shadowBlur = 8;
+    ctx.fillRect(80, 124, 96, 8);
     ctx.shadowBlur = 0;
 
     // Small laser center dot
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(256, 256, 4, 0, Math.PI * 2);
+    ctx.arc(128, 128, 2.5, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // 8. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
+  // 7. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
   if (subLabel) {
     // Top Sub-Legend (Symbols)
-    ctx.font = `bold ${Math.round(68 * fontScale)}px ${fontFamily}`;
+    ctx.font = `bold ${Math.round(34 * fontScale)}px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.globalAlpha = 0.72;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 64, 60);
+    ctx.fillText(subLabel, 32, 30);
 
     // Bottom Main Legend (Numbers)
-    ctx.font = `bold ${Math.round(92 * fontScale)}px ${fontFamily}`;
+    ctx.font = `bold ${Math.round(46 * fontScale)}px ${fontFamily}`;
     ctx.globalAlpha = 0.96;
-    ctx.fillText(label, 64, 260);
+    ctx.fillText(label, 32, 130);
   } else if (label) {
-    // 9. Single Legends (Letters, Modifiers, Function keys)
+    // 8. Single Legends (Letters, Modifiers, Function keys)
     ctx.globalAlpha = 0.96;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
@@ -380,21 +363,21 @@ export function getKeycapTexture(
     else if (label === 'RIGHT') displayLabel = '▶';
 
     if (displayLabel.length === 1) {
-      // Single Alphabet Key (A-Z) - Classic upper-left Cherry position or bold center
-      ctx.font = `bold ${Math.round(112 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(displayLabel, 256, 246);
+      // Single Alphabet Key (A-Z)
+      ctx.font = `bold ${Math.round(56 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 128, 124);
     } else if (displayLabel.length <= 3) {
       // Short modifiers (ESC, DEL, END, ALT, etc.)
-      ctx.font = `bold ${Math.round(76 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(displayLabel, 256, 256);
+      ctx.font = `bold ${Math.round(38 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 128, 128);
     } else if (displayLabel.length <= 6) {
       // Medium modifiers (⇧ SHIFT, ↵ ENTER, ⇥ TAB, ⇪ CAPS)
-      ctx.font = `bold ${Math.round(62 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(displayLabel, 256, 256);
+      ctx.font = `bold ${Math.round(31 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 128, 128);
     } else {
       // Long modifiers (BACKSPACE, CAPSLOCK)
-      ctx.font = `bold ${Math.round(52 * fontScale)}px ${fontFamily}`;
-      ctx.fillText(displayLabel, 256, 256);
+      ctx.font = `bold ${Math.round(26 * fontScale)}px ${fontFamily}`;
+      ctx.fillText(displayLabel, 128, 128);
     }
   }
 
