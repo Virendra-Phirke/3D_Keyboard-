@@ -21,17 +21,17 @@ export interface ThemeColors {
 
 export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
   ember: {
-    caseColor: '#121215',
+    caseColor: '#141418',
     caseMetalness: 0.85,
     caseRoughness: 0.35,
     alphaBase: '#18181c',
-    alphaText: '#f3f4f6',
+    alphaText: '#f8fafc',
     modBase: '#121215',
-    modText: '#d1d5db',
-    accentBase: '#222226',
-    accentText: '#f3f4f6',
-    accentGlow: '#ff8800',
-    plateColor: '#1f1f23',
+    modText: '#e2e8f0',
+    accentBase: '#ea580c',
+    accentText: '#ffffff',
+    accentGlow: '#f97316',
+    plateColor: '#1e1e24',
     switchStem: '#ff7700',
     rgbDefault: '#ff8800',
   },
@@ -42,7 +42,7 @@ export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
     alphaBase: '#f8fafc',
     alphaText: '#0f172a',
     modBase: '#e2e8f0',
-    modText: '#475569',
+    modText: '#334155',
     accentBase: '#0284c7',
     accentText: '#ffffff',
     accentGlow: '#38bdf8',
@@ -55,7 +55,7 @@ export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
     caseMetalness: 0.85,
     caseRoughness: 0.3,
     alphaBase: '#20163b',
-    alphaText: '#f1f5f9',
+    alphaText: '#f8fafc',
     modBase: '#170f2d',
     modText: '#e879f9',
     accentBase: '#d946ef',
@@ -70,17 +70,21 @@ export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
     caseMetalness: 0.95,
     caseRoughness: 0.2,
     alphaBase: '#0d0d0f',
-    alphaText: '#71717a',
+    alphaText: '#a1a1aa',
     modBase: '#08080a',
-    modText: '#52525b',
-    accentBase: '#18181b',
-    accentText: '#eab308',
+    modText: '#71717a',
+    accentBase: '#eab308',
+    accentText: '#000000',
     accentGlow: '#eab308',
     plateColor: '#18181b',
     switchStem: '#eab308',
     rgbDefault: '#eab308',
   },
 };
+
+export function clearTextureCache() {
+  textureCache.clear();
+}
 
 export function getKeycapTexture(
   theme: ColorTheme,
@@ -97,86 +101,131 @@ export function getKeycapTexture(
   }
 ): THREE.CanvasTexture {
   const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
+
   const alphaBase = customColors?.keycapsAlpha || colors.alphaBase;
   const modBase = customColors?.keycapsMod || colors.modBase;
   const accentBase = customColors?.keycapsAccent || colors.accentBase;
-  const textColor = customColors?.keycapsText || (type === 'modifier' ? colors.modText : colors.alphaText);
-
-  const cacheKey = `${alphaBase}_${modBase}_${accentBase}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}`;
-  if (textureCache.has(cacheKey)) {
-    return textureCache.get(cacheKey)!;
-  }
-
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d')!;
+  const defaultTextColor = customColors?.keycapsText || colors.alphaText;
 
   let bgColor = alphaBase;
-  if (type === 'modifier') {
+  let textColor = defaultTextColor;
+
+  if (type === 'modifier' || type === 'special' || type === 'space' || type === 'knob') {
     bgColor = modBase;
-  } else if (type === 'accent' || label === 'ESC' || label === 'ENTER') {
+    textColor = customColors?.keycapsText || colors.modText;
+  } else if (type === 'accent') {
     bgColor = accentBase;
+    textColor = customColors?.keycapsText || colors.accentText;
+  }
+
+  // Accent highlights (ESC, ENTER, FN) matching reference aesthetics
+  if (label === 'ESC') {
+    bgColor = accentBase;
+    textColor = '#ffffff';
+  } else if (label === 'ENTER') {
+    bgColor = modBase;
+    textColor = colors.accentGlow || '#f97316';
+  } else if (label === 'FN') {
+    bgColor = modBase;
+    textColor = colors.accentGlow || '#f97316';
   }
 
   if (isPressed) {
     bgColor = '#27272a';
   }
 
-  // Draw Matte Keycap Texture
-  ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 256, 256);
-
-  // Subtle Dish Gradient
-  const grad = ctx.createRadialGradient(128, 128, 20, 128, 128, 160);
-  grad.addColorStop(0, 'rgba(255, 255, 255, 0.06)');
-  grad.addColorStop(0.8, 'rgba(0, 0, 0, 0.1)');
-  grad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 256, 256);
-
-  // Clean Subtle Border Inset (No orange highlight)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(6, 6, 244, 244);
-
-  // SubLabel (e.g. ! @ # $)
-  if (subLabel) {
-    ctx.font = 'bold 36px "Segoe UI", system-ui, -apple-system, sans-serif';
-    ctx.fillStyle = textColor;
-    ctx.globalAlpha = 0.65;
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 36, 36);
+  const cacheKey = `${bgColor}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}`;
+  if (textureCache.has(cacheKey)) {
+    return textureCache.get(cacheKey)!;
   }
 
-  // Main Label (Laser-etched sharp font)
-  if (label) {
+  // Ultra-crisp 512x512 texture for laser-sharp legibility at any distance
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d')!;
+
+  // 1. Solid Matte PBT Body
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // 2. Realistic Cylindrical/Spherical Dish Lighting
+  const dishGrad = ctx.createRadialGradient(256, 230, 20, 256, 256, 320);
+  dishGrad.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+  dishGrad.addColorStop(0.55, 'rgba(255, 255, 255, 0.01)');
+  dishGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.15)');
+  dishGrad.addColorStop(1, 'rgba(0, 0, 0, 0.40)');
+  ctx.fillStyle = dishGrad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  // 3. Subtle Chamfered Edge Highlight
+  const topLip = ctx.createLinearGradient(0, 0, 0, 48);
+  topLip.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+  topLip.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+  ctx.fillStyle = topLip;
+  ctx.fillRect(10, 10, 492, 36);
+
+  // 4. Subtle Inset Border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(12, 12, 488, 488);
+
+  // 5. Spacebar Glowing Accent Line (Matching reference image)
+  if (type === 'space' || label === '') {
+    ctx.fillStyle = colors.accentGlow || '#f97316';
+    ctx.shadowColor = colors.accentGlow || '#f97316';
+    ctx.shadowBlur = 8;
+    ctx.fillRect(200, 250, 112, 12);
+    ctx.shadowBlur = 0;
+  }
+
+  // 6. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
+  if (subLabel) {
+    ctx.font = 'bold 74px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = textColor;
+    ctx.globalAlpha = 0.70;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(subLabel, 68, 68);
+
+    // Main Number
+    ctx.font = 'bold 96px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.globalAlpha = 0.95;
+    ctx.fillText(label, 68, 260);
+  } else if (label) {
+    // 7. Single Legends (Letters, Modifiers, Function keys)
     ctx.globalAlpha = 0.95;
     ctx.fillStyle = textColor;
-    ctx.textAlign = subLabel ? 'left' : 'center';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    if (label.length > 3) {
-      ctx.font = 'bold 34px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 160 : 128;
-      ctx.fillText(label, x, y);
-    } else if (label.length > 1) {
-      ctx.font = 'bold 44px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 150 : 128;
-      ctx.fillText(label, x, y);
+    if (label.length === 1) {
+      // Single Alphabet Key (A-Z)
+      ctx.font = 'bold 112px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.fillText(label, 256, 256);
+    } else if (label.length <= 3) {
+      // Short modifiers (ESC, TAB, WIN, ALT, DEL, etc.)
+      ctx.font = 'bold 80px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.fillText(label, 256, 256);
+    } else if (label.length <= 5) {
+      // Medium modifiers (SHIFT, ENTER, CAPS, SPACE)
+      ctx.font = 'bold 64px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.fillText(label, 256, 256);
     } else {
-      ctx.font = 'bold 56px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 148 : 128;
-      ctx.fillText(label, x, y);
+      // Long modifiers (BACKSPACE, CAPSLOCK)
+      ctx.font = 'bold 54px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.fillText(label, 256, 256);
     }
   }
 
+  ctx.globalAlpha = 1.0;
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = 8;
   texture.needsUpdate = true;
 
   textureCache.set(cacheKey, texture);

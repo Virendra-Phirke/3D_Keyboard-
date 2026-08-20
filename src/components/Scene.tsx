@@ -9,42 +9,49 @@ export default function Scene() {
 
   return (
     <>
-      <color attach="background" args={["#050505"]} />
+      <color attach="background" args={["#08080c"]} />
 
-      {/* THREE-POINT STUDIO LIGHTING */}
-      <ambientLight intensity={1.2} />
+      {/* BALANCED HIGH-FIDELITY STUDIO LIGHTING (100% Self-Contained, No External Network Delays) */}
+      <ambientLight intensity={1.8} color="#ffffff" />
 
-      {/* Key Light */}
+      {/* Overhead Key Softbox Light */}
       <directionalLight
-        position={[14, 20, 14]}
+        position={[8, 20, 10]}
         intensity={3.8}
         color="#ffffff"
         castShadow
-        shadow-mapSize={[512, 512]}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-near={1}
         shadow-camera-far={35}
         shadow-bias={-0.0001}
       />
 
-      {/* Left Rim Light */}
+      {/* Left Cool Studio Fill */}
       <directionalLight
-        position={[-16, 12, -10]}
-        intensity={3.5}
-        color="#94a3b8"
-      />
-
-      {/* Warm Golden/Amber Rim Light */}
-      <directionalLight
-        position={[16, 6, -8]}
-        intensity={3.2}
-        color="#ff8800"
-      />
-
-      {/* Front Fill Light */}
-      <directionalLight
-        position={[0, 8, 18]}
+        position={[-16, 12, -8]}
         intensity={2.8}
+        color="#cbd5e1"
+      />
+
+      {/* Right Warm Amber Edge Rim Light */}
+      <directionalLight
+        position={[16, 8, -6]}
+        intensity={3.0}
+        color="#ffaa33"
+      />
+
+      {/* Front Camera Fill for Laser-Sharp Legibility */}
+      <directionalLight
+        position={[0, 12, 18]}
+        intensity={3.2}
         color="#ffffff"
+      />
+
+      {/* Bottom Subtle Bounce Fill */}
+      <directionalLight
+        position={[0, -6, 6]}
+        intensity={1.0}
+        color="#64748b"
       />
 
       {/* ORBIT CONTROLS: FREE MOUSE ROTATION & PANNING */}
@@ -65,10 +72,10 @@ export default function Scene() {
         <KeyboardModel />
         <ContactShadows
           position={[0, -2.8, 0]}
-          opacity={0.6}
-          scale={28}
-          blur={2.0}
-          far={5}
+          opacity={0.7}
+          scale={30}
+          blur={2.2}
+          far={6}
           color="#000000"
         />
       </group>
