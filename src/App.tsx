@@ -129,7 +129,7 @@ export default function App() {
         </div>
       }>
         {/* R3F 3D Canvas Layer (Centered perfectly within viewport and freely interactive via mouse drag) */}
-        <div className="absolute inset-0 lg:right-[22rem] z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
+        <div className="absolute inset-0 z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
           <Canvas
             shadows
             dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)]}

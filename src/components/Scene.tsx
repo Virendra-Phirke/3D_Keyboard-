@@ -1,4 +1,4 @@
-import { ContactShadows, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { KeyboardModel } from "./KeyboardModel";
 import { useAppStore } from "../store";
 import { THEME_CONFIGS } from "../utils/keycapTexture";
@@ -11,7 +11,7 @@ export default function Scene() {
     <>
       <color attach="background" args={["#08080c"]} />
 
-      {/* BALANCED HIGH-FIDELITY STUDIO LIGHTING (100% Self-Contained, No External Network Delays) */}
+      {/* BALANCED HIGH-FIDELITY STUDIO LIGHTING */}
       <ambientLight intensity={1.8} color="#ffffff" />
 
       {/* Overhead Key Softbox Light */}
@@ -70,14 +70,6 @@ export default function Scene() {
 
       <group position={[0, 0, 0]}>
         <KeyboardModel />
-        <ContactShadows
-          position={[0, -2.8, 0]}
-          opacity={0.7}
-          scale={30}
-          blur={2.2}
-          far={6}
-          color="#000000"
-        />
       </group>
     </>
   );
