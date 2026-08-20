@@ -249,13 +249,7 @@ function SidebarTracker({ scrollContainerRef }: UIProps) {
   }, [p]);
 
   const scrollToStage = (targetProgress: number) => {
-    if (scrollContainerRef.current) {
-      const totalScroll = scrollContainerRef.current.scrollHeight - scrollContainerRef.current.clientHeight;
-      scrollContainerRef.current.scrollTo({
-        top: targetProgress * totalScroll,
-        behavior: 'smooth',
-      });
-    }
+    setScrollProgress(targetProgress);
   };
 
   return (

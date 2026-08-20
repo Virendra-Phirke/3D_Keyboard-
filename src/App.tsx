@@ -7,29 +7,26 @@ import { Canvas } from "@react-three/fiber";
 import Scene from "./components/Scene";
 import UI from "./components/UI";
 import { Suspense, useEffect, useRef } from "react";
-import { setScrollProgress, setKeyPressed, useAppStore } from "./store";
+import { setScrollProgress, getScrollProgress, setKeyPressed, useAppStore } from "./store";
 import { playSwitchSound } from "./utils/audio";
 
 export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { switchType, soundEnabled } = useAppStore();
 
-  // Wheel listener for disassembly scroll while allowing canvas pointer dragging
+  // Robust wheel listener for disassembly scroll animation
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      const el = scrollContainerRef.current;
-      if (!el) return;
-
       const target = e.target as HTMLElement;
       if (target && target.closest('.allow-internal-scroll')) {
         return;
       }
 
-      el.scrollTop += e.deltaY;
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      if (maxScroll > 0) {
-        setScrollProgress(el.scrollTop / maxScroll);
-      }
+      const current = getScrollProgress();
+      // Smooth responsive wheel scroll sensitivity
+      const delta = (e.deltaY > 0 ? 1 : -1) * Math.min(Math.abs(e.deltaY), 120) * 0.0015;
+      const next = Math.max(0, Math.min(1, current + delta));
+      setScrollProgress(next);
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
@@ -52,8 +49,6 @@ export default function App() {
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging || e.touches.length > 1) return;
-      const el = scrollContainerRef.current;
-      if (!el) return;
 
       const target = e.target as HTMLElement;
       if (target && target.closest('.allow-internal-scroll')) {
@@ -61,14 +56,12 @@ export default function App() {
       }
 
       const touchY = e.touches[0].clientY;
-      const deltaY = (touchStartY - touchY) * 1.5;
+      const deltaY = (touchStartY - touchY) * 0.0025;
       touchStartY = touchY;
 
-      el.scrollTop += deltaY;
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      if (maxScroll > 0) {
-        setScrollProgress(el.scrollTop / maxScroll);
-      }
+      const current = getScrollProgress();
+      const next = Math.max(0, Math.min(1, current + deltaY));
+      setScrollProgress(next);
     };
 
     const handleTouchEnd = () => {
@@ -122,7 +115,7 @@ export default function App() {
           <div className="text-orange-400 font-bold tracking-widest text-sm uppercase">Loading KeyCraft 3D...</div>
         </div>
       }>
-        {/* R3F 3D Canvas Layer (Centered perfectly within viewport) */}
+        {/* R3F 3D Canvas Layer (Centered perfectly within viewport and freely interactive via mouse drag) */}
         <div className="absolute inset-0 lg:right-[22rem] z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
           <Canvas
             shadows
@@ -140,15 +133,13 @@ export default function App() {
           </Canvas>
         </div>
 
-        {/* Scroll Container Layer */}
+        {/* UI Overlay Layer */}
         <div
           ref={scrollContainerRef}
-          className="absolute inset-0 z-10 overflow-y-auto no-scrollbar pointer-events-none"
+          className="absolute inset-0 z-10 pointer-events-none"
         >
-          <div style={{ height: '500vh', pointerEvents: 'none' }}>
-            <div className="sticky top-0 h-screen w-full pointer-events-none">
-              <UI scrollContainerRef={scrollContainerRef} />
-            </div>
+          <div className="h-screen w-full pointer-events-none">
+            <UI scrollContainerRef={scrollContainerRef} />
           </div>
         </div>
       </Suspense>
