@@ -47,9 +47,16 @@ import {
   setLightingBrightness,
   setShowStudio,
   setStudioTab,
+  setInspectorTab,
   saveCurrentLayout,
   loadLayout,
   deleteLayout,
+  renameLayout,
+  duplicateLayout,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
   ColorTheme,
   RGBMode,
   SwitchType,
@@ -149,7 +156,12 @@ function MiniKeyboardCard({
   isActive: boolean;
   onClick: () => void;
   onDelete?: () => void;
+  onRename?: (newName: string) => void;
+  onDuplicate?: () => void;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(layout.name);
+
   return (
     <div
       onClick={onClick}
@@ -232,28 +244,63 @@ function MiniKeyboardCard({
 
       {/* Info Footer */}
       <div className="px-2.5 py-1.5 flex items-center justify-between bg-[#0d0b17]">
-        <div className="truncate">
-          <div className="text-[11px] font-bold text-gray-200 truncate">{layout.name}</div>
+        <div className="truncate flex-grow mr-2">
+          {isEditing ? (
+            <input 
+              value={editName}
+              onChange={e => setEditName(e.target.value)}
+              onBlur={() => {
+                setIsEditing(false);
+                if (editName.trim() && onRename) onRename(editName.trim());
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  setIsEditing(false);
+                  if (editName.trim() && onRename) onRename(editName.trim());
+                }
+              }}
+              autoFocus
+              className="w-full bg-white/10 text-[11px] font-bold text-white px-1 py-0.5 rounded outline-none"
+            />
+          ) : (
+            <div className="text-[11px] font-bold text-gray-200 truncate group-hover:text-white" onDoubleClick={() => onRename && setIsEditing(true)}>
+              {layout.name}
+            </div>
+          )}
           <div className="text-[9px] text-gray-500 uppercase tracking-wider">{layout.colorTheme}</div>
         </div>
         {isActive && (
-          <span className="w-2 h-2 rounded-full bg-orange-500 ring-2 ring-orange-500/40" />
+          <span className="w-2 h-2 rounded-full bg-orange-500 ring-2 ring-orange-500/40 shrink-0" />
         )}
       </div>
 
-      {/* Delete button on hover for custom layouts */}
-      {onDelete && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          className="absolute top-1.5 right-1.5 p-1 rounded-md bg-red-600/90 text-white opacity-0 group-hover:opacity-100 transition shadow-md hover:bg-red-500 cursor-pointer"
-          title="Delete custom preset"
-        >
-          <Trash2 size={11} />
-        </button>
-      )}
+      {/* Hover Actions */}
+      <div className="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+        {onDuplicate && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            className="p-1 rounded-md bg-black/60 text-white hover:bg-gray-700 cursor-pointer backdrop-blur-md"
+            title="Duplicate preset"
+          >
+            <Layers size={11} />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="p-1 rounded-md bg-red-600/90 text-white hover:bg-red-500 cursor-pointer shadow-md"
+            title="Delete preset"
+          >
+            <Trash2 size={11} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -273,6 +320,7 @@ function StudioPanel() {
     lightingBrightness,
     savedLayouts,
     studioTab,
+    inspectorTab,
     showStudio,
     zoomLevel,
   } = useAppStore();
@@ -280,10 +328,42 @@ function StudioPanel() {
   const [layoutScroll, setLayoutScroll] = useState(0);
   const [saveName, setSaveName] = useState("");
   const [showSaveInput, setShowSaveInput] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredLayouts = savedLayouts.filter(l => l.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const maxScroll = Math.max(0, filteredLayouts.length - 4);
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts if user is typing in an input field
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        setShowSaveInput(true);
+      }
+      if (e.key === '?') {
+        e.preventDefault();
+        setShowShortcuts(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   if (!showStudio) return null;
-
-  const maxScroll = Math.max(0, savedLayouts.length - 4);
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-auto flex flex-col bg-black/60">
@@ -362,6 +442,14 @@ function StudioPanel() {
           </button>
 
           <button
+            onClick={() => setShowShortcuts(true)}
+            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+            title="Keyboard Shortcuts"
+          >
+            <Info size={18} />
+          </button>
+
+          <button
             onClick={() => setShowStudio(false)}
             className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
             title="Exit Studio"
@@ -370,6 +458,40 @@ function StudioPanel() {
           </button>
         </div>
       </div>
+
+      {/* Shortcuts Modal */}
+      {showShortcuts && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto">
+          <div className="bg-[#0e0c1a] border border-[#2a2640] rounded-2xl p-6 shadow-2xl max-w-sm w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-black uppercase tracking-wider">Keyboard Shortcuts</h3>
+              <button onClick={() => setShowShortcuts(false)} className="text-gray-400 hover:text-white"><X size={16}/></button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <span>Undo</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + Z</kbd>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <span>Redo</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + Shift + Z</kbd>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <span>Save Preset</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">Ctrl + S</kbd>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-300">
+                <span>Toggle Shortcuts</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded font-mono text-xs border border-white/20 text-white">?</kbd>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-300 pt-2 border-t border-white/10 mt-2">
+                <span>Typing</span>
+                <span className="text-xs text-gray-400">Keys animate and click!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── TAB 1: WORKSPACE VIEW ─── */}
       {studioTab === "workspace" ? (
@@ -405,11 +527,31 @@ function StudioPanel() {
                 </button>
               </div>
 
+              <div className="flex items-center bg-[#0e0c1a] border border-[#2a2640]/70 rounded-xl p-1 shadow-xl">
+                <button
+                  onClick={() => undo()}
+                  disabled={!canUndo()}
+                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Undo (Ctrl+Z)"
+                >
+                  <RotateCcw size={15} />
+                </button>
+                <button
+                  onClick={() => redo()}
+                  disabled={!canRedo()}
+                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Redo (Ctrl+Shift+Z)"
+                  style={{ transform: 'scaleX(-1)' }}
+                >
+                  <RotateCcw size={15} />
+                </button>
+              </div>
+
               <button
                 onClick={() => setScrollProgress(0)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0e0c1a] border border-[#2a2640]/70 text-xs font-bold text-gray-300 hover:text-white hover:border-orange-500/40 transition shadow-xl cursor-pointer"
               >
-                <RotateCcw size={12} className="text-orange-400" />
+                <Eye size={12} className="text-orange-400" />
                 Assemble View
               </button>
             </div>
@@ -488,7 +630,7 @@ function StudioPanel() {
                   </button>
 
                   <div className="grid grid-cols-4 gap-3 flex-grow">
-                    {savedLayouts.slice(layoutScroll, layoutScroll + 4).map((layout) => (
+                    {filteredLayouts.slice(layoutScroll, layoutScroll + 4).map((layout) => (
                       <MiniKeyboardCard
                         key={layout.id}
                         layout={layout}
@@ -499,6 +641,8 @@ function StudioPanel() {
                             ? () => deleteLayout(layout.id)
                             : undefined
                         }
+                        onRename={(newName) => renameLayout(layout.id, newName)}
+                        onDuplicate={() => duplicateLayout(layout)}
                       />
                     ))}
                   </div>
@@ -516,16 +660,112 @@ function StudioPanel() {
           </div>
 
           {/* ── RIGHT SIDEBAR: Config Controls ── */}
-          <div className="allow-internal-scroll w-[350px] shrink-0 border-l border-[#2a2640]/60 overflow-y-auto no-scrollbar bg-[#0c0a1a]">
-            <div className="p-4 space-y-4">
-              {/* 1. LEGEND DESIGN Section */}
-              <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center gap-2 mb-3.5">
-                  <Type size={14} className="text-orange-400" />
-                  <span className="text-xs font-black text-white tracking-wider uppercase">
-                    Legend Design
-                  </span>
-                </div>
+          <div className="allow-internal-scroll w-[350px] shrink-0 border-l border-[#2a2640]/60 overflow-y-auto no-scrollbar bg-[#0c0a1a] flex flex-col">
+            
+            {/* Inspector Tabs */}
+            <div className="p-4 pb-0 shrink-0">
+              <div className="flex bg-[#13111f] rounded-xl p-1 border border-[#2a2640]/60">
+                <button
+                  onClick={() => setInspectorTab('basic')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+                    inspectorTab === 'basic' 
+                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-md" 
+                    : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Basic
+                </button>
+                <button
+                  onClick={() => setInspectorTab('advanced')}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+                    inspectorTab === 'advanced' 
+                    ? "bg-orange-500/20 text-orange-400 border border-orange-500/30 shadow-md" 
+                    : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Advanced
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-4 flex-grow">
+              {/* If basic, show Presets and Legend. If advanced, show Lighting and per-component Colors */}
+              
+              {inspectorTab === 'basic' ? (
+                <>
+                  {/* Basic: Theme Presets */}
+                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
+                    <div className="flex items-center gap-2 mb-3.5">
+                      <Palette size={14} className="text-orange-400" />
+                      <span className="text-xs font-black text-white tracking-wider uppercase">
+                        Theme Presets
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {THEMES.map((th) => (
+                        <button
+                          key={th.id}
+                          onClick={() => setColorTheme(th.id)}
+                          className={`flex flex-col gap-1 p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                            colorTheme === th.id
+                              ? `${th.border} bg-white/10 text-white shadow-xs ring-1 ring-${th.border.split('-')[1]}-500/50`
+                              : "border-white/10 bg-black/40 text-gray-400 hover:border-white/30 hover:bg-white/5"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center w-full">
+                            <span className="text-[11px] font-bold truncate flex-grow">{th.label}</span>
+                            <span className={`w-3 h-3 rounded-full shrink-0 ${th.bg}`} />
+                          </div>
+                          <span className="text-[9px] text-gray-500 line-clamp-2">{th.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Basic: 4. SWITCH PROFILE Section */}
+                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sliders size={14} className="text-orange-400" />
+                      <span className="text-xs font-black text-white tracking-wider uppercase">
+                        Switch Profile
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {SWITCH_TYPES.map((sw) => (
+                        <button
+                          key={sw.id}
+                          onClick={() => {
+                            setSwitchType(sw.id);
+                            playSwitchSound(sw.id);
+                          }}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                            switchType === sw.id
+                              ? "border-orange-500 bg-orange-500/15 text-white"
+                              : "border-white/10 bg-black/40 text-gray-400 hover:border-white/20"
+                          }`}
+                        >
+                          <div>
+                            <div className="text-[11px] font-bold text-white">{sw.label}</div>
+                            <div className="text-[9px] text-gray-400">{sw.desc}</div>
+                          </div>
+                          {switchType === sw.id && (
+                            <Check size={13} className="text-orange-400" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Advanced: 1. LEGEND DESIGN Section */}
+                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
+                    <div className="flex items-center gap-2 mb-3.5">
+                      <Type size={14} className="text-orange-400" />
+                      <span className="text-xs font-black text-white tracking-wider uppercase">
+                        Legend Design
+                      </span>
+                    </div>
 
                 {/* Font Style */}
                 <div className="mb-3.5">
@@ -753,40 +993,8 @@ function StudioPanel() {
                   ))}
                 </div>
               </div>
-
-              {/* 4. SWITCH PROFILE Section */}
-              <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sliders size={14} className="text-orange-400" />
-                  <span className="text-xs font-black text-white tracking-wider uppercase">
-                    Switch Profile
-                  </span>
-                </div>
-                <div className="space-y-1.5">
-                  {SWITCH_TYPES.map((sw) => (
-                    <button
-                      key={sw.id}
-                      onClick={() => {
-                        setSwitchType(sw.id);
-                        playSwitchSound(sw.id);
-                      }}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                        switchType === sw.id
-                          ? "border-orange-500 bg-orange-500/15 text-white"
-                          : "border-white/10 bg-black/40 text-gray-400 hover:border-white/20"
-                      }`}
-                    >
-                      <div>
-                        <div className="text-[11px] font-bold text-white">{sw.label}</div>
-                        <div className="text-[9px] text-gray-400">{sw.desc}</div>
-                      </div>
-                      {switchType === sw.id && (
-                        <Check size={13} className="text-orange-400" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              </>
+              )}
             </div>
           </div>
         </div>
@@ -804,16 +1012,25 @@ function StudioPanel() {
                 </p>
               </div>
 
-              <button
-                onClick={() => setStudioTab("workspace")}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer"
-              >
-                Back to Workspace
-              </button>
+              <div className="flex items-center gap-4">
+                <input
+                  type="text"
+                  placeholder="Search presets..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white w-48 outline-none focus:ring-1 focus:ring-orange-500"
+                />
+                <button
+                  onClick={() => setStudioTab("workspace")}
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer"
+                >
+                  Back to Workspace
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {savedLayouts.map((layout) => (
+              {filteredLayouts.map((layout) => (
                 <div
                   key={layout.id}
                   className="bg-[#100e1c] border border-white/10 hover:border-orange-500/50 rounded-2xl p-4 transition-all hover:shadow-xl flex flex-col justify-between group"
@@ -830,6 +1047,8 @@ function StudioPanel() {
                         ? () => deleteLayout(layout.id)
                         : undefined
                     }
+                    onRename={(newName) => renameLayout(layout.id, newName)}
+                    onDuplicate={() => duplicateLayout(layout)}
                   />
 
                   <div className="mt-3 flex items-center justify-between pt-2 border-t border-white/5">

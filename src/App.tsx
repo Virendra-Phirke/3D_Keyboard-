@@ -9,6 +9,8 @@ import UI from "./components/UI";
 import { Suspense, useEffect, useRef } from "react";
 import { setScrollProgress, getScrollProgress, setKeyPressed, useAppStore } from "./store";
 import { playSwitchSound } from "./utils/audio";
+import { Stats } from "@react-three/drei";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -130,20 +132,23 @@ export default function App() {
       }>
         {/* R3F 3D Canvas Layer (Centered perfectly within viewport and freely interactive via mouse drag) */}
         <div className="absolute inset-0 z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
-          <Canvas
-            dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25)]}
-            camera={{ position: [0, 5.5, 20], fov: 38 }}
-            gl={{
-              antialias: true,
-              alpha: false,
-              powerPreference: 'high-performance',
-              precision: 'mediump',
-              stencil: false,
-              depth: true,
-            }}
-          >
-            <Scene />
-          </Canvas>
+          <ErrorBoundary>
+            <Canvas
+              dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.25)]}
+              camera={{ position: [0, 5.5, 20], fov: 38 }}
+              gl={{
+                antialias: true,
+                alpha: false,
+                powerPreference: 'high-performance',
+                precision: 'mediump',
+                stencil: false,
+                depth: true,
+              }}
+            >
+              <Scene />
+              <Stats className="!absolute !bottom-14 !left-6 !top-auto !right-auto z-50 rounded-lg overflow-hidden border border-white/10 shadow-xl opacity-80" />
+            </Canvas>
+          </ErrorBoundary>
         </div>
 
         {/* UI Overlay Layer */}

@@ -174,6 +174,7 @@ interface AppState {
   savedLayouts: SavedLayout[];
   showStudio: boolean;
   studioTab: 'workspace' | 'saved';
+  inspectorTab: 'basic' | 'advanced';
 }
 
 const state: AppState = {
@@ -198,6 +199,7 @@ const state: AppState = {
   savedLayouts: [...DEFAULT_SAVED_LAYOUTS],
   showStudio: false,
   studioTab: 'workspace',
+  inspectorTab: 'basic',
 };
 
 type StateListener = () => void;
@@ -258,6 +260,7 @@ export const setColorTheme = (theme: ColorTheme) => {
 export const getColorTheme = () => state.colorTheme;
 
 export const setCustomColor = (key: keyof CustomColors, color: string) => {
+  saveHistory();
   state.customColors = {
     ...state.customColors,
     [key]: color,
@@ -266,6 +269,7 @@ export const setCustomColor = (key: keyof CustomColors, color: string) => {
 };
 
 export const resetCustomColors = () => {
+  saveHistory();
   state.customColors = { ...DEFAULT_CUSTOM_COLORS[state.colorTheme] };
   notify();
 };
@@ -273,6 +277,7 @@ export const resetCustomColors = () => {
 export const getCustomColors = () => state.customColors;
 
 export const setRGBMode = (mode: RGBMode) => {
+  saveHistory();
   state.rgbMode = mode;
   notify();
 };
@@ -280,6 +285,7 @@ export const setRGBMode = (mode: RGBMode) => {
 export const getRGBMode = () => state.rgbMode;
 
 export const setSwitchType = (type: SwitchType) => {
+  saveHistory();
   state.switchType = type;
   notify();
 };
@@ -318,22 +324,26 @@ export const getCameraResetNonce = () => state.cameraResetNonce;
 
 // New Studio Actions
 export const setFontStyle = (style: FontStyle) => {
+  saveHistory();
   state.fontStyle = style;
   notify();
 };
 
 export const setFontSize = (size: number) => {
+  saveHistory();
   state.fontSize = Math.max(24, Math.min(80, size));
   notify();
 };
 
 export const setLegendColor = (color: string) => {
+  saveHistory();
   state.legendColor = color;
   state.customColors = { ...state.customColors, keycapsText: color };
   notify();
 };
 
 export const setLightingEffect = (effect: LightingEffect) => {
+  saveHistory();
   state.lightingEffect = effect;
   // Map to RGB mode
   if (effect === 'static') state.rgbMode = 'ember';
@@ -343,11 +353,13 @@ export const setLightingEffect = (effect: LightingEffect) => {
 };
 
 export const setLightingSpeed = (speed: number) => {
+  saveHistory();
   state.lightingSpeed = Math.max(0, Math.min(100, speed));
   notify();
 };
 
 export const setLightingBrightness = (brightness: number) => {
+  saveHistory();
   state.lightingBrightness = Math.max(0, Math.min(100, brightness));
   notify();
 };
@@ -373,6 +385,11 @@ export const setStudioTab = (tab: 'workspace' | 'saved') => {
   notify();
 };
 
+export const setInspectorTab = (tab: 'basic' | 'advanced') => {
+  state.inspectorTab = tab;
+  notify();
+};
+
 export const saveCurrentLayout = (name: string) => {
   const layout: SavedLayout = {
     id: `custom_${Date.now()}`,
@@ -391,7 +408,23 @@ export const saveCurrentLayout = (name: string) => {
   notify();
 };
 
+export const renameLayout = (id: string, newName: string) => {
+  state.savedLayouts = state.savedLayouts.map(l => l.id === id ? { ...l, name: newName } : l);
+  notify();
+};
+
+export const duplicateLayout = (layout: SavedLayout) => {
+  const newLayout = {
+    ...layout,
+    id: `custom_${Date.now()}`,
+    name: `${layout.name} Copy`
+  };
+  state.savedLayouts = [...state.savedLayouts, newLayout];
+  notify();
+};
+
 export const loadLayout = (layout: SavedLayout) => {
+  saveHistory();
   state.colorTheme = layout.colorTheme;
   state.customColors = { ...layout.customColors };
   state.rgbMode = layout.rgbMode;
@@ -408,6 +441,69 @@ export const deleteLayout = (id: string) => {
   state.savedLayouts = state.savedLayouts.filter((l) => l.id !== id);
   notify();
 };
+
+// Undo / Redo System
+type HistoryState = Pick<AppState, 'colorTheme' | 'customColors' | 'rgbMode' | 'switchType' | 'fontStyle' | 'fontSize' | 'legendColor' | 'lightingEffect' | 'lightingSpeed' | 'lightingBrightness'>;
+const history: HistoryState[] = [];
+let historyIndex = -1;
+
+function saveHistory() {
+  const currentState: HistoryState = {
+    colorTheme: state.colorTheme,
+    customColors: { ...state.customColors },
+    rgbMode: state.rgbMode,
+    switchType: state.switchType,
+    fontStyle: state.fontStyle,
+    fontSize: state.fontSize,
+    legendColor: state.legendColor,
+    lightingEffect: state.lightingEffect,
+    lightingSpeed: state.lightingSpeed,
+    lightingBrightness: state.lightingBrightness,
+  };
+  
+  if (historyIndex < history.length - 1) {
+    history.splice(historyIndex + 1);
+  }
+  history.push(currentState);
+  if (history.length > 50) history.shift(); // keep last 50
+  else historyIndex++;
+}
+
+export const undo = () => {
+  if (historyIndex >= 0) {
+    const previous = history[historyIndex];
+    if (historyIndex === history.length - 1) {
+      // Save current before undoing
+      saveHistory();
+      historyIndex--; // Adjust since saveHistory advanced it
+    }
+    historyIndex--;
+    const stateToRestore = historyIndex >= 0 ? history[historyIndex] : history[0]; // simplistic fallback
+    if (stateToRestore) {
+      Object.assign(state, {
+        ...stateToRestore,
+        customColors: { ...stateToRestore.customColors }
+      });
+      notify();
+    }
+  }
+};
+
+export const redo = () => {
+  if (historyIndex < history.length - 1) {
+    historyIndex++;
+    const next = history[historyIndex];
+    Object.assign(state, {
+        ...next,
+        customColors: { ...next.customColors }
+    });
+    notify();
+  }
+};
+
+export const canUndo = () => historyIndex > 0;
+export const canRedo = () => historyIndex < history.length - 1;
+
 
 export function useAppStore(): AppState {
   const [, setTick] = useState(0);
