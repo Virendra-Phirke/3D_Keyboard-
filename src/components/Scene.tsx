@@ -34,11 +34,11 @@ export default function Scene() {
         color="#cbd5e1"
       />
 
-      {/* Right Warm Amber Edge Rim Light */}
+      {/* Right Neutral Studio Rim Light */}
       <directionalLight
         position={[16, 8, -6]}
-        intensity={3.0}
-        color="#ffaa33"
+        intensity={2.8}
+        color="#e2e8f0"
       />
 
       {/* Front Camera Fill for Laser-Sharp Legibility */}

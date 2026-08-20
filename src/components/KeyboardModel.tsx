@@ -1057,12 +1057,6 @@ export function KeyboardModel() {
         <Box args={[0.3, 0.44, totalDepth + 0.6]} position={[totalWidth / 2 + 0.15, 0.08, 0]} material={caseMaterial} />
         <Box args={[0.3, 0.44, totalDepth + 0.6]} position={[-totalWidth / 2 - 0.15, 0.08, 0]} material={caseMaterial} />
 
-        {/* Gold Chamfer Accent Pinstripe along Perimeter (Matching reference image) */}
-        <Box args={[totalWidth + 0.62, 0.04, 0.04]} position={[0, 0.28, totalDepth / 2 + 0.28]} material={goldChamferMaterial} />
-        <Box args={[totalWidth + 0.62, 0.04, 0.04]} position={[0, 0.28, -totalDepth / 2 - 0.28]} material={goldChamferMaterial} />
-        <Box args={[0.04, 0.04, totalDepth + 0.62]} position={[totalWidth / 2 + 0.28, 0.28, 0]} material={goldChamferMaterial} />
-        <Box args={[0.04, 0.04, totalDepth + 0.62]} position={[-totalWidth / 2 - 0.28, 0.28, 0]} material={goldChamferMaterial} />
-
         {/* Solid Brass Internal Resonance Weight Bar */}
         <Box args={[totalWidth - 3.2, 0.09, totalDepth - 1.8]} position={[0, -0.26, 0]} material={brassMaterial} />
 
