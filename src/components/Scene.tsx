@@ -1,4 +1,4 @@
-import { OrbitControls, AdaptiveDpr, AdaptiveEvents, Preload, BakeShadows, Environment, ContactShadows } from "@react-three/drei";
+import { OrbitControls, AdaptiveDpr, AdaptiveEvents, BakeShadows, ContactShadows } from "@react-three/drei";
 import { KeyboardModel } from "./KeyboardModel";
 import { useAppStore } from "../store";
 import { THEME_CONFIGS } from "../utils/keycapTexture";
@@ -11,13 +11,10 @@ export default function Scene() {
     <>
       <color attach="background" args={["#08080c"]} />
 
-      {/* Photorealistic Studio HDR Reflections (GPU-lightweight) */}
-      <Environment preset="city" environmentIntensity={0.65} />
-
-      {/* Soft Ground Contact Shadow */}
+      {/* Instant Pure Procedural Ground Contact Shadow (100% Offline, Zero Suspense Hang) */}
       <ContactShadows
         position={[0, -2.2, 0]}
-        opacity={0.68}
+        opacity={0.65}
         scale={28}
         blur={2.0}
         far={4.2}
@@ -25,11 +22,10 @@ export default function Scene() {
         color="#000000"
       />
 
-      {/* Adaptive GPU & Event optimizations for high-frame-rate rendering */}
+      {/* Adaptive GPU & Event optimizations */}
       <AdaptiveDpr pixelated={false} />
       <AdaptiveEvents />
       <BakeShadows />
-      <Preload all />
 
       {/* BALANCED HIGH-FIDELITY STUDIO LIGHTING */}
       <ambientLight intensity={1.8} color="#ffffff" />
