@@ -94,15 +94,125 @@ const PER_KEY_COLORS = [
   '#6366f1', '#d946ef', '#ffffff', '#a1a1aa'
 ];
 
+export const SWITCH_COLOR_PRESETS = [
+  {
+    id: "tangerine",
+    name: "C³ Tangerine",
+    stem: "#06b6d4",
+    housing: "#ea580c",
+    topHousing: "#fb923c",
+    spring: "#f59e0b",
+    desc: "Vibrant orange casing with teal linear stem",
+    accent: "#ea580c",
+  },
+  {
+    id: "oil-king",
+    name: "Gateron Oil King",
+    stem: "#09090b",
+    housing: "#18181b",
+    topHousing: "#27272a",
+    spring: "#f59e0b",
+    desc: "All-black nylon body with gold spring",
+    accent: "#18181b",
+  },
+  {
+    id: "holy-panda",
+    name: "Holy Panda",
+    stem: "#fb923c",
+    housing: "#f8fafc",
+    topHousing: "#ffffff",
+    spring: "#f59e0b",
+    desc: "Milky pearl base with salmon tactile stem",
+    accent: "#fb923c",
+  },
+  {
+    id: "ink-black",
+    name: "Gateron Ink V2",
+    stem: "#18181b",
+    housing: "#1e1e24",
+    topHousing: "#334155",
+    spring: "#f59e0b",
+    desc: "Smoky translucent casing with black stem",
+    accent: "#334155",
+  },
+  {
+    id: "boba-u4t",
+    name: "Boba U4T",
+    stem: "#eab308",
+    housing: "#f1f5f9",
+    topHousing: "#ffffff",
+    spring: "#f59e0b",
+    desc: "Pearl white casing with tactile yellow stem",
+    accent: "#eab308",
+  },
+  {
+    id: "cream",
+    name: "NovelKeys Cream",
+    stem: "#fef3c7",
+    housing: "#fef3c7",
+    topHousing: "#fffbeb",
+    spring: "#d97706",
+    desc: "Full POM solid butter-cream aesthetic",
+    accent: "#fef3c7",
+  },
+  {
+    id: "aqua-king",
+    name: "Aqua King",
+    stem: "#38bdf8",
+    housing: "#ffffff",
+    topHousing: "#f0f9ff",
+    spring: "#e2e8f0",
+    desc: "Ultra-clear water ice transparency",
+    accent: "#38bdf8",
+  },
+  {
+    id: "lavender",
+    name: "Durock Lavender",
+    stem: "#a855f7",
+    housing: "#e9d5ff",
+    topHousing: "#f3e8ff",
+    spring: "#f59e0b",
+    desc: "Pastel lilac housing with violet stem",
+    accent: "#a855f7",
+  },
+  {
+    id: "sakura",
+    name: "Akko Sakura",
+    stem: "#f43f5e",
+    housing: "#fce7f3",
+    topHousing: "#fdf2f8",
+    spring: "#fb7185",
+    desc: "Japanese cherry blossom pink with rose stem",
+    accent: "#f43f5e",
+  },
+  {
+    id: "matcha",
+    name: "Matcha Latte",
+    stem: "#15803d",
+    housing: "#dcfce7",
+    topHousing: "#f0fdf4",
+    spring: "#eab308",
+    desc: "Refreshing sage and forest matcha tones",
+    accent: "#15803d",
+  },
+];
+
 const PART_CUSTOMIZERS: { key: keyof CustomColors; label: string; presetColors: string[] }[] = [
   { key: 'caseColor', label: 'CNC Case', presetColors: ['#141418', '#08080a', '#1e293b', '#e2e8f0', '#130e24', '#1c1917'] },
   { key: 'keycapsAlpha', label: 'Keycaps Alpha', presetColors: ['#18181c', '#0d0d0f', '#20163b', '#f8fafc', '#052e16', '#1e1b4b'] },
   { key: 'keycapsMod', label: 'Keycaps Mod', presetColors: ['#121215', '#08080a', '#170f2d', '#e2e8f0', '#022c22', '#0f172a'] },
   { key: 'keycapsAccent', label: 'Keycaps Accent', presetColors: ['#ea580c', '#d946ef', '#0284c7', '#eab308', '#10b981', '#ef4444'] },
-  { key: 'plate', label: 'Switch Plate', presetColors: ['#1e1e24', '#fbbf24', '#cbd5e1', '#4c1d95', '#065f46', '#334155'] },
-  { key: 'knobColor', label: 'Rotary Knob', presetColors: ['#141416', '#f59e0b', '#0284c7', '#d946ef', '#e2e8f0', '#ef4444'] },
-  { key: 'switchStem', label: 'Switch Stem', presetColors: ['#ff7700', '#0284c7', '#a855f7', '#eab308', '#22c55e', '#ef4444'] },
-  { key: 'weightBar', label: 'Weight Bar', presetColors: ['#f59e0b', '#e2e8f0', '#06b6d4', '#d946ef', '#10b981', '#3b82f6'] },
+  { key: 'switchStem', label: 'Switch Stem', presetColors: ['#ff7700', '#ef4444', '#0284c7', '#a855f7', '#eab308', '#22c55e', '#ec4899', '#f8fafc'] },
+  { key: 'switchHousing', label: 'Switch Base Housing', presetColors: ['#18181b', '#09090b', '#e2e8f0', '#20163b', '#052e16', '#7c2d12', '#1e1b4b', '#f8fafc'] },
+  { key: 'switchTopHousing', label: 'Switch Top Housing', presetColors: ['#cbd5e1', '#ffffff', '#ff7700', '#06b6d4', '#d946ef', '#22c55e', '#ef4444', '#18181b'] },
+  { key: 'switchSpring', label: 'Internal Spring & Pins', presetColors: ['#f59e0b', '#e2e8f0', '#fb923c', '#94a3b8', '#06b6d4', '#d946ef', '#eab308'] },
+  { key: 'stabilizerHousing', label: 'Stabilizer Housing', presetColors: ['#18181b', '#cbd5e1', '#170f2d', '#09090b', '#ff7700', '#0284c7', '#d946ef'] },
+  { key: 'stabilizerStem', label: 'Stabilizer Stem', presetColors: ['#ff7700', '#0284c7', '#d946ef', '#eab308', '#22c55e', '#f8fafc', '#ef4444'] },
+  { key: 'stabilizerWire', label: 'Stabilizer Wire', presetColors: ['#f59e0b', '#e2e8f0', '#71717a', '#fb923c', '#d946ef', '#38bdf8'] },
+  { key: 'plate', label: 'Switch Plate', presetColors: ['#475569', '#1e1e24', '#fbbf24', '#cbd5e1', '#4c1d95', '#065f46', '#334155'] },
+  { key: 'pcb', label: 'Hot-Swap PCB', presetColors: ['#18181b', '#0d0d10', '#1e293b', '#2e1065', '#052e16', '#3f3f46'] },
+  { key: 'knobColor', label: 'Rotary Knob', presetColors: ['#3f3f46', '#141416', '#f59e0b', '#0284c7', '#d946ef', '#e2e8f0', '#ef4444'] },
+  { key: 'weightBar', label: 'Brass Weight Bar', presetColors: ['#f59e0b', '#e2e8f0', '#06b6d4', '#d946ef', '#10b981', '#3b82f6'] },
 ];
 
 /* ─── Studio Custom Slider ─── */
@@ -773,14 +883,18 @@ function StudioPanel() {
                     </div>
                   </div>
 
-                  {/* Basic: 4. SWITCH PROFILE Section */}
-                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Sliders size={14} className="text-orange-400" />
-                      <span className="text-xs font-black text-white tracking-wider uppercase">
-                        Switch Profile
-                      </span>
+                  {/* Basic: 4. SWITCH PROFILE & COLORWAYS Section */}
+                  <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg space-y-3.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sliders size={14} className="text-orange-400" />
+                        <span className="text-xs font-black text-white tracking-wider uppercase">
+                          Switch Profile & Sound
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-orange-400 font-mono font-bold uppercase">{switchType}</span>
                     </div>
+
                     <div className="space-y-1.5">
                       {SWITCH_TYPES.map((sw) => (
                         <button
@@ -789,7 +903,7 @@ function StudioPanel() {
                             setSwitchType(sw.id);
                             playSwitchSound(sw.id);
                           }}
-                          className={`w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                          className={`w-full flex items-center justify-between p-2 rounded-xl border text-left transition cursor-pointer ${
                             switchType === sw.id
                               ? "border-orange-500 bg-orange-500/15 text-white"
                               : "border-white/10 bg-black/40 text-gray-400 hover:border-white/20"
@@ -804,6 +918,114 @@ function StudioPanel() {
                           )}
                         </button>
                       ))}
+                    </div>
+
+                    {/* Switch Colorway Presets */}
+                    <div className="pt-2 border-t border-white/10">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[10px] font-bold text-gray-300 uppercase tracking-widest flex items-center gap-1.5">
+                          <Sparkles size={11} className="text-orange-400" />
+                          Switch Colorways
+                        </label>
+                        <span className="text-[9px] text-gray-500">1-Click Apply</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto no-scrollbar pr-0.5">
+                        {SWITCH_COLOR_PRESETS.map((preset) => {
+                          const isSelected = 
+                            customColors.switchStem.toLowerCase() === preset.stem.toLowerCase() &&
+                            customColors.switchHousing.toLowerCase() === preset.housing.toLowerCase();
+
+                          return (
+                            <button
+                              key={preset.id}
+                              onClick={() => {
+                                setCustomColor("switchStem", preset.stem);
+                                setCustomColor("switchHousing", preset.housing);
+                                setCustomColor("switchTopHousing", preset.topHousing);
+                                setCustomColor("switchSpring", preset.spring);
+                              }}
+                              className={`p-2 rounded-xl border text-left transition cursor-pointer flex flex-col gap-1 ${
+                                isSelected
+                                  ? "border-orange-500 bg-orange-500/15 shadow-xs"
+                                  : "border-white/10 bg-black/40 hover:border-white/30"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-white truncate">{preset.name}</span>
+                                <div className="flex items-center gap-0.5 shrink-0">
+                                  <span className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: preset.housing }} title="Base" />
+                                  <span className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: preset.stem }} title="Stem" />
+                                </div>
+                              </div>
+                              <span className="text-[8px] text-gray-400 line-clamp-1">{preset.desc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Quick Switch Part Color Tuners */}
+                    <div className="pt-2 border-t border-white/10 space-y-2">
+                      <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-1.5">
+                        Custom Switch Parts
+                      </div>
+
+                      {/* Stem */}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-400 font-medium">Stem Slider</span>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={customColors.switchStem}
+                            onChange={(e) => setCustomColor("switchStem", e.target.value)}
+                            className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
+                          />
+                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchStem}</span>
+                        </div>
+                      </div>
+
+                      {/* Housing Base */}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-400 font-medium">Base Housing</span>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={customColors.switchHousing}
+                            onChange={(e) => setCustomColor("switchHousing", e.target.value)}
+                            className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
+                          />
+                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchHousing}</span>
+                        </div>
+                      </div>
+
+                      {/* Top Shell */}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-400 font-medium">Top Clear Shell</span>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={customColors.switchTopHousing}
+                            onChange={(e) => setCustomColor("switchTopHousing", e.target.value)}
+                            className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
+                          />
+                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchTopHousing}</span>
+                        </div>
+                      </div>
+
+                      {/* Internal Spring */}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-gray-400 font-medium">Internal Spring</span>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="color"
+                            value={customColors.switchSpring}
+                            onChange={(e) => setCustomColor("switchSpring", e.target.value)}
+                            className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent"
+                          />
+                          <span className="font-mono text-gray-300 text-[9px] w-14 text-right">{customColors.switchSpring}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>

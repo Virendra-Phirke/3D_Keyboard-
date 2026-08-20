@@ -13,6 +13,12 @@ export interface CustomColors {
   keycapsText: string;
   knobColor: string;
   switchStem: string;
+  switchHousing: string;
+  switchTopHousing: string;
+  switchSpring: string;
+  stabilizerHousing: string;
+  stabilizerStem: string;
+  stabilizerWire: string;
   plate: string;
   pcb: string;
   caseColor: string;
@@ -42,6 +48,12 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsText: '#f3f4f6',
     knobColor: '#3f3f46',
     switchStem: '#ff7700',
+    switchHousing: '#18181b',
+    switchTopHousing: '#cbd5e1',
+    switchSpring: '#f59e0b',
+    stabilizerHousing: '#18181b',
+    stabilizerStem: '#ff7700',
+    stabilizerWire: '#f59e0b',
     plate: '#475569',
     pcb: '#18181b',
     caseColor: '#27272a',
@@ -55,6 +67,12 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsText: '#0f172a',
     knobColor: '#0284c7',
     switchStem: '#0284c7',
+    switchHousing: '#e2e8f0',
+    switchTopHousing: '#ffffff',
+    switchSpring: '#38bdf8',
+    stabilizerHousing: '#cbd5e1',
+    stabilizerStem: '#0284c7',
+    stabilizerWire: '#e2e8f0',
     plate: '#cbd5e1',
     pcb: '#1e293b',
     caseColor: '#e2e8f0',
@@ -68,6 +86,12 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsText: '#f1f5f9',
     knobColor: '#d946ef',
     switchStem: '#06b6d4',
+    switchHousing: '#20163b',
+    switchTopHousing: '#d946ef',
+    switchSpring: '#f43f5e',
+    stabilizerHousing: '#170f2d',
+    stabilizerStem: '#d946ef',
+    stabilizerWire: '#d946ef',
     plate: '#4c1d95',
     pcb: '#2e1065',
     caseColor: '#130e24',
@@ -81,6 +105,12 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsText: '#71717a',
     knobColor: '#18181b',
     switchStem: '#eab308',
+    switchHousing: '#09090b',
+    switchTopHousing: '#18181b',
+    switchSpring: '#eab308',
+    stabilizerHousing: '#09090b',
+    stabilizerStem: '#eab308',
+    stabilizerWire: '#71717a',
     plate: '#18181b',
     pcb: '#09090b',
     caseColor: '#050505',

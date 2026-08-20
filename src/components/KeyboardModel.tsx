@@ -418,6 +418,11 @@ function StabilizerAssembly({
         <Box args={[0.08, 0.24, 0.24]} position={[0, 0.32, 0]} material={stemMat} />
         <Box args={[0.24, 0.24, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
       </group>
+
+      {/* Linking Stabilizer Wire */}
+      <Box args={[halfSpan * 2, 0.05, 0.05]} position={[0, 0.06, -0.16]} material={wireMat} />
+      <Box args={[0.05, 0.14, 0.05]} position={[-halfSpan, 0.12, -0.16]} material={wireMat} />
+      <Box args={[0.05, 0.14, 0.05]} position={[halfSpan, 0.12, -0.16]} material={wireMat} />
     </group>
   );
 }
@@ -536,37 +541,53 @@ export function KeyboardModel() {
 
   const switchBaseMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#18181b",
+      color: customColors.switchHousing || "#18181b",
       roughness: 0.55,
       metalness: 0.25
     });
-  }, []);
+  }, [customColors.switchHousing]);
 
   const switchClearMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#cbd5e1",
+      color: customColors.switchTopHousing || "#cbd5e1",
       roughness: 0.15,
       metalness: 0.10,
       transparent: true,
-      opacity: 0.65
+      opacity: 0.72
     });
-  }, []);
+  }, [customColors.switchTopHousing]);
 
   const switchSpringMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#f59e0b",
+      color: customColors.switchSpring || "#f59e0b",
       metalness: 0.98,
       roughness: 0.15
     });
-  }, []);
+  }, [customColors.switchSpring]);
 
-  const wireMaterial = useMemo(() => {
+  const stabHousingMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#e2e8f0",
+      color: customColors.stabilizerHousing || "#18181b",
+      roughness: 0.45,
+      metalness: 0.20
+    });
+  }, [customColors.stabilizerHousing]);
+
+  const stabStemMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: customColors.stabilizerStem || customColors.switchStem || "#ff7700",
+      roughness: 0.25,
+      metalness: 0.08
+    });
+  }, [customColors.stabilizerStem, customColors.switchStem]);
+
+  const stabWireMat = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: customColors.stabilizerWire || "#f59e0b",
       metalness: 0.98,
       roughness: 0.12
     });
-  }, []);
+  }, [customColors.stabilizerWire]);
 
   const screwPositions = useMemo(() => {
     const positions: [number, number][] = [];
@@ -747,9 +768,9 @@ export function KeyboardModel() {
             x={spacebarKey.x}
             z={spacebarKey.z}
             width={spacebarKey.width}
-            stemMat={switchStemMat}
-            baseMat={switchBaseMat}
-            wireMat={wireMaterial}
+            stemMat={stabStemMat}
+            baseMat={stabHousingMat}
+            wireMat={stabWireMat}
           />
         )}
       </group>
