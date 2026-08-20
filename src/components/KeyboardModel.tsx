@@ -273,7 +273,7 @@ interface SwitchItemProps {
   isPressed: boolean;
 }
 
-/* ─── REALISTIC GATERON / CHERRY MX SWITCH ─── */
+/* ─── REALISTIC CHERRY MX MECHANICAL SWITCH (Matching 3D CAD Image) ─── */
 function SwitchItem({
   keyInfo,
   stemMat,
@@ -285,39 +285,71 @@ function SwitchItem({
 }: SwitchItemProps) {
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
-      {/* 1. Lower Housing Base (Black Nylon Box with Side Mount Clips) */}
-      <Box args={[0.76, 0.18, 0.76]} position={[0, 0.09, 0]} material={baseMat} />
-      <Box args={[0.06, 0.14, 0.28]} position={[0.39, 0.09, 0]} material={baseMat} />
-      <Box args={[0.06, 0.14, 0.28]} position={[-0.39, 0.09, 0]} material={baseMat} />
+      {/* 1. Lower Nylon Housing Base with Plate Flange & Side Snap Latches */}
+      <Box args={[0.82, 0.05, 0.82]} position={[0, 0.025, 0]} material={baseMat} />
+      <Box args={[0.74, 0.14, 0.74]} position={[0, -0.06, 0]} material={baseMat} />
 
-      {/* 2. Clear Polycarbonate Upper Housing (Beveled Pyramid Frustum) */}
-      <Box args={[0.72, 0.08, 0.72]} position={[0, 0.22, 0]} material={clearMat} />
-      <Box args={[0.62, 0.18, 0.62]} position={[0, 0.32, 0]} material={clearMat} />
+      {/* Plate-Mount Retention Latch Clips (Left & Right) */}
+      <Box args={[0.06, 0.12, 0.22]} position={[0.40, -0.02, 0]} material={baseMat} />
+      <Box args={[0.06, 0.12, 0.22]} position={[-0.40, -0.02, 0]} material={baseMat} />
 
-      {/* 3. Internal Coiled Spring & Contact Leaf */}
-      <Cylinder args={[0.08, 0.08, 0.26, 12]} position={[0, 0.24, 0]} material={springMat} />
+      {/* 4 Corner Latch Tabs that secure the clear top housing */}
+      <Box args={[0.05, 0.10, 0.12]} position={[0.39, 0.10, 0.22]} material={baseMat} />
+      <Box args={[0.05, 0.10, 0.12]} position={[0.39, 0.10, -0.22]} material={baseMat} />
+      <Box args={[0.05, 0.10, 0.12]} position={[-0.39, 0.10, 0.22]} material={baseMat} />
+      <Box args={[0.05, 0.10, 0.12]} position={[-0.39, 0.10, -0.22]} material={baseMat} />
 
-      {/* 4. South-Facing SMD RGB LED Light Chip */}
-      <Box args={[0.18, 0.04, 0.10]} position={[0, 0.12, 0.26]} material={ledMat} />
+      {/* 2. Crystal-Clear Polycarbonate Upper Shell (Stepped Pyramid Dome with Chimney) */}
+      {/* Base Perimeter Lip */}
+      <Box args={[0.78, 0.05, 0.78]} position={[0, 0.08, 0]} material={clearMat} />
+      {/* 4-Side Tapered Pyramid Body */}
+      <Box args={[0.68, 0.16, 0.68]} position={[0, 0.18, 0]} material={clearMat} />
+      {/* Top Chimney Opening Collar with Embossed Rim */}
+      <Box args={[0.48, 0.08, 0.48]} position={[0, 0.29, 0]} material={clearMat} />
+      {/* Four Corner Chamfer Struts */}
+      <Box args={[0.10, 0.22, 0.10]} position={[0.29, 0.16, 0.29]} material={clearMat} />
+      <Box args={[0.10, 0.22, 0.10]} position={[-0.29, 0.16, 0.29]} material={clearMat} />
+      <Box args={[0.10, 0.22, 0.10]} position={[0.29, 0.16, -0.29]} material={clearMat} />
+      <Box args={[0.10, 0.22, 0.10]} position={[-0.29, 0.16, -0.29]} material={clearMat} />
 
-      {/* 5. Orange Cross Stem Slider (Depresses smoothly when key is pressed) */}
-      <group position={[0, isPressed ? 0.34 : 0.46, 0]}>
-        {/* Center Cross Slider */}
-        <Box args={[0.08, 0.26, 0.26]} position={[0, 0, 0]} material={stemMat} />
-        <Box args={[0.26, 0.26, 0.08]} position={[0, 0, 0]} material={stemMat} />
-        {/* Slider Base Collar */}
-        <Box args={[0.32, 0.06, 0.32]} position={[0, -0.10, 0]} material={stemMat} />
+      {/* Front South-Facing Arched LED Window Lens */}
+      <Box args={[0.22, 0.09, 0.12]} position={[0, 0.11, 0.32]} material={clearMat} />
+
+      {/* 3. Internal Coiled Spring & Copper Contact Leaves (Visible through clear housing) */}
+      <Cylinder args={[0.09, 0.09, 0.26, 16]} position={[0, 0.18, 0]} material={springMat} />
+      {/* Leaf Contacts inside rear chamber */}
+      <Box args={[0.03, 0.18, 0.16]} position={[-0.16, 0.18, -0.10]} material={springMat} />
+      <Box args={[0.03, 0.16, 0.12]} position={[0.16, 0.18, -0.10]} material={springMat} />
+
+      {/* 4. South-Facing SMD RGB/Amber LED Bead */}
+      <Box args={[0.16, 0.05, 0.08]} position={[0, 0.08, 0.30]} material={ledMat} />
+      <pointLight position={[0, 0.14, 0.30]} intensity={0.4} distance={1.2} color="#ffaa22" />
+
+      {/* 5. Precision MX Cross Stem Slider with Shoulder Platform & Guide Rails */}
+      <group position={[0, isPressed ? 0.24 : 0.38, 0]}>
+        {/* Rectangular Stem Shoulder Platform (Sits inside the chimney) */}
+        <Box args={[0.36, 0.06, 0.36]} position={[0, -0.02, 0]} material={stemMat} />
+        {/* Center Slider Guide Post */}
+        <Box args={[0.24, 0.28, 0.24]} position={[0, 0.10, 0]} material={stemMat} />
+        {/* Authentic Cherry MX Cross Mount (+) */}
+        <Box args={[0.08, 0.28, 0.28]} position={[0, 0.18, 0]} material={stemMat} />
+        <Box args={[0.28, 0.28, 0.08]} position={[0, 0.18, 0]} material={stemMat} />
+        {/* Left & Right Vertical Guide Wings */}
+        <Box args={[0.06, 0.22, 0.10]} position={[0.20, 0.02, 0]} material={stemMat} />
+        <Box args={[0.06, 0.22, 0.10]} position={[-0.20, 0.02, 0]} material={stemMat} />
       </group>
 
-      {/* 6. Bottom PCB Contact Pins & Center Guide Post */}
-      <Cylinder args={[0.08, 0.08, 0.16, 8]} position={[0, -0.06, 0]} material={baseMat} />
-      <Box args={[0.03, 0.18, 0.03]} position={[-0.18, -0.06, 0.12]} material={springMat} />
-      <Box args={[0.03, 0.18, 0.03]} position={[0.18, -0.06, -0.12]} material={springMat} />
+      {/* 6. Underside 5-Pin PCB Guide Post & Metal Contact Pins */}
+      <Cylinder args={[0.09, 0.09, 0.18, 12]} position={[0, -0.14, 0]} material={baseMat} />
+      <Cylinder args={[0.04, 0.04, 0.16, 8]} position={[-0.24, -0.13, 0]} material={baseMat} />
+      <Cylinder args={[0.04, 0.04, 0.16, 8]} position={[0.24, -0.13, 0]} material={baseMat} />
+      <Box args={[0.03, 0.20, 0.03]} position={[-0.16, -0.14, 0.14]} material={springMat} />
+      <Box args={[0.03, 0.20, 0.03]} position={[0.16, -0.14, -0.14]} material={springMat} />
     </group>
   );
 }
 
-/* ─── STAINLESS STEEL STABILIZER BAR ─── */
+/* ─── REALISTIC PLATE-MOUNTED STAINLESS STEEL STABILIZER (Matching Image 2) ─── */
 function StabilizerAssembly({
   x,
   z,
@@ -333,29 +365,48 @@ function StabilizerAssembly({
   baseMat: THREE.MeshStandardMaterial;
   wireMat: THREE.MeshStandardMaterial;
 }) {
-  const halfSpan = (width * 1.05 - 0.7) / 2;
+  const halfSpan = width >= 6.0 ? 2.38 : (width * 1.05 - 0.7) / 2;
 
   return (
     <group position={[x, 0, z]}>
-      {/* Left Stabilizer Housing & Dummy Stem */}
+      {/* Left Stabilizer Housing & MX Stem */}
       <group position={[-halfSpan, 0, 0]}>
-        <Box args={[0.32, 0.28, 0.38]} position={[0, 0.14, 0]} material={baseMat} />
-        <Box args={[0.08, 0.22, 0.22]} position={[0, 0.32, 0]} material={stemMat} />
-        <Box args={[0.22, 0.22, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.36, 0.32, 0.42]} position={[0, 0.16, 0]} material={baseMat} />
+        {/* Stabilizer Cross Stem */}
+        <Box args={[0.08, 0.24, 0.24]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.24, 0.24, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
       </group>
 
-      {/* Right Stabilizer Housing & Dummy Stem */}
+      {/* Right Stabilizer Housing & MX Stem */}
       <group position={[halfSpan, 0, 0]}>
-        <Box args={[0.32, 0.28, 0.38]} position={[0, 0.14, 0]} material={baseMat} />
-        <Box args={[0.08, 0.22, 0.22]} position={[0, 0.32, 0]} material={stemMat} />
-        <Box args={[0.22, 0.22, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.36, 0.32, 0.42]} position={[0, 0.16, 0]} material={baseMat} />
+        {/* Stabilizer Cross Stem */}
+        <Box args={[0.08, 0.24, 0.24]} position={[0, 0.32, 0]} material={stemMat} />
+        <Box args={[0.24, 0.24, 0.08]} position={[0, 0.32, 0]} material={stemMat} />
       </group>
 
-      {/* Stainless Steel Connecting Wire */}
-      <group position={[0, 0.06, 0.14]}>
-        <Cylinder args={[0.02, 0.02, halfSpan * 2, 8]} rotation={[0, 0, Math.PI / 2]} material={wireMat} />
-        <Cylinder args={[0.02, 0.02, 0.16, 8]} position={[-halfSpan, 0.06, -0.06]} rotation={[Math.PI / 3, 0, 0]} material={wireMat} />
-        <Cylinder args={[0.02, 0.02, 0.16, 8]} position={[halfSpan, 0.06, -0.06]} rotation={[Math.PI / 3, 0, 0]} material={wireMat} />
+      {/* Solid Stainless Steel Wire Rod connecting left and right stabilizers */}
+      <group position={[0, 0.08, 0.16]}>
+        {/* Horizontal Main Wire Span */}
+        <Cylinder
+          args={[0.024, 0.024, halfSpan * 2, 12]}
+          rotation={[0, 0, Math.PI / 2]}
+          material={wireMat}
+        />
+        {/* Left 90-degree Arm */}
+        <Cylinder
+          args={[0.024, 0.024, 0.18, 12]}
+          position={[-halfSpan, 0.06, -0.07]}
+          rotation={[Math.PI / 2.5, 0, 0]}
+          material={wireMat}
+        />
+        {/* Right 90-degree Arm */}
+        <Cylinder
+          args={[0.024, 0.024, 0.18, 12]}
+          position={[halfSpan, 0.06, -0.07]}
+          rotation={[Math.PI / 2.5, 0, 0]}
+          material={wireMat}
+        />
       </group>
     </group>
   );
