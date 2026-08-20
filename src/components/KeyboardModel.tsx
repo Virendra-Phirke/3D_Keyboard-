@@ -8,7 +8,7 @@ import {
   useAppStore,
   setKeyPressed,
   ColorTheme,
-  RGBMode
+  CustomColors
 } from "../store";
 import { THEME_CONFIGS, getKeycapTexture } from "../utils/keycapTexture";
 import { playSwitchSound } from "../utils/audio";
@@ -72,6 +72,7 @@ const LAYER_ANNOTATIONS = [
 interface KeycapItemProps {
   keyInfo: KeyInfo;
   theme: ColorTheme;
+  customColors: CustomColors;
   isPressed: boolean;
   onPress: (code: string) => void;
   onRelease: (code: string) => void;
@@ -80,6 +81,7 @@ interface KeycapItemProps {
 function KeycapItem({
   keyInfo,
   theme,
+  customColors,
   isPressed,
   onPress,
   onRelease,
@@ -95,9 +97,15 @@ function KeycapItem({
       keyInfo.subLabel,
       keyInfo.type,
       isHovered,
-      isPressed
+      isPressed,
+      {
+        keycapsAlpha: customColors.keycapsAlpha,
+        keycapsMod: customColors.keycapsMod,
+        keycapsAccent: customColors.keycapsAccent,
+        keycapsText: customColors.keycapsText,
+      }
     );
-  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isHovered, isPressed]);
+  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isHovered, isPressed, customColors]);
 
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -195,8 +203,7 @@ function SwitchItem({
 }
 
 export function KeyboardModel() {
-  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, pressedKeys } = useAppStore();
-  const themeConfig = THEME_CONFIGS[colorTheme] || THEME_CONFIGS.ember;
+  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, pressedKeys } = useAppStore();
 
   const { keys, knob } = useMemo(() => generateKeyboardLayout(), []);
 
@@ -233,30 +240,30 @@ export function KeyboardModel() {
   const totalWidth = 16.8;
   const totalDepth = 6.4;
 
-  // HIGH-PERFORMANCE SHARED MATERIALS
+  // DYNAMIC CUSTOMIZABLE MATERIALS
   const caseMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#27272a",
+      color: customColors.caseColor,
       roughness: 0.35,
       metalness: 0.8,
     });
-  }, []);
+  }, [customColors.caseColor]);
 
   const plateMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#475569",
+      color: customColors.plate,
       roughness: 0.28,
       metalness: 0.9,
     });
-  }, []);
+  }, [customColors.plate]);
 
   const pcbMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#18181b",
+      color: customColors.pcb,
       roughness: 0.65,
       metalness: 0.3,
     });
-  }, []);
+  }, [customColors.pcb]);
 
   const goldTraceMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -268,20 +275,20 @@ export function KeyboardModel() {
 
   const brassMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#f59e0b",
+      color: customColors.weightBar,
       roughness: 0.15,
       metalness: 0.98,
     });
-  }, []);
+  }, [customColors.weightBar]);
 
   const rgbLedMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: "#ff7700",
-      emissive: "#ff7700",
+      color: customColors.ledColor,
+      emissive: customColors.ledColor,
       emissiveIntensity: rgbMode === "off" ? 0 : 3.5,
       roughness: 0.2,
     });
-  }, [rgbMode]);
+  }, [rgbMode, customColors.ledColor]);
 
   const foamMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -293,11 +300,11 @@ export function KeyboardModel() {
 
   const switchStemMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: themeConfig.switchStem,
+      color: customColors.switchStem,
       roughness: 0.25,
       metalness: 0.15
     });
-  }, [themeConfig.switchStem]);
+  }, [customColors.switchStem]);
 
   const switchBaseMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -422,7 +429,7 @@ export function KeyboardModel() {
       hardwareGroup.current.position.y = -1.2 - ease * 3.3;
     }
 
-    // 3. Dynamic Amber & Warm Backlight Glow
+    // 3. Dynamic Backlight Glow with custom LED color
     if (amberBacklight.current && underglowLight.current) {
       if (rgbMode === "off") {
         amberBacklight.current.intensity = 0;
@@ -436,13 +443,13 @@ export function KeyboardModel() {
         underglowLight.current.intensity = 3.5;
       } else if (rgbMode === "breathe") {
         const intensity = (Math.sin(time * 2.5) * 0.5 + 0.5) * 4.0 + 0.8;
-        amberBacklight.current.color.set("#ff8800");
-        underglowLight.current.color.set("#ff8800");
+        amberBacklight.current.color.set(customColors.ledColor);
+        underglowLight.current.color.set(customColors.ledColor);
         amberBacklight.current.intensity = intensity;
         underglowLight.current.intensity = intensity;
       } else {
-        amberBacklight.current.color.set("#ff8800");
-        underglowLight.current.color.set("#ff7700");
+        amberBacklight.current.color.set(customColors.ledColor);
+        underglowLight.current.color.set(customColors.ledColor);
         amberBacklight.current.intensity = 4.2;
         underglowLight.current.intensity = 3.6;
       }
@@ -451,9 +458,9 @@ export function KeyboardModel() {
 
   return (
     <group ref={mainGroup} scale={[0.48, 0.48, 0.48]} position={[0, 0, 0]}>
-      {/* WARM AMBER UNDERGLOW LIGHTS */}
-      <pointLight ref={amberBacklight} position={[0, 0.6, 0]} intensity={4.2} distance={24} decay={1.8} color="#ff8800" />
-      <pointLight ref={underglowLight} position={[0, -0.6, 0]} intensity={3.6} distance={26} decay={1.8} color="#ff7700" />
+      {/* WARM UNDERGLOW LIGHTS */}
+      <pointLight ref={amberBacklight} position={[0, 0.6, 0]} intensity={rgbMode === "off" ? 0 : 4.2} distance={24} decay={1.8} color={customColors.ledColor} />
+      <pointLight ref={underglowLight} position={[0, -0.6, 0]} intensity={rgbMode === "off" ? 0 : 3.6} distance={26} decay={1.8} color={customColors.ledColor} />
 
       {/* 1. LAYER 1: KEYCAPS & ROTARY KNOB */}
       <group ref={keycapsGroup}>
@@ -462,6 +469,7 @@ export function KeyboardModel() {
             key={`keycap-${key.id}`}
             keyInfo={key}
             theme={colorTheme}
+            customColors={customColors}
             isPressed={pressedKeys.has(key.code)}
             onPress={handleKeyPress}
             onRelease={handleKeyRelease}
@@ -469,9 +477,9 @@ export function KeyboardModel() {
         ))}
 
         <group position={[knob.x, 0.35, knob.z]}>
-          <Cylinder args={[0.55, 0.55, 0.42, 24]} material={new THREE.MeshStandardMaterial({ color: "#3f3f46", roughness: 0.25, metalness: 0.95 })} />
+          <Cylinder args={[0.55, 0.55, 0.42, 24]} material={new THREE.MeshStandardMaterial({ color: customColors.caseColor, roughness: 0.25, metalness: 0.95 })} />
           <Cylinder args={[0.44, 0.44, 0.05, 24]} position={[0, 0.22, 0]} material={new THREE.MeshStandardMaterial({ color: "#27272a", roughness: 0.2, metalness: 0.9 })} />
-          <Cylinder args={[0.48, 0.48, 0.06, 24]} position={[0, 0.12, 0]} material={new THREE.MeshStandardMaterial({ color: "#ff7700", emissive: "#ff7700", emissiveIntensity: 2.5 })} />
+          <Cylinder args={[0.48, 0.48, 0.06, 24]} position={[0, 0.12, 0]} material={new THREE.MeshStandardMaterial({ color: customColors.ledColor, emissive: customColors.ledColor, emissiveIntensity: rgbMode === "off" ? 0 : 2.5 })} />
         </group>
       </group>
 

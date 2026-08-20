@@ -24,16 +24,16 @@ export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
     caseColor: '#121215',
     caseMetalness: 0.85,
     caseRoughness: 0.35,
-    alphaBase: '#18181c', // Sleek matte black PBT
-    alphaText: '#f3f4f6', // Sharp laser-etched white
-    modBase: '#121215',   // Slightly deeper tone for modifiers
+    alphaBase: '#18181c',
+    alphaText: '#f3f4f6',
+    modBase: '#121215',
     modText: '#d1d5db',
-    accentBase: '#222226', // Keep sleek dark by default matching reference image
+    accentBase: '#222226',
     accentText: '#f3f4f6',
-    accentGlow: '#ff8800', // Warm amber backlight
+    accentGlow: '#ff8800',
     plateColor: '#1f1f23',
-    switchStem: '#ff7700', // Orange mechanical switch stem
-    rgbDefault: '#ff8800', // Warm amber glow
+    switchStem: '#ff7700',
+    rgbDefault: '#ff8800',
   },
   arctic: {
     caseColor: '#e2e8f0',
@@ -88,9 +88,21 @@ export function getKeycapTexture(
   subLabel: string | undefined,
   type: 'alpha' | 'modifier' | 'accent' | 'space' | 'special' | 'knob',
   isHovered: boolean = false,
-  isPressed: boolean = false
+  isPressed: boolean = false,
+  customColors?: {
+    keycapsAlpha?: string;
+    keycapsMod?: string;
+    keycapsAccent?: string;
+    keycapsText?: string;
+  }
 ): THREE.CanvasTexture {
-  const cacheKey = `${theme}_${label}_${subLabel || ''}_${type}_${isHovered}_${isPressed}`;
+  const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
+  const alphaBase = customColors?.keycapsAlpha || colors.alphaBase;
+  const modBase = customColors?.keycapsMod || colors.modBase;
+  const accentBase = customColors?.keycapsAccent || colors.accentBase;
+  const textColor = customColors?.keycapsText || (type === 'modifier' ? colors.modText : colors.alphaText);
+
+  const cacheKey = `${alphaBase}_${modBase}_${accentBase}_${textColor}_${label}_${subLabel || ''}_${type}_${isHovered}_${isPressed}`;
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey)!;
   }
@@ -100,14 +112,11 @@ export function getKeycapTexture(
   canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
-  const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
-
-  let bgColor = colors.alphaBase;
-  let textColor = colors.alphaText;
-
+  let bgColor = alphaBase;
   if (type === 'modifier') {
-    bgColor = colors.modBase;
-    textColor = colors.modText;
+    bgColor = modBase;
+  } else if (type === 'accent' || label === 'ESC' || label === 'ENTER') {
+    bgColor = accentBase;
   }
 
   if (isPressed) {
