@@ -166,6 +166,8 @@ function KeycapItem({
   keyInfo,
   theme,
   customColors,
+  fontStyle,
+  fontSize,
   isPressed,
   onPress,
   onRelease,
@@ -186,9 +188,11 @@ function KeycapItem({
         keycapsMod: customColors.keycapsMod,
         keycapsAccent: customColors.keycapsAccent,
         keycapsText: customColors.keycapsText,
-      }
+      },
+      fontStyle,
+      fontSize / 56
     );
-  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors]);
+  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors, fontStyle, fontSize]);
 
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -389,7 +393,7 @@ function StabilizerAssembly({
 }
 
 export function KeyboardModel() {
-  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, pressedKeys } = useAppStore();
+  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, pressedKeys, fontStyle, fontSize } = useAppStore();
 
   const { keys, knob } = useMemo(() => generateKeyboardLayout(), []);
 
@@ -670,6 +674,8 @@ export function KeyboardModel() {
             keyInfo={key}
             theme={colorTheme}
             customColors={customColors}
+            fontStyle={fontStyle}
+            fontSize={fontSize}
             isPressed={pressedKeys.has(key.code)}
             onPress={handleKeyPress}
             onRelease={handleKeyRelease}

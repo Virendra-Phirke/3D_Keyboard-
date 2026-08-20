@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ColorTheme } from '../store';
+import { ColorTheme, FontStyle } from '../store';
 
 const textureCache = new Map<string, THREE.CanvasTexture>();
 
@@ -86,6 +86,14 @@ export function clearTextureCache() {
   textureCache.clear();
 }
 
+function getFontFamily(style: FontStyle): string {
+  switch (style) {
+    case 'classic': return 'Georgia, "Times New Roman", serif';
+    case 'script': return '"Brush Script MT", "Segoe Script", cursive, sans-serif';
+    default: return '"Segoe UI", system-ui, -apple-system, sans-serif';
+  }
+}
+
 export function getKeycapTexture(
   theme: ColorTheme,
   label: string,
@@ -98,7 +106,9 @@ export function getKeycapTexture(
     keycapsMod?: string;
     keycapsAccent?: string;
     keycapsText?: string;
-  }
+  },
+  fontStyle: FontStyle = 'modern',
+  fontScale: number = 1.0
 ): THREE.CanvasTexture {
   const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
 
@@ -134,7 +144,8 @@ export function getKeycapTexture(
     bgColor = '#27272a';
   }
 
-  const cacheKey = `${bgColor}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}`;
+  const fontFamily = getFontFamily(fontStyle);
+  const cacheKey = `${bgColor}_${textColor}_${label}_${subLabel || ''}_${type}_${isPressed}_${fontStyle}_${fontScale}`;
   if (textureCache.has(cacheKey)) {
     return textureCache.get(cacheKey)!;
   }
@@ -174,7 +185,7 @@ export function getKeycapTexture(
 
   // 5. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
   if (subLabel) {
-    ctx.font = 'bold 72px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.font = `bold ${Math.round(72 * fontScale)}px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.globalAlpha = 0.70;
     ctx.textAlign = 'left';
@@ -182,7 +193,7 @@ export function getKeycapTexture(
     ctx.fillText(subLabel, 64, 64);
 
     // Main Number
-    ctx.font = 'bold 96px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.font = `bold ${Math.round(96 * fontScale)}px ${fontFamily}`;
     ctx.globalAlpha = 0.95;
     ctx.fillText(label, 64, 260);
   } else if (label) {
@@ -194,19 +205,19 @@ export function getKeycapTexture(
 
     if (label.length === 1) {
       // Single Alphabet Key (A-Z)
-      ctx.font = 'bold 112px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.font = `bold ${Math.round(112 * fontScale)}px ${fontFamily}`;
       ctx.fillText(label, 256, 256);
     } else if (label.length <= 3) {
       // Short modifiers (ESC, TAB, WIN, ALT, DEL, etc.)
-      ctx.font = 'bold 80px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.font = `bold ${Math.round(80 * fontScale)}px ${fontFamily}`;
       ctx.fillText(label, 256, 256);
     } else if (label.length <= 5) {
       // Medium modifiers (SHIFT, ENTER, CAPS, SPACE)
-      ctx.font = 'bold 64px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.font = `bold ${Math.round(64 * fontScale)}px ${fontFamily}`;
       ctx.fillText(label, 256, 256);
     } else {
       // Long modifiers (BACKSPACE, CAPSLOCK)
-      ctx.font = 'bold 54px "Segoe UI", system-ui, -apple-system, sans-serif';
+      ctx.font = `bold ${Math.round(54 * fontScale)}px ${fontFamily}`;
       ctx.fillText(label, 256, 256);
     }
   }
