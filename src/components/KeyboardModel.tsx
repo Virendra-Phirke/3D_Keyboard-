@@ -606,29 +606,31 @@ export function KeyboardModel() {
 
   // Render loop with smooth easing
   useFrame(({ clock }, delta) => {
-    const rawOffset = getScrollProgress();
+    const scrollOffset = getScrollProgress();
     const clampedDelta = Math.min(delta, 0.05);
-    smoothedScroll.current = THREE.MathUtils.damp(smoothedScroll.current, rawOffset, 18, clampedDelta);
     smoothedZoom.current = THREE.MathUtils.damp(smoothedZoom.current, zoomLevel, 14, clampedDelta);
-    const scrollOffset = smoothedScroll.current;
     const time = clock.getElapsedTime();
 
     const getProgress = (start: number, end: number) => {
       return clamp(mapLinear(scrollOffset, start, end, 0, 1), 0, 1);
     };
 
+    // Quintic Hermite SmootherStep (C² continuity: 0 velocity & 0 acceleration at transition bounds)
+    const smootherStep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+
     // 1. Position, Orientation & Interactive Zoom Scaling
     if (mainGroup.current) {
-      const explodeProgress = getProgress(0.06, 0.94);
+      const explodeProgress = getProgress(0.04, 0.96);
+      const easeExplode = smootherStep(explodeProgress);
 
-      mainGroup.current.position.set(0, mapLinear(explodeProgress, 0, 1, 0, 0.1), 0);
+      mainGroup.current.position.set(0, mapLinear(easeExplode, 0, 1, 0, 0.1), 0);
 
       const currentScale = 0.48 * smoothedZoom.current;
       mainGroup.current.scale.set(currentScale, currentScale, currentScale);
 
-      const rotX = mapLinear(explodeProgress, 0, 1, 0.52, 0.42);
-      const rotY = mapLinear(explodeProgress, 0, 1, -0.32, 0.22);
-      const rotZ = mapLinear(explodeProgress, 0, 1, 0.08, -0.04);
+      const rotX = mapLinear(easeExplode, 0, 1, 0.52, 0.42);
+      const rotY = mapLinear(easeExplode, 0, 1, -0.32, 0.22);
+      const rotZ = mapLinear(easeExplode, 0, 1, 0.08, -0.04);
 
       mainGroup.current.rotation.x = rotX;
       mainGroup.current.rotation.y = rotY;
@@ -641,9 +643,6 @@ export function KeyboardModel() {
       annotationsGroup.current.style.opacity = `${annotationsVisibility}`;
       annotationsGroup.current.style.display = annotationsVisibility > 0.01 ? 'block' : 'none';
     }
-
-    // Quintic Hermite SmootherStep (C² continuity: 0 velocity & 0 acceleration at transition bounds)
-    const smootherStep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
     // 2. LAYER EXPLOSIONS WITH CONTINUOUS QUINTIC SMOOTHERSTEP EASING
     const keycapsProgress = getProgress(0.04, 0.38);

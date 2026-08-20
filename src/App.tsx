@@ -16,11 +16,10 @@ export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { switchType, soundEnabled } = useAppStore();
 
-  // Buttery-smooth virtual momentum wheel listener with kinetic inertia
+  // Buttery-smooth virtual momentum wheel listener with strictly monotonic damping (0 bounce)
   useEffect(() => {
     let target = getScrollProgress();
     let current = target;
-    let velocity = 0;
     let rafId: number;
     let isInternalUpdating = false;
 
@@ -31,25 +30,22 @@ export default function App() {
         if (Math.abs(ext - current) > 0.005) {
           target = ext;
           current = ext;
-          velocity = 0;
         }
       }
     });
 
     const tick = () => {
       const diff = target - current;
-      velocity = velocity * 0.84 + diff * 0.14;
-      current += velocity;
-
-      if (Math.abs(diff) < 0.00001 && Math.abs(velocity) < 0.00001) {
+      if (Math.abs(diff) < 0.00008) {
         if (current !== target) {
           current = target;
-          velocity = 0;
           isInternalUpdating = true;
           setScrollProgress(current);
           isInternalUpdating = false;
         }
       } else {
+        // Monotonic 1st-Order Low-Pass Filter: strictly asymptotic, mathematically 0 bounce/oscillation
+        current += diff * 0.135;
         isInternalUpdating = true;
         setScrollProgress(current);
         isInternalUpdating = false;

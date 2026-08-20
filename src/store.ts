@@ -410,16 +410,10 @@ function notifyScroll() {
 
 export const setScrollProgress = (p: number) => {
   const clamped = Math.max(0, Math.min(1, p));
-  if (Math.abs(state.scrollProgress - clamped) < 0.00005) return;
+  if (Math.abs(state.scrollProgress - clamped) < 0.00001) return;
   state.scrollProgress = clamped;
-  const newStage = Math.min(6, Math.floor(state.scrollProgress * 7.2));
-  const stageChanged = newStage !== state.activeStageIndex;
-  state.activeStageIndex = newStage;
-
+  state.activeStageIndex = Math.min(6, Math.floor(clamped * 7.2));
   notifyScroll();
-  if (stageChanged) {
-    notify();
-  }
 };
 
 export const subscribeScroll = (listener: StateListener) => {
