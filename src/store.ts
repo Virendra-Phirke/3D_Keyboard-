@@ -58,7 +58,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     keycapsMod: '#121215',
     keycapsAccent: '#222226',
     keycapsText: '#f3f4f6',
-    knobColor: '#3f3f46',
+    knobColor: '#6b7280',
     switchStem: '#ff7700',
     switchHousing: '#18181b',
     switchTopHousing: '#cbd5e1',

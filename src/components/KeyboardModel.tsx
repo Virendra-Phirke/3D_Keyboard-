@@ -451,7 +451,7 @@ function RotaryKnobCap({
 
   const knobCoreMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: color || '#141416',
+      color: color || '#6b7280',
       roughness: 0.22,
       metalness: 0.92,
     });
@@ -459,7 +459,7 @@ function RotaryKnobCap({
 
   const gripRibMat = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: color || '#141416',
+      color: color || '#6b7280',
       roughness: 0.35,
       metalness: 0.88,
     });
