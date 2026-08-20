@@ -1,4 +1,4 @@
-import { OrbitControls, AdaptiveDpr, AdaptiveEvents, BakeShadows, ContactShadows } from "@react-three/drei";
+import { OrbitControls, AdaptiveDpr, AdaptiveEvents, BakeShadows } from "@react-three/drei";
 import { KeyboardModel } from "./KeyboardModel";
 import { useAppStore } from "../store";
 import { THEME_CONFIGS } from "../utils/keycapTexture";
@@ -10,17 +10,6 @@ export default function Scene() {
   return (
     <>
       <color attach="background" args={["#08080c"]} />
-
-      {/* Instant Pure Procedural Ground Contact Shadow (100% Offline, Zero Suspense Hang) */}
-      <ContactShadows
-        position={[0, -2.2, 0]}
-        opacity={0.65}
-        scale={28}
-        blur={2.0}
-        far={4.2}
-        resolution={512}
-        color="#000000"
-      />
 
       {/* Adaptive GPU & Event optimizations */}
       <AdaptiveDpr pixelated={false} />
