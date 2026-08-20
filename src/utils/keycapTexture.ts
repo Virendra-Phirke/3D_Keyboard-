@@ -24,16 +24,16 @@ export const THEME_CONFIGS: Record<ColorTheme, ThemeColors> = {
     caseColor: '#121215',
     caseMetalness: 0.85,
     caseRoughness: 0.35,
-    alphaBase: '#18181c', // Sleek matte black PBT
-    alphaText: '#f3f4f6', // Sharp laser-etched white
-    modBase: '#121215',   // Slightly deeper tone for modifiers
-    modText: '#d1d5db',
-    accentBase: '#222226', // Keep sleek dark by default matching reference image
-    accentText: '#f3f4f6',
-    accentGlow: '#ff8800', // Warm amber backlight
+    alphaBase: '#18181b', // Ultra-sleek matte PBT dark charcoal
+    alphaText: '#f8fafc', // Crisp laser-etched brilliant white
+    modBase: '#111114',   // Deep matte obsidian for modifiers
+    modText: '#94a3b8',   // Soft silver-gray modifier legends
+    accentBase: '#1e1e24', // Accent keycap
+    accentText: '#fb923c',
+    accentGlow: '#ff8800',
     plateColor: '#1f1f23',
-    switchStem: '#ff7700', // Orange mechanical switch stem
-    rgbDefault: '#ff8800', // Warm amber glow
+    switchStem: '#ff7700', // Tangerine switch stem
+    rgbDefault: '#ff8800',
   },
   arctic: {
     caseColor: '#e2e8f0',
@@ -96,8 +96,8 @@ export function getKeycapTexture(
   }
 
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 512;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
   const colors = THEME_CONFIGS[theme] || THEME_CONFIGS.ember;
@@ -108,68 +108,100 @@ export function getKeycapTexture(
   if (type === 'modifier') {
     bgColor = colors.modBase;
     textColor = colors.modText;
+  } else if (type === 'accent' || label === 'ESC' || label === 'ENTER') {
+    bgColor = colors.accentBase;
+    textColor = colors.accentText;
   }
 
   if (isPressed) {
     bgColor = '#27272a';
   } else if (isHovered) {
-    bgColor = '#2d2d33';
+    bgColor = '#2a2a30';
   }
 
-  // Draw Matte Keycap Texture
+  // 1. Base Keycap Fill
   ctx.fillStyle = bgColor;
-  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillRect(0, 0, 512, 512);
 
-  // Subtle Dish Gradient
-  const grad = ctx.createRadialGradient(128, 128, 20, 128, 128, 160);
-  grad.addColorStop(0, 'rgba(255, 255, 255, 0.06)');
-  grad.addColorStop(0.8, 'rgba(0, 0, 0, 0.1)');
-  grad.addColorStop(1, 'rgba(0, 0, 0, 0.35)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 256, 256);
+  // 2. Realistic PBT Stippled Texture Grain
+  const imgData = ctx.getImageData(0, 0, 512, 512);
+  const data = imgData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const grain = (Math.random() - 0.5) * 14;
+    data[i] = Math.min(255, Math.max(0, data[i] + grain));
+    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + grain));
+    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + grain));
+  }
+  ctx.putImageData(imgData, 0, 0);
 
-  // Subtle Border Inset
-  ctx.strokeStyle = isHovered ? '#ff8800' : 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = isHovered ? 6 : 2;
-  ctx.strokeRect(6, 6, 244, 244);
+  // 3. Ergonomic Concave Dish Spherical Highlight & Shadow
+  const dishGradient = ctx.createRadialGradient(256, 230, 40, 256, 256, 240);
+  dishGradient.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+  dishGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.02)');
+  dishGradient.addColorStop(0.85, 'rgba(0, 0, 0, 0.15)');
+  dishGradient.addColorStop(1, 'rgba(0, 0, 0, 0.45)');
+  ctx.fillStyle = dishGradient;
+  ctx.fillRect(0, 0, 512, 512);
 
-  // SubLabel (e.g. ! @ # $)
+  // 4. Subtle Injection Mold Beveled Perimeter Chamfer
+  ctx.strokeStyle = isHovered ? '#ff8800' : 'rgba(255, 255, 255, 0.1)';
+  ctx.lineWidth = isHovered ? 8 : 3;
+  ctx.strokeRect(12, 12, 488, 488);
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(20, 20, 472, 472);
+
+  // 5. Sub-Legend (Secondary Function)
   if (subLabel) {
-    ctx.font = 'bold 36px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.font = '700 68px "Outfit", "Segoe UI", system-ui, sans-serif';
     ctx.fillStyle = textColor;
-    ctx.globalAlpha = 0.65;
+    ctx.globalAlpha = 0.7;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 36, 36);
+    ctx.fillText(subLabel, 68, 68);
   }
 
-  // Main Label (Laser-etched sharp font)
+  // 6. Main Doubleshot Laser-Sharp Legend
   if (label) {
-    ctx.globalAlpha = 0.95;
+    ctx.globalAlpha = 0.96;
     ctx.fillStyle = textColor;
-    ctx.textAlign = subLabel ? 'left' : 'center';
-    ctx.textBaseline = 'middle';
 
-    if (label.length > 3) {
-      ctx.font = 'bold 34px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 160 : 128;
+    // Crisp shadow underneath doubleshot legend
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 2;
+
+    if (label.length > 4) {
+      ctx.font = '700 62px "Outfit", "Segoe UI", system-ui, sans-serif';
+      const x = subLabel ? 68 : 256;
+      const y = subLabel ? 320 : 256;
+      ctx.textAlign = subLabel ? 'left' : 'center';
+      ctx.textBaseline = 'middle';
       ctx.fillText(label, x, y);
     } else if (label.length > 1) {
-      ctx.font = 'bold 44px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 150 : 128;
+      ctx.font = '800 84px "Outfit", "Segoe UI", system-ui, sans-serif';
+      const x = subLabel ? 68 : 256;
+      const y = subLabel ? 310 : 256;
+      ctx.textAlign = subLabel ? 'left' : 'center';
+      ctx.textBaseline = 'middle';
       ctx.fillText(label, x, y);
     } else {
-      ctx.font = 'bold 56px "Segoe UI", system-ui, -apple-system, sans-serif';
-      const x = subLabel ? 36 : 128;
-      const y = subLabel ? 148 : 128;
+      ctx.font = '800 112px "Outfit", "Segoe UI", system-ui, sans-serif';
+      const x = subLabel ? 68 : 256;
+      const y = subLabel ? 300 : 256;
+      ctx.textAlign = subLabel ? 'left' : 'center';
+      ctx.textBaseline = 'middle';
       ctx.fillText(label, x, y);
     }
   }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
   texture.needsUpdate = true;
 
   textureCache.set(cacheKey, texture);
