@@ -1265,33 +1265,36 @@ function StudioPanel() {
 
                 {/* Individual Part Pickers */}
                 <div className="space-y-2">
-                  {PART_CUSTOMIZERS.map((part) => (
-                    <div key={part.key} className="flex items-center gap-2">
-                      <div className="w-24 text-[10px] font-bold text-gray-400 truncate">
-                        {part.label}
+                  {PART_CUSTOMIZERS.map((part) => {
+                    const currentVal = customColors[part.key] || part.presetColors[0] || '#18181b';
+                    return (
+                      <div key={part.key} className="flex items-center gap-2">
+                        <div className="w-24 text-[10px] font-bold text-gray-400 truncate">
+                          {part.label}
+                        </div>
+                        <div className="flex items-center gap-1 flex-grow overflow-x-auto no-scrollbar">
+                          {part.presetColors.slice(0, 5).map((hex) => (
+                            <button
+                              key={hex}
+                              onClick={() => setCustomColor(part.key, hex)}
+                              className={`w-5 h-5 rounded-md shrink-0 transition cursor-pointer border ${
+                                currentVal.toLowerCase() === hex.toLowerCase()
+                                  ? "border-orange-400 ring-1 ring-orange-500/50 scale-110"
+                                  : "border-white/10 hover:scale-105"
+                              }`}
+                              style={{ backgroundColor: hex }}
+                            />
+                          ))}
+                        </div>
+                        <input
+                          type="color"
+                          value={currentVal}
+                          onChange={(e) => setCustomColor(part.key, e.target.value)}
+                          className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent shrink-0"
+                        />
                       </div>
-                      <div className="flex items-center gap-1 flex-grow overflow-x-auto no-scrollbar">
-                        {part.presetColors.slice(0, 5).map((hex) => (
-                          <button
-                            key={hex}
-                            onClick={() => setCustomColor(part.key, hex)}
-                            className={`w-5 h-5 rounded-md shrink-0 transition cursor-pointer border ${
-                              customColors[part.key].toLowerCase() === hex.toLowerCase()
-                                ? "border-orange-400 ring-1 ring-orange-500/50 scale-110"
-                                : "border-white/10 hover:scale-105"
-                            }`}
-                            style={{ backgroundColor: hex }}
-                          />
-                        ))}
-                      </div>
-                      <input
-                        type="color"
-                        value={customColors[part.key]}
-                        onChange={(e) => setCustomColor(part.key, e.target.value)}
-                        className="w-5 h-5 rounded border border-white/20 cursor-pointer bg-transparent shrink-0"
-                      />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               </>

@@ -93,6 +93,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#e2e8f0',
     weightBar: '#38bdf8',
     ledColor: '#00d2ff',
+    bgColor: '#0f172a',
   },
   synthwave: {
     keycapsAlpha: '#20163b',
@@ -112,6 +113,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#130e24',
     weightBar: '#d946ef',
     ledColor: '#d946ef',
+    bgColor: '#120d24',
   },
   stealth: {
     keycapsAlpha: '#0d0d0f',
@@ -131,6 +133,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#050505',
     weightBar: '#eab308',
     ledColor: '#eab308',
+    bgColor: '#09090b',
   },
   botanical: {
     keycapsAlpha: '#e2e8f0',
@@ -150,6 +153,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#0f291e',
     weightBar: '#10b981',
     ledColor: '#10b981',
+    bgColor: '#111827',
   },
   olivia: {
     keycapsAlpha: '#fdf2f8',
@@ -169,6 +173,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#1c1917',
     weightBar: '#fb7185',
     ledColor: '#fb7185',
+    bgColor: '#18181b',
   },
   cafe: {
     keycapsAlpha: '#fef3c7',
@@ -188,6 +193,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#241407',
     weightBar: '#d97706',
     ledColor: '#f59e0b',
+    bgColor: '#1c140d',
   },
   nautilus: {
     keycapsAlpha: '#06b6d4',
@@ -207,6 +213,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#070d18',
     weightBar: '#06b6d4',
     ledColor: '#06b6d4',
+    bgColor: '#0b1320',
   },
   laser: {
     keycapsAlpha: '#3b82f6',
@@ -226,6 +233,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#1e0538',
     weightBar: '#ec4899',
     ledColor: '#06b6d4',
+    bgColor: '#160826',
   },
   dracula: {
     keycapsAlpha: '#f8fafc',
@@ -245,6 +253,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#14141d',
     weightBar: '#ff79c6',
     ledColor: '#bd93f9',
+    bgColor: '#181824',
   },
   retro: {
     keycapsAlpha: '#f5f5f4',
@@ -264,6 +273,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#44403c',
     weightBar: '#a8a29e',
     ledColor: '#dc2626',
+    bgColor: '#1c1917',
   },
   apollo: {
     keycapsAlpha: '#cbd5e1',
@@ -283,6 +293,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#111827',
     weightBar: '#f97316',
     ledColor: '#f97316',
+    bgColor: '#0f172a',
   },
 };
 
@@ -515,13 +526,14 @@ export const toggleSound = () => {
 
 export const getSoundEnabled = () => state.soundEnabled;
 
+export const isKeyPressed = (code: string) => state.pressedKeys.has(code);
+
 export const setKeyPressed = (code: string, isPressed: boolean) => {
   if (isPressed) {
     state.pressedKeys.add(code);
   } else {
     state.pressedKeys.delete(code);
   }
-  notify();
 };
 
 export const getPressedKeys = () => state.pressedKeys;

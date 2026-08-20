@@ -1,12 +1,13 @@
 import { RoundedBox, Box, Cylinder, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, memo } from "react";
 import * as THREE from "three";
 import { generateKeyboardLayout, KeyInfo } from "../utils/keyboardLayout";
 import {
   getScrollProgress,
   useAppStore,
   setKeyPressed,
+  isKeyPressed,
   ColorTheme,
   CustomColors,
   FontStyle
@@ -90,7 +91,6 @@ interface KeycapItemProps {
   customColors: CustomColors;
   fontStyle: FontStyle;
   fontSize: number;
-  isPressed: boolean;
   onPress: (code: string) => void;
   onRelease: (code: string) => void;
 }
@@ -198,13 +198,12 @@ function createCherryKeycapGeometry(
 }
 
 /* ─── REALISTIC CHERRY PROFILE MECHANICAL KEYCAP ─── */
-function KeycapItem({
+const KeycapItem = memo(function KeycapItem({
   keyInfo,
   theme,
   customColors,
   fontStyle,
   fontSize,
-  isPressed,
   onPress,
   onRelease,
 }: KeycapItemProps) {
@@ -218,7 +217,7 @@ function KeycapItem({
       keyInfo.subLabel,
       keyInfo.type,
       false,
-      isPressed,
+      false,
       {
         keycapsAlpha: customColors.keycapsAlpha,
         keycapsMod: customColors.keycapsMod,
@@ -228,7 +227,7 @@ function KeycapItem({
       fontStyle,
       fontSize / 56
     );
-  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors, fontStyle, fontSize]);
+  }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, customColors, fontStyle, fontSize]);
 
   const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -258,6 +257,7 @@ function KeycapItem({
   }, [keyInfo.row]);
 
   useFrame((_, delta) => {
+    const isPressed = isKeyPressed(keyInfo.code);
     if (keycapRef.current && (isPressed || Math.abs(currentY.current) > 0.0005)) {
       const targetY = isPressed ? -0.12 : 0;
       currentY.current = THREE.MathUtils.damp(currentY.current, targetY, 28, delta);
@@ -311,7 +311,7 @@ function KeycapItem({
       </group>
     </group>
   );
-}
+});
 
 interface SwitchItemProps {
   keyInfo: KeyInfo;
@@ -320,19 +320,29 @@ interface SwitchItemProps {
   clearMat: THREE.MeshStandardMaterial;
   springMat: THREE.MeshStandardMaterial;
   ledMat: THREE.MeshStandardMaterial;
-  isPressed: boolean;
 }
 
 /* ─── REALISTIC CHERRY MX MECHANICAL SWITCH (Matching 3D CAD Image) ─── */
-function SwitchItem({
+const SwitchItem = memo(function SwitchItem({
   keyInfo,
   stemMat,
   baseMat,
   clearMat,
   springMat,
   ledMat,
-  isPressed
 }: SwitchItemProps) {
+  const stemRef = useRef<THREE.Group>(null);
+  const currentY = useRef(0);
+
+  useFrame((_, delta) => {
+    const isPressed = isKeyPressed(keyInfo.code);
+    if (stemRef.current && (isPressed || Math.abs(currentY.current) > 0.0005)) {
+      const targetY = isPressed ? -0.12 : 0;
+      currentY.current = THREE.MathUtils.damp(currentY.current, targetY, 28, delta);
+      stemRef.current.position.y = 0.38 + currentY.current;
+    }
+  });
+
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
       {/* 1. Lower Nylon Housing Base with Plate Flange & Side Snap Latches */}
@@ -375,7 +385,7 @@ function SwitchItem({
       <Box args={[0.16, 0.05, 0.08]} position={[0, 0.08, 0.30]} material={ledMat} />
 
       {/* 5. Precision MX Cross Stem Slider with Shoulder Platform & Guide Rails */}
-      <group position={[0, isPressed ? 0.24 : 0.38, 0]}>
+      <group ref={stemRef} position={[0, 0.38, 0]}>
         {/* Rectangular Stem Shoulder Platform (Sits inside the chimney) */}
         <Box args={[0.36, 0.06, 0.36]} position={[0, -0.02, 0]} material={stemMat} />
         {/* Center Slider Guide Post */}
@@ -396,7 +406,7 @@ function SwitchItem({
       <Box args={[0.03, 0.20, 0.03]} position={[0.16, -0.14, -0.14]} material={springMat} />
     </group>
   );
-}
+});
 
 /* ─── REALISTIC PLATE-MOUNTED STAINLESS STEEL STABILIZER (Matching Image 2) ─── */
 function StabilizerAssembly({
@@ -629,7 +639,7 @@ function AlpsEncoderPcbModule({
 }
 
 export function KeyboardModel() {
-  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, pressedKeys, fontStyle, fontSize } = useAppStore();
+  const { colorTheme, rgbMode, switchType, soundEnabled, showAnnotations, zoomLevel, customColors, fontStyle, fontSize } = useAppStore();
 
   const { keys, knob } = useMemo(() => generateKeyboardLayout(), []);
 
@@ -929,7 +939,6 @@ export function KeyboardModel() {
             customColors={customColors}
             fontStyle={fontStyle}
             fontSize={fontSize}
-            isPressed={pressedKeys.has(key.code)}
             onPress={handleKeyPress}
             onRelease={handleKeyRelease}
           />
@@ -956,7 +965,6 @@ export function KeyboardModel() {
             clearMat={switchClearMat}
             springMat={switchSpringMat}
             ledMat={rgbLedMaterial}
-            isPressed={pressedKeys.has(key.code)}
           />
         ))}
 
