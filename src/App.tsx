@@ -122,8 +122,8 @@ export default function App() {
           <div className="text-orange-400 font-bold tracking-widest text-sm uppercase">Loading KeyCraft 3D...</div>
         </div>
       }>
-        {/* R3F 3D Canvas Layer (Directly interactive with mouse drag to rotate and pan) */}
-        <div className="absolute inset-0 z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
+        {/* R3F 3D Canvas Layer (Centered perfectly within viewport) */}
+        <div className="absolute inset-0 lg:right-[22rem] z-0 pointer-events-auto cursor-grab active:cursor-grabbing">
           <Canvas
             shadows
             dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 1.5)]}
