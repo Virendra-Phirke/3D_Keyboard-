@@ -1369,22 +1369,6 @@ function StudioPanel() {
         </div>
       )}
 
-      {/* ─── BOTTOM STATUS BAR ─── */}
-      <div className="h-10 flex items-center justify-between px-6 border-t border-[#2a2640]/50 shrink-0 bg-[#0c0a1a] pointer-events-auto">
-        <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold tracking-wider uppercase">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Hardware WebGL Engine • 60 FPS
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-            Real-Time Rendering
-          </span>
-          <div className="w-8 h-4 rounded-full bg-orange-500 flex items-center justify-end px-0.5 shadow-xs">
-            <div className="w-3 h-3 rounded-full bg-white shadow-xs" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

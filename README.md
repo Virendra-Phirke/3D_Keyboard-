@@ -23,10 +23,19 @@ An interactive 3D web experience showcasing a custom 75% mechanical keyboard wit
   - **Refined Switch Colorways Cards**: Solved text-clipping issues with comfortable 54px min-height cards, high-contrast labels, and dual-dot indicator badges.
   - **Active State Highlights**: Selected themes and switches feature sleek orange rings, subtle glow backgrounds, and instant 3D model synchronization.
 
+### 15. Elimination of Mid-Scroll Bouncing & Frame-Spike Jitter
+- **Root-Cause Analysis & Fix**:
+  - Previously, when scroll passed 30-50%, `setScrollProgress` triggered global `notify()` upon crossing discrete stage thresholds (14%, 28%, 42%, 56%, 70%), forcing a heavy React tree re-render in mid-scroll which dropped frames and caused `useFrame` delta spikes.
+  - Additionally, a nested 2nd-order spring loop in `App.tsx` and a secondary dampener in `KeyboardModel.tsx` had conflicting resonant frequencies, producing a rubber-band overshoot/bounce.
+- **Monotonic 1st-Order Critical Damping**:
+  - Replaced the spring momentum loop with a **critically damped 1st-order exponential filter** (`current += (target - current) * 0.135`). Mathematically, this trajectory is strictly monotonic with **0 oscillation and 0 recoil**.
+- **Direct 3D Frame Sampling**:
+  - `KeyboardModel.tsx` now directly samples the smoothly filtered `getScrollProgress()`, removing the secondary lagging dampener and ensuring all 7 layers move in pure mathematical lockstep.
+
 ## Verification
 - Clean build verified via `npm run build` (0 TypeScript errors).
-- All 12 themes render with custom laser-sharp keycap textures and matching materials.
-- Pushed to GitHub main (`9805051`).
+- Model and layer separation transition smoothly across 0% to 100% with zero recoil, zero bouncing, and zero frame-rate hitching.
+- Pushed to GitHub main (`48f1940`).
 
 ---
 
