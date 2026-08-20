@@ -37,6 +37,7 @@ export interface CustomColors {
   caseColor: string;
   weightBar: string;
   ledColor: string;
+  bgColor?: string;
 }
 
 export interface SavedLayout {
@@ -72,6 +73,7 @@ export const DEFAULT_CUSTOM_COLORS: Record<ColorTheme, CustomColors> = {
     caseColor: '#27272a',
     weightBar: '#f59e0b',
     ledColor: '#ff8800',
+    bgColor: '#18181b',
   },
   arctic: {
     keycapsAlpha: '#f8fafc',

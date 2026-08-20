@@ -4,12 +4,12 @@ import { useAppStore } from "../store";
 import { THEME_CONFIGS } from "../utils/keycapTexture";
 
 export default function Scene() {
-  const { colorTheme } = useAppStore();
+  const { colorTheme, customColors } = useAppStore();
   const themeConfig = THEME_CONFIGS[colorTheme] || THEME_CONFIGS.ember;
 
   return (
     <>
-      <color attach="background" args={["#08080c"]} />
+      <color attach="background" args={[customColors.bgColor || "#18181b"]} />
 
       {/* Adaptive GPU & Event optimizations */}
       <AdaptiveDpr pixelated={false} />

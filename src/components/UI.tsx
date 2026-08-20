@@ -323,8 +323,9 @@ const PART_CUSTOMIZERS: { key: keyof CustomColors; label: string; presetColors: 
   { key: 'stabilizerWire', label: 'Stabilizer Wire', presetColors: ['#f59e0b', '#e2e8f0', '#71717a', '#fb923c', '#d946ef', '#38bdf8'] },
   { key: 'plate', label: 'Switch Plate', presetColors: ['#475569', '#1e1e24', '#fbbf24', '#cbd5e1', '#4c1d95', '#065f46', '#334155'] },
   { key: 'pcb', label: 'Hot-Swap PCB', presetColors: ['#18181b', '#0d0d10', '#1e293b', '#2e1065', '#052e16', '#3f3f46'] },
-  { key: 'knobColor', label: 'Rotary Knob', presetColors: ['#3f3f46', '#141416', '#f59e0b', '#0284c7', '#d946ef', '#e2e8f0', '#ef4444'] },
+  { key: 'knobColor', label: 'Rotary Knob', presetColors: ['#6b7280', '#3f3f46', '#141416', '#f59e0b', '#0284c7', '#d946ef', '#e2e8f0', '#ef4444'] },
   { key: 'weightBar', label: 'Brass Weight Bar', presetColors: ['#f59e0b', '#e2e8f0', '#06b6d4', '#d946ef', '#10b981', '#3b82f6'] },
+  { key: 'bgColor', label: 'Studio Background', presetColors: ['#18181b', '#27272a', '#3f3f46', '#0f172a', '#1e293b', '#09090b', '#050505', '#f1f5f9'] },
 ];
 
 /* ─── Studio Custom Slider ─── */

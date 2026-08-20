@@ -14,7 +14,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 
 export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { switchType, soundEnabled } = useAppStore();
+  const { switchType, soundEnabled, customColors } = useAppStore();
 
   // Buttery-smooth virtual momentum wheel listener with strictly monotonic damping (0 bounce)
   useEffect(() => {
@@ -162,7 +162,10 @@ export default function App() {
   }, [switchType, soundEnabled]);
 
   return (
-    <div className="w-screen h-screen bg-[#050505] overflow-hidden text-white font-sans selection:bg-orange-500/30 relative">
+    <div
+      className="w-screen h-screen overflow-hidden text-white font-sans selection:bg-orange-500/30 relative transition-colors duration-300"
+      style={{ backgroundColor: customColors.bgColor || '#18181b' }}
+    >
       <Suspense fallback={
         <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] gap-4">
           <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
