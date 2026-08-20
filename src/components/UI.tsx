@@ -70,11 +70,123 @@ interface UIProps {
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-const THEMES: { id: ColorTheme; label: string; bg: string; border: string; desc: string }[] = [
-  { id: "ember", label: "Ember Dark", bg: "bg-amber-600", border: "border-amber-500", desc: "Anodized Black with Burnt Copper & Amber Glow" },
-  { id: "arctic", label: "Arctic White", bg: "bg-sky-400", border: "border-sky-400", desc: "Frost White & Sky Blue Accents" },
-  { id: "synthwave", label: "Synthwave", bg: "bg-fuchsia-500", border: "border-fuchsia-500", desc: "Cyberpunk Neon Violet & Cyan" },
-  { id: "stealth", label: "Stealth Black", bg: "bg-zinc-800", border: "border-zinc-600", desc: "Matte Black & Industrial Gold" },
+const THEMES: {
+  id: ColorTheme;
+  label: string;
+  dotColor: string;
+  dotMod: string;
+  dotAccent: string;
+  border: string;
+  desc: string;
+}[] = [
+  {
+    id: "ember",
+    label: "Ember Dark",
+    dotColor: "#18181c",
+    dotMod: "#121215",
+    dotAccent: "#ea580c",
+    border: "border-amber-500",
+    desc: "Burnt copper & industrial amber glow",
+  },
+  {
+    id: "arctic",
+    label: "Arctic Frost",
+    dotColor: "#f8fafc",
+    dotMod: "#e2e8f0",
+    dotAccent: "#0284c7",
+    border: "border-sky-400",
+    desc: "Frost white & oceanic cyan accents",
+  },
+  {
+    id: "botanical",
+    label: "GMK Botanical",
+    dotColor: "#e2e8f0",
+    dotMod: "#1e3a2f",
+    dotAccent: "#10b981",
+    border: "border-emerald-500",
+    desc: "Forest sage green with succulent mint",
+  },
+  {
+    id: "olivia",
+    label: "GMK Olivia",
+    dotColor: "#fdf2f8",
+    dotMod: "#18181b",
+    dotAccent: "#f43f5e",
+    border: "border-rose-500",
+    desc: "Rose gold and soft blush pink keycaps",
+  },
+  {
+    id: "synthwave",
+    label: "Synthwave 80s",
+    dotColor: "#20163b",
+    dotMod: "#170f2d",
+    dotAccent: "#d946ef",
+    border: "border-fuchsia-500",
+    desc: "Cyberpunk neon violet & vibrant cyan",
+  },
+  {
+    id: "stealth",
+    label: "Stealth Black",
+    dotColor: "#0d0d0f",
+    dotMod: "#08080a",
+    dotAccent: "#eab308",
+    border: "border-zinc-500",
+    desc: "Matte black with industrial brass gold",
+  },
+  {
+    id: "cafe",
+    label: "GMK Café",
+    dotColor: "#fef3c7",
+    dotMod: "#38220f",
+    dotAccent: "#b45309",
+    border: "border-amber-700",
+    desc: "Warm dark espresso with creamy latte",
+  },
+  {
+    id: "nautilus",
+    label: "GMK Nautilus",
+    dotColor: "#06b6d4",
+    dotMod: "#0f172a",
+    dotAccent: "#eab308",
+    border: "border-cyan-500",
+    desc: "Deep ocean midnight navy with yellow",
+  },
+  {
+    id: "laser",
+    label: "GMK Laser",
+    dotColor: "#3b82f6",
+    dotMod: "#581c87",
+    dotAccent: "#ec4899",
+    border: "border-pink-500",
+    desc: "Cyber cobalt blue with neon magenta",
+  },
+  {
+    id: "dracula",
+    label: "Dracula Gothic",
+    dotColor: "#f8fafc",
+    dotMod: "#1e1e2e",
+    dotAccent: "#bd93f9",
+    border: "border-purple-400",
+    desc: "Gotham dark slate with vampire lilac",
+  },
+  {
+    id: "retro",
+    label: "Retro 1984",
+    dotColor: "#f5f5f4",
+    dotMod: "#78716c",
+    dotAccent: "#dc2626",
+    border: "border-stone-400",
+    desc: "IBM Model M beige & industrial red",
+  },
+  {
+    id: "apollo",
+    label: "Space Apollo",
+    dotColor: "#cbd5e1",
+    dotMod: "#1e293b",
+    dotAccent: "#f97316",
+    border: "border-orange-500",
+    desc: "NASA lunar graphite with safety orange",
+  },
 ];
 
 const SWITCH_TYPES: { id: SwitchType; label: string; desc: string }[] = [
@@ -856,30 +968,41 @@ function StudioPanel() {
                 <>
                   {/* Basic: Theme Presets */}
                   <div className="bg-[#13111f]/90 border border-[#2a2640]/60 rounded-2xl p-4 shadow-lg">
-                    <div className="flex items-center gap-2 mb-3.5">
-                      <Palette size={14} className="text-orange-400" />
-                      <span className="text-xs font-black text-white tracking-wider uppercase">
-                        Theme Presets
-                      </span>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Palette size={14} className="text-orange-400" />
+                        <span className="text-xs font-black text-white tracking-wider uppercase">
+                          Theme Presets
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-mono font-medium">{THEMES.length} Presets</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {THEMES.map((th) => (
-                        <button
-                          key={th.id}
-                          onClick={() => setColorTheme(th.id)}
-                          className={`flex flex-col gap-1 p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                            colorTheme === th.id
-                              ? `${th.border} bg-white/10 text-white shadow-xs ring-1 ring-${th.border.split('-')[1]}-500/50`
-                              : "border-white/10 bg-black/40 text-gray-400 hover:border-white/30 hover:bg-white/5"
-                          }`}
-                        >
-                          <div className="flex justify-between items-center w-full">
-                            <span className="text-[11px] font-bold truncate flex-grow">{th.label}</span>
-                            <span className={`w-3 h-3 rounded-full shrink-0 ${th.bg}`} />
-                          </div>
-                          <span className="text-[9px] text-gray-500 line-clamp-2">{th.desc}</span>
-                        </button>
-                      ))}
+
+                    <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto no-scrollbar pr-0.5">
+                      {THEMES.map((th) => {
+                        const isSelected = colorTheme === th.id;
+                        return (
+                          <button
+                            key={th.id}
+                            onClick={() => setColorTheme(th.id)}
+                            className={`flex flex-col gap-1 p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                              isSelected
+                                ? `${th.border} bg-orange-500/10 text-white shadow-md ring-1 ring-orange-500/50`
+                                : "border-white/10 bg-black/40 text-gray-400 hover:border-white/25 hover:bg-white/5"
+                            }`}
+                          >
+                            <div className="flex justify-between items-center w-full">
+                              <span className="text-[11px] font-bold text-white truncate flex-grow mr-1">{th.label}</span>
+                              <div className="flex items-center -space-x-1 shrink-0">
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: th.dotColor }} />
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: th.dotMod }} />
+                                <span className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-xs" style={{ backgroundColor: th.dotAccent }} />
+                              </div>
+                            </div>
+                            <span className="text-[9px] text-gray-400 line-clamp-1">{th.desc}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -930,7 +1053,7 @@ function StudioPanel() {
                         <span className="text-[9px] text-gray-500">1-Click Apply</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto no-scrollbar pr-0.5">
+                      <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto no-scrollbar pr-0.5">
                         {SWITCH_COLOR_PRESETS.map((preset) => {
                           const isSelected = 
                             customColors.switchStem.toLowerCase() === preset.stem.toLowerCase() &&
@@ -945,20 +1068,20 @@ function StudioPanel() {
                                 setCustomColor("switchTopHousing", preset.topHousing);
                                 setCustomColor("switchSpring", preset.spring);
                               }}
-                              className={`p-2 rounded-xl border text-left transition cursor-pointer flex flex-col gap-1 ${
+                              className={`p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between min-h-[54px] ${
                                 isSelected
-                                  ? "border-orange-500 bg-orange-500/15 shadow-xs"
-                                  : "border-white/10 bg-black/40 hover:border-white/30"
+                                  ? "border-orange-500 bg-orange-500/15 shadow-xs ring-1 ring-orange-500/50"
+                                  : "border-white/10 bg-black/40 hover:border-white/30 hover:bg-white/5"
                               }`}
                             >
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-bold text-white truncate">{preset.name}</span>
-                                <div className="flex items-center gap-0.5 shrink-0">
-                                  <span className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: preset.housing }} title="Base" />
-                                  <span className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: preset.stem }} title="Stem" />
+                              <div className="flex items-center justify-between w-full mb-0.5">
+                                <span className="text-[10.5px] font-bold text-white truncate mr-1">{preset.name}</span>
+                                <div className="flex items-center -space-x-1 shrink-0">
+                                  <span className="w-2.5 h-2.5 rounded-full border border-black/40" style={{ backgroundColor: preset.housing }} title="Base Housing" />
+                                  <span className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-xs" style={{ backgroundColor: preset.stem }} title="Stem Slider" />
                                 </div>
                               </div>
-                              <span className="text-[8px] text-gray-400 line-clamp-1">{preset.desc}</span>
+                              <span className="text-[8.5px] text-gray-400 line-clamp-1 leading-tight">{preset.desc}</span>
                             </button>
                           );
                         })}
