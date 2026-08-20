@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { SwitchType } from './utils/audio';
+import type { SwitchType } from './utils/audio';
+export type { SwitchType } from './utils/audio';
 
 export type ColorTheme =
   | 'ember'

@@ -19,7 +19,7 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-export type SwitchType = 'linear' | 'clicky' | 'silent';
+export type SwitchType = 'linear' | 'tactile' | 'clicky' | 'silent';
 
 export function playSwitchSound(type: SwitchType = 'linear', pitchVariation: number = 0) {
   try {
@@ -29,7 +29,38 @@ export function playSwitchSound(type: SwitchType = 'linear', pitchVariation: num
     const now = ctx.currentTime;
     const randPitch = (Math.random() - 0.5) * 0.15 + pitchVariation;
 
-    if (type === 'clicky') {
+    if (type === 'tactile') {
+      // Holy Panda / Boba U4T tactile bump + deep resonant bottom-out
+      const bumpOsc = ctx.createOscillator();
+      const bumpGain = ctx.createGain();
+      bumpOsc.type = 'triangle';
+      bumpOsc.frequency.setValueAtTime(680 * (1 + randPitch), now);
+      bumpOsc.frequency.exponentialRampToValueAtTime(160, now + 0.025);
+
+      bumpGain.gain.setValueAtTime(0.28, now);
+      bumpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+      bumpOsc.connect(bumpGain);
+      bumpGain.connect(ctx.destination);
+      bumpOsc.start(now);
+      bumpOsc.stop(now + 0.03);
+
+      // Deep marbly bottom-out
+      const thockOsc = ctx.createOscillator();
+      const thockGain = ctx.createGain();
+      thockOsc.type = 'sine';
+      thockOsc.frequency.setValueAtTime(210 * (1 + randPitch), now + 0.008);
+      thockOsc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+
+      thockGain.gain.setValueAtTime(0.35, now + 0.008);
+      thockGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+      thockOsc.connect(thockGain);
+      thockGain.connect(ctx.destination);
+      thockOsc.start(now + 0.008);
+      thockOsc.stop(now + 0.09);
+
+    } else if (type === 'clicky') {
       // High-pitched tactile mechanical click (Blue Switch)
       // 1. High click burst
       const clickOsc = ctx.createOscillator();

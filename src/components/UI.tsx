@@ -1249,7 +1249,10 @@ function StudioPanel() {
                             : "border-white/10 bg-black/40 text-gray-400 hover:border-white/30"
                         }`}
                       >
-                        <span className={`w-3 h-3 rounded-full ${th.bg}`} />
+                        <div className="flex -space-x-1 shrink-0">
+                          <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotColor }} />
+                          <div className="w-2.5 h-2.5 rounded-full border border-white/20" style={{ backgroundColor: th.dotAccent }} />
+                        </div>
                         <span className="truncate">{th.label}</span>
                         {colorTheme === th.id && (
                           <Check size={12} className="ml-auto text-orange-400 shrink-0" />
