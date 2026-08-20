@@ -78,7 +78,101 @@ interface KeycapItemProps {
   onRelease: (code: string) => void;
 }
 
-/* ─── REALISTIC SCULPTED CHERRY PROFILE KEYCAP ─── */
+/**
+ * Creates a single, seamless, authentic Cherry/OEM profile truncated pyramid keycap.
+ * No stepped ledges or chicklet borders - pure sloped mechanical keycap geometry.
+ */
+function createCherryKeycapGeometry(width: number, depth: number, height: number = 0.50) {
+  const wBottom = width - 0.05;
+  const dBottom = depth - 0.05;
+  const wTop = width - 0.22;
+  const dTop = depth - 0.20;
+
+  const hw0 = wBottom / 2;
+  const hd0 = dBottom / 2;
+  const hw1 = wTop / 2;
+  const hd1 = dTop / 2;
+
+  const positions = new Float32Array([
+    // Top face (y = height)
+    -hw1, height, -hd1,
+     hw1, height, -hd1,
+     hw1, height,  hd1,
+    -hw1, height,  hd1,
+
+    // Front face
+    -hw0, 0,  hd0,
+     hw0, 0,  hd0,
+     hw1, height,  hd1,
+    -hw1, height,  hd1,
+
+    // Back face
+     hw0, 0, -hd0,
+    -hw0, 0, -hd0,
+    -hw1, height, -hd1,
+     hw1, height, -hd1,
+
+    // Left face
+    -hw0, 0, -hd0,
+    -hw0, 0,  hd0,
+    -hw1, height,  hd1,
+    -hw1, height, -hd1,
+
+    // Right face
+     hw0, 0,  hd0,
+     hw0, 0, -hd0,
+     hw1, height, -hd1,
+     hw1, height,  hd1,
+
+    // Bottom face (y = 0)
+    -hw0, 0,  hd0,
+    -hw0, 0, -hd0,
+     hw0, 0, -hd0,
+     hw0, 0,  hd0,
+  ]);
+
+  // UV mapping: Top face receives full texture with legends; side faces sample top edge
+  const uvs = new Float32Array([
+    // Top face
+    0, 1,
+    1, 1,
+    1, 0,
+    0, 0,
+
+    // Front face
+    0, 0,  1, 0,  1, 0.05,  0, 0.05,
+
+    // Back face
+    0, 0,  1, 0,  1, 0.05,  0, 0.05,
+
+    // Left face
+    0, 0,  1, 0,  1, 0.05,  0, 0.05,
+
+    // Right face
+    0, 0,  1, 0,  1, 0.05,  0, 0.05,
+
+    // Bottom face
+    0, 0,  1, 0,  1, 0.05,  0, 0.05,
+  ]);
+
+  const indices = [
+    0, 1, 2,  0, 2, 3,        // Top
+    4, 5, 6,  4, 6, 7,        // Front
+    8, 9, 10, 8, 10, 11,      // Back
+    12, 13, 14, 12, 14, 15,   // Left
+    16, 17, 18, 16, 18, 19,   // Right
+    20, 21, 22, 20, 22, 23,   // Bottom
+  ];
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/* ─── REALISTIC CHERRY PROFILE MECHANICAL KEYCAP ─── */
 function KeycapItem({
   keyInfo,
   theme,
@@ -107,31 +201,18 @@ function KeycapItem({
     );
   }, [theme, keyInfo.label, keyInfo.subLabel, keyInfo.type, isPressed, customColors]);
 
-  const topDishMaterial = useMemo(() => {
+  const keycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.42,
-      metalness: 0.05,
+      roughness: 0.44,
+      metalness: 0.04,
     });
   }, [texture]);
 
-  const skirtColor = useMemo(() => {
-    if (keyInfo.label === 'ESC' || (keyInfo.type === 'accent' && keyInfo.label !== 'ENTER' && keyInfo.label !== 'FN')) {
-      return customColors.keycapsAccent || '#ea580c';
-    }
-    if (keyInfo.type === 'modifier' || keyInfo.type === 'special' || keyInfo.type === 'space' || keyInfo.type === 'knob') {
-      return customColors.keycapsMod || '#121215';
-    }
-    return customColors.keycapsAlpha || '#18181c';
-  }, [keyInfo.type, keyInfo.label, customColors]);
-
-  const skirtMaterial = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
-      color: isPressed ? '#27272a' : skirtColor,
-      roughness: 0.44,
-      metalness: 0.05,
-    });
-  }, [skirtColor, isPressed]);
+  // Seamless truncated pyramid mechanical keycap geometry
+  const geometry = useMemo(() => {
+    return createCherryKeycapGeometry(keyInfo.width, keyInfo.depth, 0.50);
+  }, [keyInfo.width, keyInfo.depth]);
 
   // Cherry sculpt profile row tilts
   const rowTilt = useMemo(() => {
@@ -154,37 +235,13 @@ function KeycapItem({
     }
   });
 
-  const w = keyInfo.width;
-  const d = keyInfo.depth;
-
   return (
     <group position={[keyInfo.x, 0, keyInfo.z]}>
       <group ref={keycapRef} position={[0, 0.2, 0]} rotation={[rowTilt, 0, 0]}>
-        {/* 1. Base Skirt (Lower wide foundation) */}
-        <RoundedBox
-          args={[w - 0.06, 0.16, d - 0.06]}
-          radius={0.03}
-          smoothness={2}
-          material={skirtMaterial}
-          position={[0, 0.08, 0]}
-        />
-
-        {/* 2. Tapered Upper Body (Inward sloping Cherry profile side walls) */}
-        <RoundedBox
-          args={[w - 0.16, 0.24, d - 0.16]}
-          radius={0.04}
-          smoothness={2}
-          material={skirtMaterial}
-          position={[0, 0.24, 0]}
-        />
-
-        {/* 3. Top Sculpted Concave Dish with Laser-Etched Texture */}
-        <RoundedBox
-          args={[w - 0.18, 0.06, d - 0.18]}
-          radius={0.03}
-          smoothness={2}
-          material={topDishMaterial}
-          position={[0, 0.38, 0]}
+        {/* Seamless Authentic Mechanical Keycap Mesh */}
+        <mesh
+          geometry={geometry}
+          material={keycapMaterial}
           onPointerDown={(e) => {
             e.stopPropagation();
             onPress(keyInfo.code);
@@ -195,11 +252,11 @@ function KeycapItem({
           }}
         />
 
-        {/* 4. Bottom Cross Stem Mount Socket */}
+        {/* Underside Switch Stem Socket */}
         <Cylinder
-          args={[0.18, 0.18, 0.12, 12]}
-          position={[0, -0.04, 0]}
-          material={skirtMaterial}
+          args={[0.16, 0.16, 0.14, 12]}
+          position={[0, 0.06, 0]}
+          material={new THREE.MeshStandardMaterial({ color: "#18181b", roughness: 0.5 })}
         />
       </group>
     </group>

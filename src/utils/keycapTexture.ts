@@ -145,55 +145,48 @@ export function getKeycapTexture(
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
-  // 1. Solid Matte PBT Body
+  // 1. Solid Matte PBT Body (Uniform, realistic micro-textured plastic)
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, 512, 512);
 
-  // 2. Realistic Cylindrical/Spherical Dish Lighting
-  const dishGrad = ctx.createRadialGradient(256, 230, 20, 256, 256, 320);
-  dishGrad.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
-  dishGrad.addColorStop(0.55, 'rgba(255, 255, 255, 0.01)');
-  dishGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.15)');
-  dishGrad.addColorStop(1, 'rgba(0, 0, 0, 0.40)');
-  ctx.fillStyle = dishGrad;
+  // 2. Subtle Vertical Dish Lighting Gradient (Never distorts horizontally on wide keys!)
+  const vertGrad = ctx.createLinearGradient(0, 0, 0, 512);
+  vertGrad.addColorStop(0, 'rgba(255, 255, 255, 0.09)');
+  vertGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.02)');
+  vertGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.08)');
+  vertGrad.addColorStop(1, 'rgba(0, 0, 0, 0.28)');
+  ctx.fillStyle = vertGrad;
   ctx.fillRect(0, 0, 512, 512);
 
-  // 3. Subtle Chamfered Edge Highlight
-  const topLip = ctx.createLinearGradient(0, 0, 0, 48);
-  topLip.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
-  topLip.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-  ctx.fillStyle = topLip;
-  ctx.fillRect(10, 10, 492, 36);
+  // 3. Subtle Chamfered Inset Border
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(8, 8, 496, 496);
 
-  // 4. Subtle Inset Border
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(12, 12, 488, 488);
-
-  // 5. Spacebar Glowing Accent Line (Matching reference image)
+  // 4. Spacebar Glowing Accent Line (Matching reference image)
   if (type === 'space' || label === '') {
     ctx.fillStyle = colors.accentGlow || '#f97316';
     ctx.shadowColor = colors.accentGlow || '#f97316';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(200, 250, 112, 12);
+    ctx.shadowBlur = 12;
+    ctx.fillRect(180, 248, 152, 16);
     ctx.shadowBlur = 0;
   }
 
-  // 6. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
+  // 5. Dual Legends (Number row: ! @ # $ % ^ & * ( ) _ +)
   if (subLabel) {
-    ctx.font = 'bold 74px "Segoe UI", system-ui, -apple-system, sans-serif';
+    ctx.font = 'bold 72px "Segoe UI", system-ui, -apple-system, sans-serif';
     ctx.fillStyle = textColor;
     ctx.globalAlpha = 0.70;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText(subLabel, 68, 68);
+    ctx.fillText(subLabel, 64, 64);
 
     // Main Number
     ctx.font = 'bold 96px "Segoe UI", system-ui, -apple-system, sans-serif';
     ctx.globalAlpha = 0.95;
-    ctx.fillText(label, 68, 260);
+    ctx.fillText(label, 64, 260);
   } else if (label) {
-    // 7. Single Legends (Letters, Modifiers, Function keys)
+    // 6. Single Legends (Letters, Modifiers, Function keys)
     ctx.globalAlpha = 0.95;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
